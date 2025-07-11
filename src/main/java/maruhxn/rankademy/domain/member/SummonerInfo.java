@@ -4,7 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import lombok.*;
-import maruhxn.rankademy.domain.member.dto.CertifySummonerInfoRequest;
 import maruhxn.rankademy.domain.shared.AbstractEntity;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
@@ -51,18 +50,18 @@ public class SummonerInfo extends AbstractEntity {
         this.enrolledAt = enrolledAt;
     }
 
-    static SummonerInfo from(CertifySummonerInfoRequest certifySummonerInfoRequest) {
+    public static SummonerInfo create(String puuid, String summonerName, String summonerTag, int summonerIconNum, TierInfo tierInfo, double winRate) {
         return SummonerInfo.builder()
-                .puuid(requireNonNull(certifySummonerInfoRequest.puuid()))
-                .summonerName(requireNonNull(certifySummonerInfoRequest.summonerName()))
-                .summonerTag(requireNonNull(certifySummonerInfoRequest.summonerTag()))
-                .summonerIconNum(certifySummonerInfoRequest.summonerIconNum())
+                .puuid(requireNonNull(puuid))
+                .summonerName(requireNonNull(summonerName))
+                .summonerTag(requireNonNull(summonerTag))
+                .summonerIconNum(summonerIconNum)
                 .tierInfo(new TierInfo(
-                        certifySummonerInfoRequest.tier(),
-                        certifySummonerInfoRequest.rank(),
-                        certifySummonerInfoRequest.lp()
+                        tierInfo.tier(),
+                        tierInfo.rank(),
+                        tierInfo.lp()
                 ))
-                .winRate(certifySummonerInfoRequest.winRate())
+                .winRate(winRate)
                 .enrolledAt(LocalDateTime.now())
                 .build();
     }

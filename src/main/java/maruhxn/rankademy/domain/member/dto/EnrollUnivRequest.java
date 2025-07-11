@@ -7,16 +7,13 @@ import jakarta.validation.constraints.Size;
 
 import java.time.Year;
 
-public record CertifyUnivRequest(
+public record EnrollUnivRequest(
         @NotEmpty
         @Size(max = 100)
         String univName,
 
         @Email
         String univMail,
-
-        @NotNull
-        Boolean univVerified,
 
         @NotNull
         Boolean inCollege,
@@ -28,7 +25,7 @@ public record CertifyUnivRequest(
         @Size(min = 1, max = 100)
         String major
 ) {
-    public CertifyUnivRequest {
+    public EnrollUnivRequest {
         int currentYear = Year.now().getValue();
         if (admissionYear > currentYear) {
             throw new IllegalArgumentException("입학년도가 올바르지 않습니다: " + admissionYear);

@@ -2,8 +2,8 @@ package maruhxn.rankademy.domain.member;
 
 import jakarta.persistence.*;
 import lombok.*;
-import maruhxn.rankademy.domain.member.dto.CertifySummonerInfoRequest;
-import maruhxn.rankademy.domain.member.dto.CertifyUnivRequest;
+import maruhxn.rankademy.domain.member.dto.EnrollUnivRequest;
+import maruhxn.rankademy.domain.member.dto.MemberProfileUpdateRequest;
 import maruhxn.rankademy.domain.member.dto.MemberRegisterRequest;
 import maruhxn.rankademy.domain.shared.AbstractEntity;
 import org.hibernate.annotations.NaturalId;
@@ -21,7 +21,7 @@ import static java.util.Objects.requireNonNull;
 @NaturalIdCache
 public class Member extends AbstractEntity {
 
-    @Column(unique = true)
+    @Column(unique = true, length = 20)
     private String username;
 
     @NaturalId
@@ -87,33 +87,57 @@ public class Member extends AbstractEntity {
 
     public boolean isAuthorized() {
         Assert.state(authStatus == MemberAuthStatus.UNAUTHORIZED, "이미 인증처리가 완료되었습니다.");
-        Assert.state(univInfo != null, "학교 인증을 완료해주세요");
-        Assert.state(summonerInfo != null, "소환사 정보를 등록해주세요");
 
-        if (univInfo != null && summonerInfo != null) {
-            authStatus = MemberAuthStatus.AUTHORIZED;
+        if ((univInfo == null || !univInfo.univVerified()) ||
+                summonerInfo == null) {
+            authStatus = MemberAuthStatus.UNAUTHORIZED;
+            return false;
         }
 
-        return authStatus == MemberAuthStatus.AUTHORIZED;
+        authStatus = MemberAuthStatus.AUTHORIZED;
+        return true;
     }
 
-    public void completeUniversityAuthentication(CertifyUnivRequest certifyUnivRequest) {
-        Assert.state(authStatus == MemberAuthStatus.UNAUTHORIZED, "이미 인증처리가 완료되었습니다.");
-        this.univInfo = UnivInfo.from(certifyUnivRequest);
+
+    public void enrollUnivInfo(EnrollUnivRequest enrollUnivRequest) {
+        if (this.univInfo == null) {
+            this.univInfo = UnivInfo.from(enrollUnivRequest);
+            return;
+        }
+
+        boolean isEmailChanged = !this.univInfo.univMail().address().equals(enrollUnivRequest.univMail());
+
+        if (isEmailChanged) { // 이메일이 바뀌었으면 학생 재인증 필요
+            this.authStatus = MemberAuthStatus.UNAUTHORIZED;
+            this.univInfo = UnivInfo.from(enrollUnivRequest);
+        } else {
+            this.univInfo = this.univInfo.update(enrollUnivRequest);
+        }
     }
 
-    public void removeUniversityAuthentication() {
+    public void completeUnivAuthentication() {
+        Assert.state(this.univInfo != null, "학교 정보를 등록해주세요.");
+        Assert.state(!this.univInfo.univVerified(), "이미 학교 인증이 완료되었습니다.");
+        this.univInfo = this.univInfo.authenticate();
+    }
+
+    public void removeUnivInfo() {
         this.univInfo = null;
-        this.authStatus = MemberAuthStatus.UNAUTHORIZED;
     }
 
-    public void completeRiotAuthentication(CertifySummonerInfoRequest certifySummonerInfoRequest) {
-        Assert.state(authStatus == MemberAuthStatus.UNAUTHORIZED, "이미 인증처리가 완료되었습니다.");
-        this.summonerInfo = SummonerInfo.from(certifySummonerInfoRequest);
+    public void completeRiotAuthentication(SummonerInfo summonerInfo) {
+        Assert.state(this.summonerInfo == null, "이미 라이엇 계정이 연동되었습니다.");
+        this.summonerInfo = summonerInfo;
     }
 
     public void removeRiotAuthentication() {
         this.summonerInfo = null;
-        this.authStatus = MemberAuthStatus.UNAUTHORIZED;
+    }
+
+    public void updateProfile(MemberProfileUpdateRequest memberProfileUpdateRequest) {
+        this.username = memberProfileUpdateRequest.username();
+        this.description = memberProfileUpdateRequest.description();
+        this.mainPosition = memberProfileUpdateRequest.mainPosition();
+        this.subPosition = memberProfileUpdateRequest.subPosition();
     }
 }

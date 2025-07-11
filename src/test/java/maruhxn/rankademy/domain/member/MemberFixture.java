@@ -1,7 +1,6 @@
 package maruhxn.rankademy.domain.member;
 
-import maruhxn.rankademy.domain.member.dto.CertifySummonerInfoRequest;
-import maruhxn.rankademy.domain.member.dto.CertifyUnivRequest;
+import maruhxn.rankademy.domain.member.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.member.dto.MemberRegisterRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -35,27 +34,28 @@ public class MemberFixture {
         return member;
     }
 
-    public static CertifyUnivRequest createCertifyUnivRequest() {
-        return new CertifyUnivRequest(
-                "서울과학기술대학교",
-                "test@seoultech.ac.kr",
-                true,
+    public static EnrollUnivRequest createCertifyUnivRequest() {
+        return createCertifyUnivRequest("서울과학기술대학교", "test@seoultech.ac.kr");
+    }
+
+    public static EnrollUnivRequest createCertifyUnivRequest(String univname, String univMail) {
+        return new EnrollUnivRequest(
+                univname,
+                univMail,
                 true,
                 2020,
                 "컴퓨터공학과"
         );
     }
 
-    public static CertifySummonerInfoRequest createCertifySummonerInfoRequest() {
-        return new CertifySummonerInfoRequest(
-                "puuid",
+    public static SummonerInfo createSummonerInfo() {
+        return SummonerInfo.create(
+                "test-puuid",
                 "maruhxn",
                 "KOR",
-                1234,
-                "CHALLENGER",
-                "I",
-                100,
-                0.55
+                123,
+                new TierInfo("CHALLENGER", "I", 0),
+                50.0
         );
     }
 }
