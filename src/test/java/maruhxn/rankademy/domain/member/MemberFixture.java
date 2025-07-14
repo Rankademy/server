@@ -31,7 +31,11 @@ public class MemberFixture {
     }
 
     public static SummonerInfoConnector createSummonerInfoConnector() {
-        return request -> SummonerInfo.create(
+        return MemberFixture::createSummonerInfo;
+    }
+
+    public static SummonerInfo createSummonerInfo(RiotAuthRequest request) {
+        return SummonerInfo.create(
                 "test-puuid",
                 request.summonerName(),
                 request.summonerTag(),

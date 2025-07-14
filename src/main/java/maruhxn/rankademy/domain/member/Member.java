@@ -53,7 +53,7 @@ public class Member extends AbstractEntity {
     })
     private UnivInfo univInfo;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "summoner_info_id")
     private SummonerInfo summonerInfo;
 

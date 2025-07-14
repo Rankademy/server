@@ -2,6 +2,7 @@ package maruhxn.rankademy.domain.member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import maruhxn.rankademy.domain.member.dto.RiotLeagueEntryResponse;
 
 @Embeddable
 public record TierInfo(
@@ -20,5 +21,9 @@ public record TierInfo(
             rank = null;
             lp = 0;
         }
+    }
+
+    static TierInfo from(RiotLeagueEntryResponse soloRankEntry) {
+        return new TierInfo(soloRankEntry.tier(), soloRankEntry.rank(), soloRankEntry.leaguePoints());
     }
 }

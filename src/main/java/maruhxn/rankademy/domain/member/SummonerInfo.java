@@ -4,11 +4,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import lombok.*;
+import maruhxn.rankademy.domain.member.dto.RiotAuthRequest;
+import maruhxn.rankademy.domain.member.dto.RiotLeagueEntryResponse;
+import maruhxn.rankademy.domain.member.dto.RiotSummonerResponse;
 import maruhxn.rankademy.domain.shared.AbstractEntity;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
@@ -37,6 +41,9 @@ public class SummonerInfo extends AbstractEntity {
 
     private double winRate;
 
+    // TODO: AttributeConverter
+    private List<String> mostChampions;
+
     private LocalDateTime enrolledAt;
 
     @Builder
@@ -62,6 +69,21 @@ public class SummonerInfo extends AbstractEntity {
                         tierInfo.lp()
                 ))
                 .winRate(winRate)
+                .enrolledAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static SummonerInfo of(String puuid, RiotAuthRequest riotAuthRequest, RiotSummonerResponse riotSummonerResponse, RiotLeagueEntryResponse soloRankEntry) {
+        int totalWins = soloRankEntry.wins();
+        int totalMatches = soloRankEntry.wins() + soloRankEntry.losses();
+
+        return SummonerInfo.builder()
+                .puuid(requireNonNull(puuid))
+                .summonerName(riotAuthRequest.summonerName())
+                .summonerTag(riotAuthRequest.summonerTag())
+                .summonerIconNum(riotSummonerResponse.profileIconId())
+                .tierInfo(TierInfo.from(soloRankEntry))
+                .winRate((double) totalWins / totalMatches * 100)
                 .enrolledAt(LocalDateTime.now())
                 .build();
     }

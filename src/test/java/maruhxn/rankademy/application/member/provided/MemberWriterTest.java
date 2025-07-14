@@ -1,8 +1,7 @@
-package maruhxn.rankademy.application.member;
+package maruhxn.rankademy.application.member.provided;
 
 import jakarta.persistence.EntityManager;
 import maruhxn.rankademy.RankademyTestConfiguration;
-import maruhxn.rankademy.application.member.provided.MemberWriter;
 import maruhxn.rankademy.application.member.required.EmailSender;
 import maruhxn.rankademy.application.member.required.MemberRepository;
 import maruhxn.rankademy.domain.member.LolPosition;
