@@ -2,6 +2,8 @@ package maruhxn.rankademy.domain.member;
 
 import maruhxn.rankademy.domain.member.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.member.dto.MemberRegisterRequest;
+import maruhxn.rankademy.domain.member.dto.RiotAuthRequest;
+import maruhxn.rankademy.domain.member.service.SummonerInfoConnector;
 import org.springframework.test.util.ReflectionTestUtils;
 
 public class MemberFixture {
@@ -28,17 +30,28 @@ public class MemberFixture {
         };
     }
 
+    public static SummonerInfoConnector createSummonerInfoConnector() {
+        return request -> SummonerInfo.create(
+                "test-puuid",
+                request.summonerName(),
+                request.summonerTag(),
+                12345,
+                new TierInfo("BRONZE", "II", 50),
+                50.0
+        );
+    }
+
     public static Member createMember(Long id) {
         Member member = Member.register(createMemberRegisterRequest(), createPasswordEncoder());
         ReflectionTestUtils.setField(member, "id", id);
         return member;
     }
 
-    public static EnrollUnivRequest createCertifyUnivRequest() {
-        return createCertifyUnivRequest("서울과학기술대학교", "test@seoultech.ac.kr");
+    public static EnrollUnivRequest createEnrollUnivRequest() {
+        return createEnrollUnivRequest("서울과학기술대학교", "test@seoultech.ac.kr");
     }
 
-    public static EnrollUnivRequest createCertifyUnivRequest(String univname, String univMail) {
+    public static EnrollUnivRequest createEnrollUnivRequest(String univname, String univMail) {
         return new EnrollUnivRequest(
                 univname,
                 univMail,
@@ -48,14 +61,7 @@ public class MemberFixture {
         );
     }
 
-    public static SummonerInfo createSummonerInfo() {
-        return SummonerInfo.create(
-                "test-puuid",
-                "maruhxn",
-                "KOR",
-                123,
-                new TierInfo("CHALLENGER", "I", 0),
-                50.0
-        );
+    public static RiotAuthRequest createRiotAuthRequest() {
+        return new RiotAuthRequest("maruhxn", "KOR");
     }
 }

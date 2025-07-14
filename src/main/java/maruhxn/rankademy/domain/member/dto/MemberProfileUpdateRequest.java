@@ -15,6 +15,5 @@ public record MemberProfileUpdateRequest(
 
         @NotNull
         LolPosition subPosition
-
 ) {
 }

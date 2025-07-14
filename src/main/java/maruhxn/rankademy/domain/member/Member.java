@@ -5,12 +5,15 @@ import lombok.*;
 import maruhxn.rankademy.domain.member.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.member.dto.MemberProfileUpdateRequest;
 import maruhxn.rankademy.domain.member.dto.MemberRegisterRequest;
+import maruhxn.rankademy.domain.member.dto.RiotAuthRequest;
+import maruhxn.rankademy.domain.member.service.SummonerInfoConnector;
 import maruhxn.rankademy.domain.shared.AbstractEntity;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
@@ -53,6 +56,9 @@ public class Member extends AbstractEntity {
     @OneToOne
     @JoinColumn(name = "summoner_info_id")
     private SummonerInfo summonerInfo;
+
+    // TODO: AttributeConverter
+    private List<String> titles;
 
     @Builder
     public Member(String username, Email email, String passwordHash, MemberAuthStatus authStatus, String description, LocalDateTime joinedAt, LolPosition mainPosition, LolPosition subPosition, Role role) {
@@ -125,9 +131,9 @@ public class Member extends AbstractEntity {
         this.univInfo = null;
     }
 
-    public void completeRiotAuthentication(SummonerInfo summonerInfo) {
+    public void connectSummonerInfo(SummonerInfoConnector summonerInfoConnector, RiotAuthRequest riotAuthRequest) {
         Assert.state(this.summonerInfo == null, "이미 라이엇 계정이 연동되었습니다.");
-        this.summonerInfo = summonerInfo;
+        this.summonerInfo = summonerInfoConnector.connect(riotAuthRequest);
     }
 
     public void removeRiotAuthentication() {

@@ -56,9 +56,9 @@ class MemberTest {
     @DisplayName("학교 및 라이엇 계정 인증 완료 시 최종 인증에 성공한다")
     void isAuthorized_Success() {
         // given
-        member.enrollUnivInfo(createCertifyUnivRequest());
+        member.enrollUnivInfo(createEnrollUnivRequest());
         member.completeUnivAuthentication();
-        member.completeRiotAuthentication(createSummonerInfo());
+        member.connectSummonerInfo(createSummonerInfoConnector(), createRiotAuthRequest());
 
         // when /then
         assertThat(member.isAuthorized()).isTrue();
@@ -69,11 +69,11 @@ class MemberTest {
     @DisplayName("최종 인증에 성공 후, 학교 이메일을 수정하면 인증이 해제된다.")
     void updateUnivInfo_Then_Auth_Fail() {
         // given
-        member.enrollUnivInfo(createCertifyUnivRequest());
+        member.enrollUnivInfo(createEnrollUnivRequest());
         member.completeUnivAuthentication();
-        member.completeRiotAuthentication(createSummonerInfo());
+        member.connectSummonerInfo(createSummonerInfoConnector(), createRiotAuthRequest());
 
-        member.enrollUnivInfo(createCertifyUnivRequest("홍익대학교", "test@hongik.ac.kr"));
+        member.enrollUnivInfo(createEnrollUnivRequest("홍익대학교", "test@hongik.ac.kr"));
 
         // when /then
         assertThat(member.isAuthorized()).isFalse();
@@ -84,10 +84,10 @@ class MemberTest {
     @DisplayName("최종 인증에 성공 후, 학교 이메일 외 다른 정보를 수정하면 인증은 해제되지 않는다.")
     void updateUnivInfo_Then_Keep_Auth() {
         // given
-        var request = createCertifyUnivRequest();
+        var request = createEnrollUnivRequest();
         member.enrollUnivInfo(request);
         member.completeUnivAuthentication();
-        member.completeRiotAuthentication(createSummonerInfo());
+        member.connectSummonerInfo(createSummonerInfoConnector(), createRiotAuthRequest());
 
         member.enrollUnivInfo(new EnrollUnivRequest(
                 request.univName(),
@@ -106,7 +106,7 @@ class MemberTest {
     @DisplayName("학교 인증만 했을 경우 최종 인증에 실패한다")
     void isAuthorized_Fail_When_UnivOnly() {
         // given
-        member.enrollUnivInfo(createCertifyUnivRequest());
+        member.enrollUnivInfo(createEnrollUnivRequest());
         member.completeUnivAuthentication();
 
         // when & then
@@ -117,7 +117,7 @@ class MemberTest {
     @DisplayName("라이엇 계정 인증만 했을 경우 최종 인증에 실패한다")
     void isAuthorized_Fail_When_RiotOnly() {
         // given
-        member.completeRiotAuthentication(createSummonerInfo());
+        member.connectSummonerInfo(createSummonerInfoConnector(), createRiotAuthRequest());
 
         // when & then
         assertThat(member.isAuthorized()).isFalse();
@@ -127,7 +127,7 @@ class MemberTest {
     @DisplayName("학교 정보를 정상적으로 인증(업데이트)한다")
     void enrollUnivInfo() {
         // given
-        EnrollUnivRequest request = createCertifyUnivRequest();
+        EnrollUnivRequest request = createEnrollUnivRequest();
 
         // when
         member.enrollUnivInfo(request);
@@ -141,7 +141,7 @@ class MemberTest {
     @DisplayName("학교 인증 정보를 제거한다")
     void removeUnivInfo() {
         // given
-        member.enrollUnivInfo(createCertifyUnivRequest());
+        member.enrollUnivInfo(createEnrollUnivRequest());
         assertThat(member.getUnivInfo()).isNotNull();
 
         // when
@@ -154,23 +154,23 @@ class MemberTest {
 
     @Test
     @DisplayName("라이엇 소환사 정보를 정상적으로 인증(업데이트)한다")
-    void completeRiotAuthentication() {
+    void connectSummonerInfo() {
         // given
-        var summonerInfo = createSummonerInfo();
+        var request = createRiotAuthRequest();
 
         // when
-        member.completeRiotAuthentication(summonerInfo);
+        member.connectSummonerInfo(createSummonerInfoConnector(), request);
 
         // then
         assertThat(member.getSummonerInfo()).isNotNull();
-        assertThat(member.getSummonerInfo().getSummonerName()).isEqualTo(summonerInfo.getSummonerName());
+        assertThat(member.getSummonerInfo().getSummonerName()).isEqualTo(request.summonerName());
     }
 
     @Test
     @DisplayName("라이엇 소환사 인증 정보를 제거한다")
     void removeRiotAuthentication() {
         // given
-        member.completeRiotAuthentication(createSummonerInfo());
+        member.connectSummonerInfo(createSummonerInfoConnector(), createRiotAuthRequest());
         assertThat(member.getSummonerInfo()).isNotNull();
 
         // when
@@ -185,16 +185,16 @@ class MemberTest {
     @DisplayName("이미 최종 인증된 멤버가 다시 인증을 시도하면 예외가 발생한다")
     void reAuthentication_Fail() {
         // given
-        member.enrollUnivInfo(createCertifyUnivRequest());
+        member.enrollUnivInfo(createEnrollUnivRequest());
         member.completeUnivAuthentication();
-        member.completeRiotAuthentication(createSummonerInfo());
+        member.connectSummonerInfo(createSummonerInfoConnector(), createRiotAuthRequest());
         assertThat(member.isAuthorized()).isTrue();
 
         // when & then
         assertThatThrownBy(() -> member.completeUnivAuthentication())
                 .isInstanceOf(IllegalStateException.class);
 
-        assertThatThrownBy(() -> member.completeRiotAuthentication(createSummonerInfo()))
+        assertThatThrownBy(() -> member.connectSummonerInfo(createSummonerInfoConnector(), createRiotAuthRequest()))
                 .isInstanceOf(IllegalStateException.class);
     }
 
