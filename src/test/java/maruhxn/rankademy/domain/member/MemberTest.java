@@ -217,4 +217,13 @@ class MemberTest {
         assertThat(member.getMainPosition()).isEqualTo(LolPosition.TOP);
         assertThat(member.getSubPosition()).isEqualTo(LolPosition.JG);
     }
+
+    @Test
+    void updateTitles() {
+        member = createMember(1L);
+
+        member.updateTitles(createTitleProvider());
+
+        assertThat(member.getTitles()).hasSize(1);
+    }
 }

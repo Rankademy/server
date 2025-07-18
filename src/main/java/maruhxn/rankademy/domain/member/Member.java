@@ -6,6 +6,7 @@ import maruhxn.rankademy.domain.member.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.member.dto.MemberProfileUpdateRequest;
 import maruhxn.rankademy.domain.member.dto.MemberRegisterRequest;
 import maruhxn.rankademy.domain.member.dto.RiotAuthRequest;
+import maruhxn.rankademy.domain.member.service.MemberTitleProvider;
 import maruhxn.rankademy.domain.member.service.SummonerInfoConnector;
 import maruhxn.rankademy.domain.shared.AbstractEntity;
 import org.hibernate.annotations.NaturalId;
@@ -59,6 +60,10 @@ public class Member extends AbstractEntity {
 
     // TODO: AttributeConverter
     private List<String> titles;
+
+    public List<String> getTitles() {
+        return titles == null ? null : java.util.Collections.unmodifiableList(titles);
+    }
 
     @Builder
     public Member(String username, Email email, String passwordHash, MemberAuthStatus authStatus, String description, LocalDateTime joinedAt, LolPosition mainPosition, LolPosition subPosition, Role role) {
@@ -145,5 +150,11 @@ public class Member extends AbstractEntity {
         this.description = memberProfileUpdateRequest.description();
         this.mainPosition = memberProfileUpdateRequest.mainPosition();
         this.subPosition = memberProfileUpdateRequest.subPosition();
+    }
+
+    public void updateTitles(MemberTitleProvider titleProvider) {
+        Assert.state(this.getId() != null, "ID가 null일 수 없습니다.");
+
+        this.titles = titleProvider.getTitles(this.getId());
     }
 }

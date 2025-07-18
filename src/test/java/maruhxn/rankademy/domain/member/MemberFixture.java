@@ -3,10 +3,12 @@ package maruhxn.rankademy.domain.member;
 import maruhxn.rankademy.domain.member.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.member.dto.MemberRegisterRequest;
 import maruhxn.rankademy.domain.member.dto.RiotAuthRequest;
+import maruhxn.rankademy.domain.member.service.MemberTitleProvider;
 import maruhxn.rankademy.domain.member.service.SummonerInfoConnector;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class MemberFixture {
 
@@ -75,5 +77,9 @@ public class MemberFixture {
 
     public static RiotAuthRequest createRiotAuthRequest() {
         return new RiotAuthRequest("maruhxn", "KOR");
+    }
+
+    public static MemberTitleProvider createTitleProvider() {
+        return memberId -> List.of("DUMMY");
     }
 }
