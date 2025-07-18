@@ -10,8 +10,10 @@ import maruhxn.rankademy.domain.member.dto.RiotAuthRequest;
 import maruhxn.rankademy.domain.member.service.SummonerInfoConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 @Service
+@Validated
 @RequiredArgsConstructor
 public class MemberAuthService implements MemberAuthorizer {
 

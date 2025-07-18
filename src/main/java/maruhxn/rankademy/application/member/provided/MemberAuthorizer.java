@@ -1,5 +1,6 @@
 package maruhxn.rankademy.application.member.provided;
 
+import jakarta.validation.Valid;
 import maruhxn.rankademy.domain.member.Member;
 import maruhxn.rankademy.domain.member.dto.RiotAuthRequest;
 
@@ -9,7 +10,7 @@ public interface MemberAuthorizer {
 
     Member completeUnivAuthentication(Long memberId, int code);
 
-    Member completeRiotAuthentication(Long memberId, RiotAuthRequest riotAuthRequest);
+    Member completeRiotAuthentication(Long memberId, @Valid RiotAuthRequest riotAuthRequest);
 
     Member removeRiotAuthentication(Long memberId);
 
