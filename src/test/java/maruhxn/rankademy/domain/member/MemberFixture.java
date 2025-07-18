@@ -6,6 +6,8 @@ import maruhxn.rankademy.domain.member.dto.RiotAuthRequest;
 import maruhxn.rankademy.domain.member.service.SummonerInfoConnector;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
+
 public class MemberFixture {
 
     public static MemberRegisterRequest createMemberRegisterRequest(String email) {
@@ -35,14 +37,20 @@ public class MemberFixture {
     }
 
     public static SummonerInfo createSummonerInfo(RiotAuthRequest request) {
-        return SummonerInfo.create(
-                "test-puuid",
+        return new SummonerInfo(
+                "MfiVjqqTLQ_XhERTcyHydIdiFmlQhK9zNTfKSel_DECSZHGgTIITI7QmHGGaPDbpjlPVOqAahCtHzA",
                 request.summonerName(),
                 request.summonerTag(),
                 12345,
                 new TierInfo("BRONZE", "II", 50),
-                50.0
+                100,
+                50.0,
+                LocalDateTime.now()
         );
+    }
+
+    public static Member createMember() {
+        return Member.register(createMemberRegisterRequest(), createPasswordEncoder());
     }
 
     public static Member createMember(Long id) {
