@@ -35,6 +35,7 @@ public class MemberModifyService implements MemberWriter {
 
         Member member;
         if (optionalMember.isPresent()) {
+            // TODO: 같은 이메일로 이메일 회원가입을 중복 진행하는 경우 막기.
             member = optionalMember.get();
             member.changePassword(registerRequest.password(), passwordEncoder);
         } else {

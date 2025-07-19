@@ -21,7 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static maruhxn.rankademy.domain.member.MemberFixture.createEnrollUnivRequest;
 import static maruhxn.rankademy.domain.member.MemberFixture.createMemberRegisterRequest;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;

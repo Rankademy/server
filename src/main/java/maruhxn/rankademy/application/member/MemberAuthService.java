@@ -7,6 +7,7 @@ import maruhxn.rankademy.application.member.required.MemberRepository;
 import maruhxn.rankademy.application.member.required.UnivMailCertifier;
 import maruhxn.rankademy.domain.member.Member;
 import maruhxn.rankademy.domain.member.dto.RiotAuthRequest;
+import maruhxn.rankademy.domain.member.exception.RequiredUnivInfoException;
 import maruhxn.rankademy.domain.member.service.SummonerInfoConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,7 @@ public class MemberAuthService implements MemberAuthorizer {
         Member member = memberReader.find(memberId);
 
         if (member.getUnivInfo() == null) {
-            throw new IllegalStateException("학교 정보를 등록해주세요.");
+            throw new RequiredUnivInfoException();
         }
 
         univMailCertifier.sendCertifyMail(

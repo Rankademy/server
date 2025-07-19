@@ -2,9 +2,9 @@ package maruhxn.rankademy.domain.member;
 
 import jakarta.persistence.*;
 import lombok.*;
-import maruhxn.rankademy.domain.match.service.MostChampionCalculator;
 import maruhxn.rankademy.domain.match.ChampionPlayRecord;
 import maruhxn.rankademy.domain.match.MatchData;
+import maruhxn.rankademy.domain.match.service.MostChampionCalculator;
 import maruhxn.rankademy.domain.member.dto.RiotAuthRequest;
 import maruhxn.rankademy.domain.member.dto.RiotLeagueEntryResponse;
 import maruhxn.rankademy.domain.member.dto.RiotSummonerResponse;
