@@ -1,6 +1,6 @@
 package maruhxn.rankademy.adapter.integration;
 
-import maruhxn.rankademy.application.member.required.UnivMailCertifier;
+import maruhxn.rankademy.application.user.required.UnivMailCertifier;
 import org.springframework.context.annotation.Fallback;
 import org.springframework.stereotype.Component;
 

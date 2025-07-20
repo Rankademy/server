@@ -2,9 +2,9 @@ package maruhxn.rankademy.adapter.integration;
 
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.application.match.required.MatchHistoryCollector;
-import maruhxn.rankademy.application.member.required.RiotApiProvider;
+import maruhxn.rankademy.application.user.required.RiotApiProvider;
 import maruhxn.rankademy.domain.match.MatchData;
-import maruhxn.rankademy.domain.member.Member;
+import maruhxn.rankademy.domain.user.User;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -24,14 +24,14 @@ public class RiotApiMatchHistoryCollector implements MatchHistoryCollector {
     private final RiotApiProvider riotApiProvider;
 
     @Override
-    public List<MatchData> collectAllMatches(Member member) {
-        String puuid = member.getSummonerInfo().getPuuid();
-        List<String> allMatchIds = this.getMatchIds(puuid, member.getSummonerInfo().getTotalMatchCnt());
+    public List<MatchData> collectAllMatches(User user) {
+        String puuid = user.getSummonerInfo().getPuuid();
+        List<String> allMatchIds = this.getMatchIds(puuid, user.getSummonerInfo().getTotalMatchCnt());
 
         List<MatchData> matches = new ArrayList<>();
 
         allMatchIds.forEach(matchId -> {
-            MatchData matchInfo = riotApiProvider.getMatchInfo(matchId, member.getId());
+            MatchData matchInfo = riotApiProvider.getMatchInfo(matchId, user.getId());
             matches.add(matchInfo);
         });
 

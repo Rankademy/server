@@ -1,7 +1,7 @@
 package maruhxn.rankademy.adapter.integration;
 
-import maruhxn.rankademy.application.member.required.EmailSender;
-import maruhxn.rankademy.domain.member.Email;
+import maruhxn.rankademy.application.user.required.EmailSender;
+import maruhxn.rankademy.domain.user.Email;
 import org.springframework.context.annotation.Fallback;
 import org.springframework.stereotype.Component;
 

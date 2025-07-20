@@ -37,7 +37,7 @@ class MostChampionCalculatorTest {
 
     @Test
     void calculateMostChampion() {
-        Long memberId = 1L;
+        Long userId = 1L;
         String puuid = UUID.randomUUID().toString();
         List<MatchData> matches = new ArrayList<>();
 
@@ -46,7 +46,7 @@ class MostChampionCalculatorTest {
 
         for (int i = 0; i < 10; i++) {
             MatchData matchData = MatchData.builder()
-                    .memberId(memberId)
+                    .userId(userId)
                     .matchId(UUID.randomUUID().toString())
                     .jsonData("jsonData")
                     .build();

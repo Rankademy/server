@@ -19,16 +19,16 @@ public class MatchData {
     private String matchId; // Riot에서 제공하는 고유 매치 ID
 
     @Indexed
-    @Field("member_id")
-    private Long memberId; // Member 엔티티 참조용
+    @Field("user_id")
+    private Long userId; // User 엔티티 참조용
 
     @Field("json_data")
     String jsonData;
 
     @Builder
-    public MatchData(String matchId, Long memberId, String jsonData) {
+    public MatchData(String matchId, Long userId, String jsonData) {
         this.matchId = matchId;
-        this.memberId = memberId;
+        this.userId = userId;
         this.jsonData = jsonData;
     }
 }

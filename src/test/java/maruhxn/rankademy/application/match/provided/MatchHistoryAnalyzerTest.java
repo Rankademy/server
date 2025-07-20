@@ -4,10 +4,10 @@ import jakarta.persistence.EntityManager;
 import maruhxn.rankademy.RankademyTestConfiguration;
 import maruhxn.rankademy.application.match.required.MatchDataRepository;
 import maruhxn.rankademy.application.match.required.MatchHistoryCollector;
-import maruhxn.rankademy.application.member.required.MemberRepository;
+import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.match.MatchData;
-import maruhxn.rankademy.domain.member.Member;
-import maruhxn.rankademy.domain.member.MemberFixture;
+import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.domain.user.UserFixture;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ class MatchHistoryAnalyzerTest {
     MatchHistoryAnalyzer matchHistoryAnalyzer;
 
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
 
     @Autowired
     MatchDataRepository matchDataRepository;
@@ -55,33 +55,33 @@ class MatchHistoryAnalyzerTest {
 
     @Test
     void fetchAndAnalyzeMatches() throws IOException {
-        Member member = MemberFixture.createMember();
-        member.enrollUnivInfo(MemberFixture.createEnrollUnivRequest());
-        member.completeUnivAuthentication();
-        member.connectSummonerInfo(MemberFixture.createSummonerInfoConnector(), MemberFixture.createRiotAuthRequest());
-        memberRepository.save(member);
+        User user = UserFixture.createUser();
+        user.enrollUnivInfo(UserFixture.createEnrollUnivRequest());
+        user.completeUnivAuthentication();
+        user.connectSummonerInfo(UserFixture.createSummonerInfoConnector(), UserFixture.createRiotAuthRequest());
+        userRepository.save(user);
         em.flush();
         em.clear();
 
-        Long memberId = member.getId();
+        Long userId = user.getId();
 
         String jsonData = getMatchJsonData();
 
-        when(matchHistoryCollector.collectAllMatches(member))
+        when(matchHistoryCollector.collectAllMatches(user))
                 .thenReturn(Arrays.asList(
                         MatchData.builder()
                                 .matchId(UUID.randomUUID().toString())
-                                .memberId(memberId)
+                                .userId(userId)
                                 .jsonData(jsonData)
                                 .build()));
 
-        matchHistoryAnalyzer.fetchAndAnalyzeMatches(memberId);
+        matchHistoryAnalyzer.fetchAndAnalyzeMatches(userId);
         em.flush();
         em.clear();
 
-        member = memberRepository.findById(memberId).get();
+        user = userRepository.findById(userId).get();
         assertThat(matchDataRepository.findAll()).isNotEmpty();
-        assertThat(member.getSummonerInfo().getMostChampions()).hasSize(1);
+        assertThat(user.getSummonerInfo().getMostChampions()).hasSize(1);
     }
 
     private static String getMatchJsonData() throws IOException {

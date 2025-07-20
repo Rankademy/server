@@ -1,6 +1,6 @@
 package maruhxn.rankademy.adapter.security;
 
-import maruhxn.rankademy.domain.member.PasswordEncoder;
+import maruhxn.rankademy.domain.user.PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 

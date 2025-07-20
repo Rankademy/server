@@ -1,10 +1,10 @@
 package maruhxn.rankademy;
 
-import maruhxn.rankademy.application.member.required.EmailSender;
-import maruhxn.rankademy.application.member.required.UnivMailCertifier;
-import maruhxn.rankademy.domain.member.MemberFixture;
-import maruhxn.rankademy.domain.member.PasswordEncoder;
-import maruhxn.rankademy.domain.member.service.SummonerInfoConnector;
+import maruhxn.rankademy.application.user.required.EmailSender;
+import maruhxn.rankademy.application.user.required.UnivMailCertifier;
+import maruhxn.rankademy.domain.user.UserFixture;
+import maruhxn.rankademy.domain.user.PasswordEncoder;
+import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
@@ -18,7 +18,7 @@ public class RankademyTestConfiguration {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return MemberFixture.createPasswordEncoder();
+        return UserFixture.createPasswordEncoder();
     }
 
     @Bean
@@ -38,7 +38,7 @@ public class RankademyTestConfiguration {
 
     @Bean
     public SummonerInfoConnector summonerInfoConnector() {
-        return MemberFixture::createSummonerInfo;
+        return UserFixture::createSummonerInfo;
     }
 
 }

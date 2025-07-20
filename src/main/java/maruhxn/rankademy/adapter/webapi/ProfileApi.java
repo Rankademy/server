@@ -3,67 +3,67 @@ package maruhxn.rankademy.adapter.webapi;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.webapi.dto.ProfileResponse;
-import maruhxn.rankademy.application.member.provided.MemberAuthorizer;
-import maruhxn.rankademy.application.member.provided.MemberReader;
-import maruhxn.rankademy.application.member.provided.MemberWriter;
-import maruhxn.rankademy.domain.member.Member;
-import maruhxn.rankademy.domain.member.dto.MemberProfileUpdateRequest;
-import maruhxn.rankademy.domain.member.dto.RiotAuthRequest;
+import maruhxn.rankademy.application.user.provided.UserAuthorizer;
+import maruhxn.rankademy.application.user.provided.UserReader;
+import maruhxn.rankademy.application.user.provided.UserWriter;
+import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
+import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/{memberId}") // TODO: 변경 필요
+@RequestMapping("/api/v1/{userId}") // TODO: 변경 필요
 public class ProfileApi {
 
-    private final MemberReader memberReader;
-    private final MemberWriter memberWriter;
-    private final MemberAuthorizer memberAuthorizer;
+    private final UserReader userReader;
+    private final UserWriter userWriter;
+    private final UserAuthorizer userAuthorizer;
 
     @GetMapping
     public ProfileResponse getProfile(
-            @PathVariable("memberId") Long memberId
+            @PathVariable("userId") Long userId
     ) {
-        Member member = memberReader.find(memberId);
-        return ProfileResponse.from(member);
+        User user = userReader.find(userId);
+        return ProfileResponse.from(user);
     }
 
     @PatchMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateProfile(
-            @PathVariable("memberId") Long memberId,
-            @RequestBody @Valid MemberProfileUpdateRequest profileUpdateRequest
+            @PathVariable("userId") Long userId,
+            @RequestBody @Valid ProfileUpdateRequest profileUpdateRequest
     ) {
-        memberWriter.updateProfile(memberId, profileUpdateRequest);
+        userWriter.updateProfile(userId, profileUpdateRequest);
     }
 
     @PostMapping("/univ-email/send")
     public void sendCertifyUnivMail(
-            @PathVariable("memberId") Long memberId
+            @PathVariable("userId") Long userId
     ) {
-        memberAuthorizer.sendUnivCertifyMail(memberId);
+        userAuthorizer.sendUnivCertifyMail(userId);
     }
 
     @PostMapping("/univ-email/certify")
     public void certifyUnivMail(
-            @PathVariable("memberId") Long memberId,
+            @PathVariable("userId") Long userId,
             @RequestParam(name = "code", required = true) int code
     ) {
-        memberAuthorizer.completeUnivAuthentication(memberId, code);
+        userAuthorizer.completeUnivAuthentication(userId, code);
     }
 
     @PostMapping("/rso")
     public void rso(
-            @PathVariable("memberId") Long memberId,
+            @PathVariable("userId") Long userId,
             @RequestBody @Valid RiotAuthRequest riotAuthRequest
     ) {
-        memberAuthorizer.completeRiotAuthentication(memberId, riotAuthRequest);
+        userAuthorizer.completeRiotAuthentication(userId, riotAuthRequest);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void withdraw(@PathVariable("memberId") Long memberId) {
-        memberWriter.withdraw(memberId);
+    public void withdraw(@PathVariable("userId") Long userId) {
+        userWriter.withdraw(userId);
     }
 }

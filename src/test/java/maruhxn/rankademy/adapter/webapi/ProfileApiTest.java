@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import maruhxn.rankademy.RankademyTestConfiguration;
 import maruhxn.rankademy.adapter.webapi.dto.ProfileResponse;
-import maruhxn.rankademy.application.member.required.MemberRepository;
-import maruhxn.rankademy.domain.member.LolPosition;
-import maruhxn.rankademy.domain.member.Member;
-import maruhxn.rankademy.domain.member.dto.MemberProfileUpdateRequest;
+import maruhxn.rankademy.application.user.required.UserRepository;
+import maruhxn.rankademy.domain.user.LolPosition;
+import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
 
-import static maruhxn.rankademy.domain.member.MemberFixture.*;
+import static maruhxn.rankademy.domain.user.UserFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @Import(RankademyTestConfiguration.class)
 class ProfileApiTest {
 
-    static final String BASE_URL = "/api/v1/{memberId}";
+    static final String BASE_URL = "/api/v1/{userId}";
 
     @Autowired
     MockMvcTester mvcTester;
@@ -41,16 +41,16 @@ class ProfileApiTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
 
     @Autowired
     EntityManager em;
 
     @Test
     void getProfile() throws UnsupportedEncodingException, JsonProcessingException {
-        Member member = registerMember();
+        User user = registerUser();
 
-        MvcTestResult result = mvcTester.get().uri(BASE_URL, member.getId())
+        MvcTestResult result = mvcTester.get().uri(BASE_URL, user.getId())
                 .exchange();
 
         assertThat(result).hasStatusOk();
@@ -58,8 +58,8 @@ class ProfileApiTest {
         var response = objectMapper.readValue(result.getResponse().getContentAsString(), ProfileResponse.class);
 
         assertAll(
-                () -> assertThat(response.id()).isEqualTo(member.getId()),
-                () -> assertThat(response.username()).isEqualTo(member.getUsername()),
+                () -> assertThat(response.id()).isEqualTo(user.getId()),
+                () -> assertThat(response.username()).isEqualTo(user.getUsername()),
                 () -> assertThat(response.univInfo()).isNull(),
                 () -> assertThat(response.mainPosition()).isNull(),
                 () -> assertThat(response.summonerInfo()).isNull()
@@ -68,20 +68,20 @@ class ProfileApiTest {
 
     @Test
     void getProfile_VERIFIED() throws UnsupportedEncodingException, JsonProcessingException {
-        Member member = createMember();
-        member.enrollUnivInfo(createEnrollUnivRequest());
-        member = memberRepository.save(member);
+        User user = createUser();
+        user.enrollUnivInfo(createEnrollUnivRequest());
+        user = userRepository.save(user);
         em.flush();
         em.clear();
 
-        MvcTestResult result = mvcTester.get().uri(BASE_URL, member.getId())
+        MvcTestResult result = mvcTester.get().uri(BASE_URL, user.getId())
                 .exchange();
 
         assertThat(result).hasStatusOk();
 
         var response = objectMapper.readValue(result.getResponse().getContentAsString(), ProfileResponse.class);
 
-        Member target = memberRepository.findById(member.getId()).orElseThrow();
+        User target = userRepository.findById(user.getId()).orElseThrow();
         assertAll(
                 () -> assertThat(response.id()).isEqualTo(target.getId()),
                 () -> assertThat(response.username()).isEqualTo(target.getUsername()),
@@ -94,21 +94,21 @@ class ProfileApiTest {
                 () -> assertThat(response.summonerInfo()).isNull()
         );
 
-        member.completeUnivAuthentication();
-        member.connectSummonerInfo(createSummonerInfoConnector(), createRiotAuthRequest());
-        memberRepository.save(member);
+        user.completeUnivAuthentication();
+        user.connectSummonerInfo(createSummonerInfoConnector(), createRiotAuthRequest());
+        userRepository.save(user);
         em.flush();
         em.clear();
 
         // 학교 인증 및 라이엇 인증 완료 후
-        MvcTestResult result2 = mvcTester.get().uri(BASE_URL, member.getId())
+        MvcTestResult result2 = mvcTester.get().uri(BASE_URL, user.getId())
                 .exchange();
 
         assertThat(result2).hasStatusOk();
 
         var response2 = objectMapper.readValue(result2.getResponse().getContentAsString(), ProfileResponse.class);
 
-        Member target2 = memberRepository.findById(member.getId()).orElseThrow();
+        User target2 = userRepository.findById(user.getId()).orElseThrow();
         assertAll(
                 () -> assertThat(response2.id()).isEqualTo(target2.getId()),
                 () -> assertThat(response2.username()).isEqualTo(target2.getUsername()),
@@ -125,9 +125,9 @@ class ProfileApiTest {
 
     @Test
     void updateProfile() throws JsonProcessingException {
-        Member member = registerMember();
+        User user = registerUser();
 
-        var request = new MemberProfileUpdateRequest(
+        var request = new ProfileUpdateRequest(
                 "new-username",
                 "it's description",
                 LolPosition.TOP,
@@ -135,13 +135,13 @@ class ProfileApiTest {
         );
         String requestJson = objectMapper.writeValueAsString(request);
 
-        MvcTestResult result = mvcTester.patch().uri(BASE_URL, member.getId())
+        MvcTestResult result = mvcTester.patch().uri(BASE_URL, user.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestJson)
                 .exchange();
         assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
 
-        Member target = memberRepository.findById(member.getId()).orElseThrow();
+        User target = userRepository.findById(user.getId()).orElseThrow();
 
         assertAll(
                 () -> assertThat(target.getUsername()).isEqualTo(request.username()),
@@ -153,20 +153,20 @@ class ProfileApiTest {
 
     @Test
     void withdraw() {
-        Member member = registerMember();
+        User user = registerUser();
 
-        MvcTestResult result = mvcTester.delete().uri(BASE_URL, member.getId())
+        MvcTestResult result = mvcTester.delete().uri(BASE_URL, user.getId())
                 .exchange();
         assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
 
-        assertThat(memberRepository.findById(member.getId())).isEmpty();
+        assertThat(userRepository.findById(user.getId())).isEmpty();
     }
 
     @Test
     void sendCertifyUnivMail_FAIL() {
-        Member member = registerMember();
+        User user = registerUser();
 
-        MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/send", member.getId())
+        MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/send", user.getId())
                 .exchange();
         assertThat(result)
                 .hasStatus(HttpStatus.BAD_REQUEST);
@@ -174,11 +174,11 @@ class ProfileApiTest {
 
     @Test
     void sendCertifyUnivMail() {
-        Member member = registerMember();
-        member.enrollUnivInfo(createEnrollUnivRequest());
-        memberRepository.save(member);
+        User user = registerUser();
+        user.enrollUnivInfo(createEnrollUnivRequest());
+        userRepository.save(user);
 
-        MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/send", member.getId())
+        MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/send", user.getId())
                 .exchange();
 
         assertThat(result).hasStatusOk();
@@ -186,29 +186,29 @@ class ProfileApiTest {
 
     @Test
     void certifyUnivMail() {
-        Member member = registerMember();
-        member.enrollUnivInfo(createEnrollUnivRequest());
-        memberRepository.save(member);
+        User user = registerUser();
+        user.enrollUnivInfo(createEnrollUnivRequest());
+        userRepository.save(user);
 
 
-        MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/certify", member.getId())
+        MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/certify", user.getId())
                 .param("code", "1234")
                 .exchange();
 
         assertThat(result).hasStatusOk();
 
-        Member target = memberRepository.findById(member.getId()).orElseThrow();
+        User target = userRepository.findById(user.getId()).orElseThrow();
         assertThat(target.getUnivInfo().univVerified()).isTrue();
     }
 
     @Test
     void certifyUnivMail_FAIL_WITHOUT_CODE() {
-        Member member = registerMember();
-        member.enrollUnivInfo(createEnrollUnivRequest());
-        memberRepository.save(member);
+        User user = registerUser();
+        user.enrollUnivInfo(createEnrollUnivRequest());
+        userRepository.save(user);
 
 
-        MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/certify", member.getId())
+        MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/certify", user.getId())
                 .exchange();
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
@@ -216,26 +216,26 @@ class ProfileApiTest {
 
     @Test
     void rso() throws JsonProcessingException {
-        Member member = registerMember();
+        User user = registerUser();
 
         var request = createRiotAuthRequest();
 
-        MvcTestResult result = mvcTester.post().uri(BASE_URL + "/rso", member.getId())
+        MvcTestResult result = mvcTester.post().uri(BASE_URL + "/rso", user.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .exchange();
         assertThat(result).hasStatusOk();
 
-        Member target = memberRepository.findById(member.getId()).orElseThrow();
+        User target = userRepository.findById(user.getId()).orElseThrow();
         assertThat(target.getSummonerInfo().getSummonerName()).isEqualTo(request.summonerName());
         assertThat(target.getSummonerInfo().getSummonerTag()).isEqualTo(request.summonerTag());
     }
 
-    private Member registerMember() {
-        Member member = memberRepository.save(createMember());
+    private User registerUser() {
+        User user = userRepository.save(createUser());
         em.flush();
         em.clear();
-        return member;
+        return user;
     }
 
 }

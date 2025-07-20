@@ -2,9 +2,9 @@ package maruhxn.rankademy.adapter.webapi;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import maruhxn.rankademy.application.member.provided.MemberWriter;
-import maruhxn.rankademy.domain.member.Member;
-import maruhxn.rankademy.domain.member.dto.MemberRegisterRequest;
+import maruhxn.rankademy.application.user.provided.UserWriter;
+import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.domain.user.dto.UserRegisterRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 public class AuthApi {
 
-    private final MemberWriter memberWriter;
+    private final UserWriter userWriter;
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public Long register(
-            @RequestBody @Valid MemberRegisterRequest request
+            @RequestBody @Valid UserRegisterRequest request
     ) {
-        Member member = memberWriter.register(request);
-        return member.getId();
+        User user = userWriter.register(request);
+        return user.getId();
     }
 }

@@ -1,7 +1,7 @@
 package maruhxn.rankademy.adapter.webapi;
 
-import maruhxn.rankademy.domain.member.exception.DuplicateUsernameException;
-import maruhxn.rankademy.domain.member.exception.RequiredUnivInfoException;
+import maruhxn.rankademy.domain.user.exception.DuplicateUsernameException;
+import maruhxn.rankademy.domain.user.exception.RequiredUnivInfoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;

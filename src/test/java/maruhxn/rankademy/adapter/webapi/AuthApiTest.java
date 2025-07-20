@@ -4,11 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import maruhxn.rankademy.application.member.provided.MemberWriter;
-import maruhxn.rankademy.application.member.required.MemberRepository;
-import maruhxn.rankademy.domain.member.Member;
-import maruhxn.rankademy.domain.member.MemberFixture;
-import maruhxn.rankademy.domain.member.dto.MemberRegisterRequest;
+import maruhxn.rankademy.application.user.provided.UserWriter;
+import maruhxn.rankademy.application.user.required.UserRepository;
+import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.domain.user.UserFixture;
+import maruhxn.rankademy.domain.user.dto.UserRegisterRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -37,16 +37,16 @@ class AuthApiTest {
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
     @Autowired
-    MemberWriter memberWriter;
+    UserWriter userWriter;
 
     @Autowired
     EntityManager em;
 
     @Test
     void register() throws JsonProcessingException, UnsupportedEncodingException {
-        MemberRegisterRequest request = MemberFixture.createMemberRegisterRequest();
+        UserRegisterRequest request = UserFixture.createUserRegisterRequest();
         String requestJson = objectMapper.writeValueAsString(request);
 
         MvcTestResult result = mvcTester.post().uri(BASE_URL + "/register")
@@ -59,11 +59,11 @@ class AuthApiTest {
                 .body()
                 .isNotNull();
 
-        Member member = memberRepository.findById(Long.parseLong(result.getResponse().getContentAsString())).orElseThrow();
+        User user = userRepository.findById(Long.parseLong(result.getResponse().getContentAsString())).orElseThrow();
         assertAll(
-                () -> assertThat(member.getEmail().address()).isEqualTo(request.email()),
-                () -> assertThat(member.getUsername()).isEqualTo(request.username()),
-                () -> assertThat(member.getPasswordHash()).isNotNull()
+                () -> assertThat(user.getEmail().address()).isEqualTo(request.email()),
+                () -> assertThat(user.getUsername()).isEqualTo(request.username()),
+                () -> assertThat(user.getPasswordHash()).isNotNull()
         );
     }
 
