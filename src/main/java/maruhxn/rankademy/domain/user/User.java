@@ -174,4 +174,9 @@ public class User extends AbstractEntity {
     public void addRefreshToken(String refreshToken) {
         this.refreshTokens.add(new RefreshToken(refreshToken));
     }
+
+    public void rotateRefreshToken(String oldToken, String newToken) {
+        this.refreshTokens.remove(new RefreshToken(oldToken));
+        this.refreshTokens.add(new RefreshToken(newToken));
+    }
 }

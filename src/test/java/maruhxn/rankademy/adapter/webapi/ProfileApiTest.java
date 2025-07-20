@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import maruhxn.rankademy.RankademyTestConfiguration;
+import maruhxn.rankademy.adapter.security.model.RankademyUser;
+import maruhxn.rankademy.adapter.security.model.UserInfo;
 import maruhxn.rankademy.adapter.webapi.dto.ProfileResponse;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.user.LolPosition;
@@ -25,6 +27,7 @@ import java.io.UnsupportedEncodingException;
 import static maruhxn.rankademy.domain.user.UserFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -32,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @Import(RankademyTestConfiguration.class)
 class ProfileApiTest {
 
-    static final String BASE_URL = "/api/v1/{userId}";
+    static final String BASE_URL = "/api/v1/me";
 
     @Autowired
     MockMvcTester mvcTester;
@@ -49,8 +52,10 @@ class ProfileApiTest {
     @Test
     void getProfile() throws UnsupportedEncodingException, JsonProcessingException {
         User user = registerUser();
+        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
 
-        MvcTestResult result = mvcTester.get().uri(BASE_URL, user.getId())
+        MvcTestResult result = mvcTester.get().uri(BASE_URL)
+                .with(user(mockUser))
                 .exchange();
 
         assertThat(result).hasStatusOk();
@@ -74,7 +79,10 @@ class ProfileApiTest {
         em.flush();
         em.clear();
 
-        MvcTestResult result = mvcTester.get().uri(BASE_URL, user.getId())
+        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
+
+        MvcTestResult result = mvcTester.get().uri(BASE_URL)
+                .with(user(mockUser))
                 .exchange();
 
         assertThat(result).hasStatusOk();
@@ -101,7 +109,8 @@ class ProfileApiTest {
         em.clear();
 
         // 학교 인증 및 라이엇 인증 완료 후
-        MvcTestResult result2 = mvcTester.get().uri(BASE_URL, user.getId())
+        MvcTestResult result2 = mvcTester.get().uri(BASE_URL)
+                .with(user(mockUser))
                 .exchange();
 
         assertThat(result2).hasStatusOk();
@@ -126,6 +135,7 @@ class ProfileApiTest {
     @Test
     void updateProfile() throws JsonProcessingException {
         User user = registerUser();
+        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
 
         var request = new ProfileUpdateRequest(
                 "new-username",
@@ -135,7 +145,8 @@ class ProfileApiTest {
         );
         String requestJson = objectMapper.writeValueAsString(request);
 
-        MvcTestResult result = mvcTester.patch().uri(BASE_URL, user.getId())
+        MvcTestResult result = mvcTester.patch().uri(BASE_URL)
+                .with(user(mockUser))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestJson)
                 .exchange();
@@ -154,8 +165,10 @@ class ProfileApiTest {
     @Test
     void withdraw() {
         User user = registerUser();
+        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
 
-        MvcTestResult result = mvcTester.delete().uri(BASE_URL, user.getId())
+        MvcTestResult result = mvcTester.delete().uri(BASE_URL)
+                .with(user(mockUser))
                 .exchange();
         assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
 
@@ -165,8 +178,10 @@ class ProfileApiTest {
     @Test
     void sendCertifyUnivMail_FAIL() {
         User user = registerUser();
+        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
 
         MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/send", user.getId())
+                .with(user(mockUser))
                 .exchange();
         assertThat(result)
                 .hasStatus(HttpStatus.BAD_REQUEST);
@@ -177,8 +192,10 @@ class ProfileApiTest {
         User user = registerUser();
         user.enrollUnivInfo(createEnrollUnivRequest());
         userRepository.save(user);
+        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
 
         MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/send", user.getId())
+                .with(user(mockUser))
                 .exchange();
 
         assertThat(result).hasStatusOk();
@@ -189,9 +206,11 @@ class ProfileApiTest {
         User user = registerUser();
         user.enrollUnivInfo(createEnrollUnivRequest());
         userRepository.save(user);
+        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
 
 
         MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/certify", user.getId())
+                .with(user(mockUser))
                 .param("code", "1234")
                 .exchange();
 
@@ -206,9 +225,11 @@ class ProfileApiTest {
         User user = registerUser();
         user.enrollUnivInfo(createEnrollUnivRequest());
         userRepository.save(user);
+        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
 
 
         MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/certify", user.getId())
+                .with(user(mockUser))
                 .exchange();
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
@@ -217,10 +238,12 @@ class ProfileApiTest {
     @Test
     void rso() throws JsonProcessingException {
         User user = registerUser();
+        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
 
         var request = createRiotAuthRequest();
 
         MvcTestResult result = mvcTester.post().uri(BASE_URL + "/rso", user.getId())
+                .with(user(mockUser))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .exchange();
