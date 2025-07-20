@@ -2,19 +2,21 @@ package maruhxn.rankademy.domain.user;
 
 import jakarta.persistence.*;
 import lombok.*;
+import maruhxn.rankademy.domain.shared.AbstractEntity;
 import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
-import maruhxn.rankademy.domain.user.dto.UserRegisterRequest;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
-import maruhxn.rankademy.domain.user.service.UserTitleProvider;
+import maruhxn.rankademy.domain.user.dto.UserRegisterRequest;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
-import maruhxn.rankademy.domain.shared.AbstractEntity;
+import maruhxn.rankademy.domain.user.service.UserTitleProvider;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
@@ -62,6 +64,11 @@ public class User extends AbstractEntity {
     // TODO: AttributeConverter
     private List<String> titles;
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "refresh_tokens",
+            joinColumns = @JoinColumn(name = "user_id"))
+    private Set<RefreshToken> refreshTokens = new HashSet<>();
+
     public List<String> getTitles() {
         return titles == null ? null : java.util.Collections.unmodifiableList(titles);
     }
@@ -86,6 +93,7 @@ public class User extends AbstractEntity {
                 .passwordHash(requireNonNull(passwordEncoder.encode(registerRequest.password())))
                 .authStatus(UserAuthStatus.UNAUTHORIZED)
                 .joinedAt(LocalDateTime.now())
+                .role(Role.ROLE_USER)
                 .build();
     }
 
@@ -157,5 +165,13 @@ public class User extends AbstractEntity {
         Assert.state(this.getId() != null, "ID가 null일 수 없습니다.");
 
         this.titles = titleProvider.getTitles(this.getId());
+    }
+
+    public void invalidateAllTokens() {
+        this.refreshTokens.clear();
+    }
+
+    public void addRefreshToken(String refreshToken) {
+        this.refreshTokens.add(new RefreshToken(refreshToken));
     }
 }

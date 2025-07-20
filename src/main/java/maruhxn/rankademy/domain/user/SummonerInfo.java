@@ -2,13 +2,12 @@ package maruhxn.rankademy.domain.user;
 
 import jakarta.persistence.*;
 import lombok.*;
-import maruhxn.rankademy.domain.match.ChampionPlayRecord;
 import maruhxn.rankademy.domain.match.MatchData;
 import maruhxn.rankademy.domain.match.service.MostChampionCalculator;
+import maruhxn.rankademy.domain.shared.AbstractEntity;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
 import maruhxn.rankademy.domain.user.dto.RiotLeagueEntryResponse;
 import maruhxn.rankademy.domain.user.dto.RiotSummonerResponse;
-import maruhxn.rankademy.domain.shared.AbstractEntity;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 
@@ -50,10 +49,6 @@ public class SummonerInfo extends AbstractEntity {
             joinColumns = @JoinColumn(name = "summoner_info_id"))
     @OrderColumn(name = "champion_order")
     private List<ChampionPlayRecord> mostChampions = new ArrayList<>();
-
-    public List<ChampionPlayRecord> getMostChampions() {
-        return java.util.Collections.unmodifiableList(mostChampions);
-    }
 
     private LocalDateTime enrolledAt;
 

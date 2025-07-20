@@ -2,6 +2,7 @@ package maruhxn.rankademy.application.user.required;
 
 import maruhxn.rankademy.domain.user.Email;
 import maruhxn.rankademy.domain.user.User;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
 import java.util.Optional;
@@ -21,4 +22,6 @@ public interface UserRepository extends Repository<User, Long> {
 
     void delete(User user);
 
+    @Query("select u from User u join fetch u.refreshTokens rt where rt.payload = :refreshToken")
+    Optional<User> findByRefreshToken(String refreshToken);
 }

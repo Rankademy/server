@@ -1,4 +1,4 @@
-package maruhxn.rankademy.domain.match;
+package maruhxn.rankademy.domain.user;
 
 import jakarta.persistence.Embeddable;
 

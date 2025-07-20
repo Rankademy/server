@@ -1,7 +1,7 @@
 package maruhxn.rankademy.domain.match.service;
 
 import lombok.RequiredArgsConstructor;
-import maruhxn.rankademy.domain.match.ChampionPlayRecord;
+import maruhxn.rankademy.domain.user.ChampionPlayRecord;
 import maruhxn.rankademy.domain.match.MatchData;
 import org.springframework.stereotype.Service;
 
