@@ -127,6 +127,22 @@ class UserWriterTest {
         assertThat(user.getUnivInfo().univVerified()).isEqualTo(false);
     }
 
+    @Test
+    void enrollUnivInfo_Validation_Fail() {
+        User user = registerOrSetPasswordUser();
+
+        EnrollUnivRequest enrollUnivRequest = createEnrollUnivRequest("서울과학기술대학교", "test@test.ac.kr");
+
+        assertThatThrownBy(() -> userWriter.enrollUnivInfo(user.getId(), enrollUnivRequest))
+            .isInstanceOf(IllegalArgumentException.class);
+
+
+        EnrollUnivRequest enrollUnivRequest2 = createEnrollUnivRequest("없는대학교", "test@test.ac.kr");
+
+        assertThatThrownBy(() -> userWriter.enrollUnivInfo(user.getId(), enrollUnivRequest2))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
     private User registerOrSetPasswordUser() {
         var initialRequest = createUserRegisterRequest();
         User user = userWriter.registerOrSetPassword(initialRequest);

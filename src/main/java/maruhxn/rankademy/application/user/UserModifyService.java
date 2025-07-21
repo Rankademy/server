@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.application.user.provided.UserReader;
 import maruhxn.rankademy.application.user.provided.UserWriter;
 import maruhxn.rankademy.application.user.required.EmailSender;
+import maruhxn.rankademy.application.user.required.UnivMailValidator;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.user.Email;
 import maruhxn.rankademy.domain.user.PasswordEncoder;
@@ -28,6 +29,7 @@ public class UserModifyService implements UserWriter {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailSender emailSender;
+    private final UnivMailValidator univMailValidator;
 
     @Override
     public User registerOrSetPassword(UserRegisterRequest registerRequest) {
@@ -66,8 +68,12 @@ public class UserModifyService implements UserWriter {
     @Override
     public User enrollUnivInfo(Long userId, EnrollUnivRequest enrollUnivRequest) {
         User user = userReader.get(userId);
-        // TODO: 이메일 일치 여부 확인 로직 추가 필요
+
+        if (!univMailValidator.isValid(enrollUnivRequest.univName(), enrollUnivRequest.univMail()))
+            throw new IllegalArgumentException("학교 이메일이 올바르지 않습니다.");
+
         user.enrollUnivInfo(enrollUnivRequest);
+
         return userRepository.save(user);
     }
 

@@ -1,4 +1,4 @@
-package maruhxn.rankademy.adapter.integration;
+package maruhxn.rankademy.adapter.integration.riot;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
