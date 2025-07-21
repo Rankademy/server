@@ -7,7 +7,6 @@ import maruhxn.rankademy.domain.match.service.MostChampionCalculator;
 import maruhxn.rankademy.domain.shared.AbstractEntity;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
 import maruhxn.rankademy.domain.user.dto.RiotLeagueEntryResponse;
-import maruhxn.rankademy.domain.user.dto.RiotSummonerResponse;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 
@@ -64,7 +63,7 @@ public class SummonerInfo extends AbstractEntity {
         this.enrolledAt = enrolledAt;
     }
 
-    public static SummonerInfo of(String puuid, RiotAuthRequest riotAuthRequest, RiotSummonerResponse riotSummonerResponse, RiotLeagueEntryResponse soloRankEntry) {
+    public static SummonerInfo of(String puuid, RiotAuthRequest riotAuthRequest, int summonerIconId, RiotLeagueEntryResponse soloRankEntry) {
         int totalWins = soloRankEntry.wins();
         int totalMatches = soloRankEntry.wins() + soloRankEntry.losses();
 
@@ -72,7 +71,7 @@ public class SummonerInfo extends AbstractEntity {
                 .puuid(requireNonNull(puuid))
                 .summonerName(riotAuthRequest.summonerName())
                 .summonerTag(riotAuthRequest.summonerTag())
-                .summonerIconNum(riotSummonerResponse.profileIconId())
+                .summonerIconNum(summonerIconId)
                 .tierInfo(TierInfo.from(soloRankEntry))
                 .winRate((double) totalWins / totalMatches * 100)
                 .totalMatchCnt(totalMatches)

@@ -27,10 +27,6 @@ public class MatchHistoryService implements MatchHistoryAnalyzer {
     public void fetchAndAnalyzeMatches(Long userId) {
         User user = userReader.get(userId);
 
-        if (!user.isAuthorized()) {
-            throw new IllegalStateException("인증된 사용자가 아닙니다.");
-        }
-
         // 외부에서 새로운 매치 기록을 가져옴
         List<MatchData> newMatches = matchHistoryCollector.collectAllMatches(user);
 

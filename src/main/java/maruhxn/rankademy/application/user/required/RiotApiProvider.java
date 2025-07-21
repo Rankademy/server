@@ -3,7 +3,6 @@ package maruhxn.rankademy.application.user.required;
 import maruhxn.rankademy.domain.match.MatchData;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
 import maruhxn.rankademy.domain.user.dto.RiotLeagueEntryResponse;
-import maruhxn.rankademy.domain.user.dto.RiotSummonerResponse;
 
 import java.util.List;
 
@@ -13,7 +12,7 @@ public interface RiotApiProvider {
     String getPuuid(RiotAuthRequest riotAuthRequest);
 
     // https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}
-    RiotSummonerResponse getSummonerInfoByPuuid(String puuid);
+    int getSummonerIconId(String puuid);
 
     // https://kr.api.riotgames.com/lol/league/v4/entries/by-puuid{puuid}
     RiotLeagueEntryResponse getSoloRankInfoByPuuid(String puuid);

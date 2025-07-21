@@ -1,9 +1,10 @@
 package maruhxn.rankademy;
 
+import maruhxn.rankademy.application.match.RiotAuthEventHandler;
 import maruhxn.rankademy.application.user.required.EmailSender;
 import maruhxn.rankademy.application.user.required.UnivMailCertifier;
-import maruhxn.rankademy.domain.user.UserFixture;
 import maruhxn.rankademy.domain.user.PasswordEncoder;
+import maruhxn.rankademy.domain.user.UserFixture;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -39,6 +40,11 @@ public class RankademyTestConfiguration {
     @Bean
     public SummonerInfoConnector summonerInfoConnector() {
         return UserFixture::createSummonerInfo;
+    }
+
+    @Bean
+    public RiotAuthEventHandler riotAuthEventHandler() {
+        return new RiotAuthEventHandler(userId -> System.out.println("Fetching matches for user: " + userId));
     }
 
 }

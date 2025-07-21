@@ -1,4 +1,4 @@
-package maruhxn.rankademy.adapter.integration;
+package maruhxn.rankademy.adapter.integration.riot;
 
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.application.match.required.MatchHistoryCollector;
