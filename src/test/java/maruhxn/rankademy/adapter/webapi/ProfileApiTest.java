@@ -184,7 +184,7 @@ class ProfileApiTest {
                 .with(user(mockUser))
                 .exchange();
         assertThat(result)
-                .hasStatus(HttpStatus.BAD_REQUEST);
+                .hasStatus(HttpStatus.CONFLICT);
     }
 
     @Test

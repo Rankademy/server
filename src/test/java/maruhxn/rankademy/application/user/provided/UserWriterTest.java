@@ -12,7 +12,6 @@ import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
 import maruhxn.rankademy.domain.user.dto.UserOAuth2CreateRequest;
 import maruhxn.rankademy.domain.user.dto.UserRegisterRequest;
-import maruhxn.rankademy.domain.user.exception.DuplicateUsernameException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +86,7 @@ class UserWriterTest {
 
         // when & then
         assertThatThrownBy(() -> userWriter.registerOrSetPassword(duplicateRequest))
-                .isInstanceOf(DuplicateUsernameException.class);
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test

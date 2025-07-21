@@ -7,7 +7,6 @@ import maruhxn.rankademy.application.user.required.UnivMailCertifier;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
-import maruhxn.rankademy.domain.user.exception.RequiredUnivInfoException;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +27,7 @@ public class UserAuthService implements UserAuthorizer {
         User user = userReader.get(userId);
 
         if (user.getUnivInfo() == null) {
-            throw new RequiredUnivInfoException();
+            throw new IllegalStateException("학교 정보를 등록해주세요.");
         }
 
         univMailCertifier.sendCertifyMail(
