@@ -38,4 +38,5 @@ out/
 
 ### ADDITIONAL ###
 **/src/*/resources/*.yml
+**/src/*/resources/*.json
 **/src/main/generated/**
