@@ -61,6 +61,9 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
 
+    // webflux
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+
     mockitoAgent("org.mockito:mockito-core:5.18.0") { isTransitive = false }
 }
 
