@@ -27,7 +27,7 @@ public class ProfileApi {
     public ProfileResponse getProfile(
             @AuthenticationPrincipal RankademyUser rankademyUser
             ) {
-        User user = userReader.find(rankademyUser.getId());
+        User user = userReader.get(rankademyUser.getId());
         return ProfileResponse.from(user);
     }
 

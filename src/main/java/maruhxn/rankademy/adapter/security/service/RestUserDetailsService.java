@@ -18,7 +18,7 @@ public class RestUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userReader.findByEmail(email);
+        User user = userReader.getByEmail(email);
         return RankademyUser.from(UserInfo.from(user));
     }
 }

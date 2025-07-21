@@ -6,7 +6,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.util.ProblemDetailBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,10 +19,9 @@ import java.io.IOException;
  * JwtVerification Filter에서 발생하는 에러를 핸들링하기 위한 보조 필터
  */
 @Component
-@RequiredArgsConstructor
 public class JwtExceptionFilter extends OncePerRequestFilter {
 
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -35,7 +33,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         }
     }
 
-    public void setErrorResponse(HttpServletResponse response, Throwable ex) throws IOException {
+    public void setErrorResponse(HttpServletResponse response, JwtException ex) throws IOException {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");

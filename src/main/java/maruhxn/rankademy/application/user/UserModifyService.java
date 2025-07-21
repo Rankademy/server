@@ -10,6 +10,7 @@ import maruhxn.rankademy.domain.user.PasswordEncoder;
 import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
+import maruhxn.rankademy.domain.user.dto.UserOAuth2CreateRequest;
 import maruhxn.rankademy.domain.user.dto.UserRegisterRequest;
 import maruhxn.rankademy.domain.user.exception.DuplicateUsernameException;
 import org.springframework.stereotype.Service;
@@ -30,21 +31,21 @@ public class UserModifyService implements UserWriter {
     private final EmailSender emailSender;
 
     @Override
-    public User register(UserRegisterRequest registerRequest) {
+    public User registerOrSetPassword(UserRegisterRequest registerRequest) {
         Optional<User> optionalUser = userRepository.findByEmail(new Email(registerRequest.email()));
 
-        User user;
         if (optionalUser.isPresent()) {
-            // TODO: 같은 이메일로 이메일 회원가입을 중복 진행하는 경우 막기.
-            user = optionalUser.get();
-            user.changePassword(registerRequest.password(), passwordEncoder);
-        } else {
-            this.checkDuplicateUsername(registerRequest.username());
-
-            user = User.register(registerRequest, passwordEncoder);
-
-            this.sendWelcomeEmail(user);
+            User user = optionalUser.get();
+            if (user.isRegisteredViaOAuthOnly()) {
+                // 비밀번호 설정만 진행 (소셜 가입자 → 이메일 로그인 확장)
+                user.changePassword(registerRequest.password(), passwordEncoder);
+                return userRepository.save(user);
+            }
         }
+
+        this.checkDuplicateUsername(registerRequest.username());
+        User user = User.register(registerRequest, passwordEncoder);
+        this.sendWelcomeEmail(user);
 
         return userRepository.save(user);
     }
@@ -65,7 +66,7 @@ public class UserModifyService implements UserWriter {
 
     @Override
     public User enrollUnivInfo(Long userId, EnrollUnivRequest enrollUnivRequest) {
-        User user = userReader.find(userId);
+        User user = userReader.get(userId);
         // TODO: 이메일 일치 여부 확인 로직 추가 필요
         user.enrollUnivInfo(enrollUnivRequest);
         return userRepository.save(user);
@@ -73,14 +74,14 @@ public class UserModifyService implements UserWriter {
 
     @Override
     public User removeUnivInfo(Long userId) {
-        User user = userReader.find(userId);
+        User user = userReader.get(userId);
         user.removeUnivInfo();
         return userRepository.save(user);
     }
 
     @Override
     public User updateProfile(Long userId, ProfileUpdateRequest updateProfileRequest) {
-        User user = userReader.find(userId);
+        User user = userReader.get(userId);
 
         this.checkDuplicateUsername(updateProfileRequest.username());
 
@@ -91,8 +92,15 @@ public class UserModifyService implements UserWriter {
 
     @Override
     public void withdraw(Long userId) {
-        User user = userReader.find(userId);
+        User user = userReader.get(userId);
         userRepository.delete(user);
+    }
+
+    @Override
+    public User oauth2Register(UserOAuth2CreateRequest userOAuth2CreateRequest) {
+        User user = User.oauth2Register(userOAuth2CreateRequest);
+        this.sendWelcomeEmail(user);
+        return userRepository.save(user);
     }
 
 }

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
+import maruhxn.rankademy.domain.user.dto.UserOAuth2CreateRequest;
 import maruhxn.rankademy.domain.user.dto.UserRegisterRequest;
 
 /**
@@ -11,7 +12,7 @@ import maruhxn.rankademy.domain.user.dto.UserRegisterRequest;
  */
 public interface UserWriter {
 
-    User register(@Valid UserRegisterRequest registerRequest);
+    User registerOrSetPassword(@Valid UserRegisterRequest registerRequest);
 
     User enrollUnivInfo(Long userId, @Valid EnrollUnivRequest enrollUnivRequest);
 
@@ -20,4 +21,6 @@ public interface UserWriter {
     User updateProfile(Long userId, @Valid ProfileUpdateRequest updateProfileRequest);
 
     void withdraw(Long userId);
+
+    User oauth2Register(UserOAuth2CreateRequest userOAuth2CreateRequest);
 }

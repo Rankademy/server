@@ -25,7 +25,7 @@ public class UserAuthService implements UserAuthorizer {
 
     @Override
     public void sendUnivCertifyMail(Long userId) {
-        User user = userReader.find(userId);
+        User user = userReader.get(userId);
 
         if (user.getUnivInfo() == null) {
             throw new RequiredUnivInfoException();
@@ -41,7 +41,7 @@ public class UserAuthService implements UserAuthorizer {
     @Override
     @Transactional
     public User completeUnivAuthentication(Long userId, int code) {
-        User user = userReader.find(userId);
+        User user = userReader.get(userId);
 
         univMailCertifier.certifyCode(
                 user.getUnivInfo().univMail().address(),
@@ -57,7 +57,7 @@ public class UserAuthService implements UserAuthorizer {
     @Override
     @Transactional
     public User completeRiotAuthentication(Long userId, RiotAuthRequest riotAuthRequest) {
-        User user = userReader.find(userId);
+        User user = userReader.get(userId);
         user.connectSummonerInfo(summonerInfoConnector, riotAuthRequest);
         return userRepository.save(user);
     }
@@ -65,7 +65,7 @@ public class UserAuthService implements UserAuthorizer {
     @Override
     @Transactional
     public User removeRiotAuthentication(Long userId) {
-        User user = userReader.find(userId);
+        User user = userReader.get(userId);
         user.removeRiotAuthentication();
         return userRepository.save(user);
     }

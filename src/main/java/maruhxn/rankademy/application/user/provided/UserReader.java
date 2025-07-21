@@ -1,12 +1,19 @@
 package maruhxn.rankademy.application.user.provided;
 
+import maruhxn.rankademy.domain.user.OAuth2Provider;
 import maruhxn.rankademy.domain.user.User;
+
+import java.util.Optional;
 
 public interface UserReader {
 
-    User find(Long userId);
+    User get(Long userId);
 
-    User findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
-    User findByRefreshToken(String refreshToken);
+    User getByEmail(String email);
+
+    User getByRefreshToken(String refreshToken);
+
+    Optional<User> findByProviderAndOauthId(OAuth2Provider provider, String oauthId);
 }

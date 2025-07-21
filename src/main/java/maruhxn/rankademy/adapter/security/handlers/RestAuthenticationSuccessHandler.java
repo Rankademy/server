@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
@@ -23,18 +24,19 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final JwtProvider jwtProvider;
     private final UserReader userReader;
 
     @Override
+    @Transactional
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
         RankademyUser principal = (RankademyUser) authentication.getPrincipal();
-        User user = userReader.find(principal.getId());
+        User user = userReader.get(principal.getId());
         TokenDto tokenDto = jwtProvider.createJwt(principal);
         user.addRefreshToken(tokenDto.refreshToken());
 //        jwtService.setCookie(tokenDto, response);

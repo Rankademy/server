@@ -1,6 +1,7 @@
 package maruhxn.rankademy.application.user.required;
 
 import maruhxn.rankademy.domain.user.Email;
+import maruhxn.rankademy.domain.user.OAuth2Provider;
 import maruhxn.rankademy.domain.user.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
@@ -24,4 +25,7 @@ public interface UserRepository extends Repository<User, Long> {
 
     @Query("select u from User u join fetch u.refreshTokens rt where rt.payload = :refreshToken")
     Optional<User> findByRefreshToken(String refreshToken);
+
+    @Query("select u from User u join fetch u.oauthAccounts oa where oa.provider = :provider and oa.oauthId = :oauthId")
+    Optional<User> findByProviderAndOAuthId(OAuth2Provider provider, String oauthId);
 }

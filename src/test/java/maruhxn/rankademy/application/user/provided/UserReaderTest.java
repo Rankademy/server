@@ -28,7 +28,7 @@ class UserReaderTest {
     EntityManager em;
 
     @Test
-    void findByRefreshToken() {
+    void getByRefreshToken() {
         User user = createUser();
         user.addRefreshToken("refresh_token1");
         user.addRefreshToken("refresh_token2");
@@ -37,7 +37,7 @@ class UserReaderTest {
         em.flush();
         em.clear();
 
-        assertThat(userReader.findByRefreshToken("refresh_token1")).isEqualTo(user);
-        assertThat(userReader.findByRefreshToken("refresh_token2")).isEqualTo(user);
+        assertThat(userReader.getByRefreshToken("refresh_token1")).isEqualTo(user);
+        assertThat(userReader.getByRefreshToken("refresh_token2")).isEqualTo(user);
     }
 }

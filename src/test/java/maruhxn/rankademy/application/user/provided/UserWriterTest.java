@@ -5,10 +5,12 @@ import maruhxn.rankademy.RankademyTestConfiguration;
 import maruhxn.rankademy.application.user.required.EmailSender;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.user.LolPosition;
+import maruhxn.rankademy.domain.user.OAuth2Provider;
 import maruhxn.rankademy.domain.user.PasswordEncoder;
 import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
+import maruhxn.rankademy.domain.user.dto.UserOAuth2CreateRequest;
 import maruhxn.rankademy.domain.user.dto.UserRegisterRequest;
 import maruhxn.rankademy.domain.user.exception.DuplicateUsernameException;
 import org.junit.jupiter.api.DisplayName;
@@ -50,12 +52,12 @@ class UserWriterTest {
 
     @Test
     @DisplayName("신규 회원이 정상적으로 가입된다.")
-    void register_NewUser() {
+    void register_OrSetPassword_NewUser() {
         // given
         var request = createUserRegisterRequest();
 
         // when
-        User user = userWriter.register(request);
+        User user = userWriter.registerOrSetPassword(request);
 
         // then
         assertThat(user).isNotNull();
@@ -72,9 +74,9 @@ class UserWriterTest {
 
     @Test
     @DisplayName("중복된 아이디(username)로 가입 시 예외가 발생한다.")
-    void register_FailWithDuplicateUsername() {
+    void register_OrSetPassword_FailWithDuplicateUsername() {
         // given
-        User user = registerUser();
+        User user = registerOrSetPasswordUser();
 
         // 다른 이메일, 하지만 동일한 아이디로 가입 시도
         var duplicateRequest = new UserRegisterRequest(
@@ -84,37 +86,38 @@ class UserWriterTest {
         );
 
         // when & then
-        assertThatThrownBy(() -> userWriter.register(duplicateRequest))
+        assertThatThrownBy(() -> userWriter.registerOrSetPassword(duplicateRequest))
                 .isInstanceOf(DuplicateUsernameException.class);
     }
 
     @Test
-    @DisplayName("기존에 가입된 이메일로 다시 가입 시 비밀번호가 변경된다.")
-    void register_ExistingUser_ChangesPassword() {
+    @DisplayName("소셜가입 이후 동일 이메일 회원 가입 시 비밀번호 설정된다.")
+    void register_OrSetPassword_ExistingUser_ChangesPassword() {
         // given
-        User user = registerUser();
+        User user = User.oauth2Register(new UserOAuth2CreateRequest("test@test.com", "소셜유저", OAuth2Provider.GOOGLE, "12345"));
+        userRepository.save(user);
+        em.flush();
+        em.clear();
 
         // 동일한 이메일, 새로운 비밀번호로 다시 가입 요청
         var updateRequest = new UserRegisterRequest(
-                user.getEmail().address(),
-                user.getUsername(),
-                "newsecret"
+                "test@test.com",
+                "소셜유저",
+                "verysecret"
         );
 
         // when
-        User updatedUser = userWriter.register(updateRequest);
+        User updatedUser = userWriter.registerOrSetPassword(updateRequest);
         em.flush();
 
         // then
-        assertThat(updatedUser.verifyPassword("newsecret", passwordEncoder)).isTrue(); // 간단한 PasswordEncoder 모킹
-
-        // 환영 이메일은 발송되지 않아야 함
-        verify(emailSender, times(1)).send(any(), any(), any()); // 초기 가입 때 1번만 호출
+        assertThat(updatedUser.getOauthAccounts()).isNotEmpty();
+        assertThat(updatedUser.verifyPassword("verysecret", passwordEncoder)).isTrue();
     }
 
     @Test
     void enrollUnivInfo() {
-        User user = registerUser();
+        User user = registerOrSetPasswordUser();
 
         EnrollUnivRequest enrollUnivRequest = createEnrollUnivRequest();
 
@@ -125,9 +128,9 @@ class UserWriterTest {
         assertThat(user.getUnivInfo().univVerified()).isEqualTo(false);
     }
 
-    private User registerUser() {
+    private User registerOrSetPasswordUser() {
         var initialRequest = createUserRegisterRequest();
-        User user = userWriter.register(initialRequest);
+        User user = userWriter.registerOrSetPassword(initialRequest);
         em.flush();
         em.clear();
         return user;
@@ -135,7 +138,7 @@ class UserWriterTest {
 
     @Test
     void removeUnivInfo() {
-        User user = registerUser();
+        User user = registerOrSetPasswordUser();
 
         user = userWriter.removeUnivInfo(user.getId());
         em.flush();
@@ -146,7 +149,7 @@ class UserWriterTest {
 
     @Test
     void updateProfile() {
-        User user = registerUser();
+        User user = registerOrSetPasswordUser();
 
         ProfileUpdateRequest request = new ProfileUpdateRequest(
                 "newname",
@@ -166,7 +169,7 @@ class UserWriterTest {
 
     @Test
     void withdraw() {
-        User user = registerUser();
+        User user = registerOrSetPasswordUser();
 
         userWriter.withdraw(user.getId());
         em.flush();

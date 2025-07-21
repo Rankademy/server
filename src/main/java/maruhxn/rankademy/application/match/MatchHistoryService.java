@@ -25,7 +25,7 @@ public class MatchHistoryService implements MatchHistoryAnalyzer {
 
     @Transactional
     public void fetchAndAnalyzeMatches(Long userId) {
-        User user = userReader.find(userId);
+        User user = userReader.get(userId);
 
         if (!user.isAuthorized()) {
             throw new IllegalStateException("인증된 사용자가 아닙니다.");

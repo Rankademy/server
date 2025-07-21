@@ -5,6 +5,7 @@ import maruhxn.rankademy.adapter.security.filter.JwtExceptionFilter;
 import maruhxn.rankademy.adapter.security.filter.JwtVerificationFilter;
 import maruhxn.rankademy.adapter.security.filter.RestLoginFilter;
 import maruhxn.rankademy.adapter.security.handlers.*;
+import maruhxn.rankademy.adapter.security.service.RankademyOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,7 +39,7 @@ public class SecurityConfig {
     private final RestAuthenticationFailureHandler authenticationFailureHandler;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final RestLogoutSuccessHandler logoutSuccessHandler;
-//    private final RankademyOAuth2UserService  oAuth2UserService;
+    private final RankademyOAuth2UserService oAuth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -62,6 +63,14 @@ public class SecurityConfig {
 
                             authz.anyRequest().authenticated();
                         }
+                )
+                .oauth2Login(oauth2 ->
+                        oauth2
+                                .userInfoEndpoint(userInfoEndpointConfig ->
+                                        userInfoEndpointConfig.userService(oAuth2UserService)
+                                )
+                                .successHandler(authenticationSuccessHandler)
+                                .failureHandler(authenticationFailureHandler)
                 )
                 .logout(
                         logout -> logout

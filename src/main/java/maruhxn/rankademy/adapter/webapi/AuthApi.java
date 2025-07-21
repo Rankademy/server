@@ -29,7 +29,7 @@ public class AuthApi {
     public Long register(
             @RequestBody @Valid UserRegisterRequest request
     ) {
-        User user = userWriter.register(request);
+        User user = userWriter.registerOrSetPassword(request);
         return user.getId();
     }
 
@@ -39,7 +39,7 @@ public class AuthApi {
     ) {
         String refreshToken = jwtProvider.getTokenFromBearer(bearerRefreshToken);
         jwtProvider.validate(refreshToken);
-        User user = userReader.findByRefreshToken(refreshToken);
+        User user = userReader.getByRefreshToken(refreshToken);
         TokenDto tokenDto = jwtProvider.createJwt(RankademyUser.from(UserInfo.from(user)));
         user.rotateRefreshToken(refreshToken, tokenDto.refreshToken());
         return tokenDto;

@@ -52,7 +52,7 @@ class ProfileApiTest {
     @Test
     void getProfile() throws UnsupportedEncodingException, JsonProcessingException {
         User user = registerUser();
-        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
+        RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
 
         MvcTestResult result = mvcTester.get().uri(BASE_URL)
                 .with(user(mockUser))
@@ -79,7 +79,7 @@ class ProfileApiTest {
         em.flush();
         em.clear();
 
-        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
+        RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
 
         MvcTestResult result = mvcTester.get().uri(BASE_URL)
                 .with(user(mockUser))
@@ -135,7 +135,7 @@ class ProfileApiTest {
     @Test
     void updateProfile() throws JsonProcessingException {
         User user = registerUser();
-        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
+        RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
 
         var request = new ProfileUpdateRequest(
                 "new-username",
@@ -165,7 +165,7 @@ class ProfileApiTest {
     @Test
     void withdraw() {
         User user = registerUser();
-        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
+        RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
 
         MvcTestResult result = mvcTester.delete().uri(BASE_URL)
                 .with(user(mockUser))
@@ -178,7 +178,7 @@ class ProfileApiTest {
     @Test
     void sendCertifyUnivMail_FAIL() {
         User user = registerUser();
-        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
+        RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
 
         MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/send", user.getId())
                 .with(user(mockUser))
@@ -192,7 +192,7 @@ class ProfileApiTest {
         User user = registerUser();
         user.enrollUnivInfo(createEnrollUnivRequest());
         userRepository.save(user);
-        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
+        RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
 
         MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/send", user.getId())
                 .with(user(mockUser))
@@ -206,7 +206,7 @@ class ProfileApiTest {
         User user = registerUser();
         user.enrollUnivInfo(createEnrollUnivRequest());
         userRepository.save(user);
-        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
+        RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
 
 
         MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/certify", user.getId())
@@ -225,7 +225,7 @@ class ProfileApiTest {
         User user = registerUser();
         user.enrollUnivInfo(createEnrollUnivRequest());
         userRepository.save(user);
-        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
+        RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
 
 
         MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/certify", user.getId())
@@ -238,7 +238,7 @@ class ProfileApiTest {
     @Test
     void rso() throws JsonProcessingException {
         User user = registerUser();
-        RankademyUser mockUser = new RankademyUser(UserInfo.from(user));
+        RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
 
         var request = createRiotAuthRequest();
 

@@ -10,7 +10,7 @@ public class ProblemDetailBuilder {
     public static ProblemDetail build(HttpStatus status, Exception exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, exception.getMessage());
 
-        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        problemDetail.setProperty("timestamp", LocalDateTime.now().toString());
         problemDetail.setProperty("exception", exception.getClass().getSimpleName());
 
         return problemDetail;

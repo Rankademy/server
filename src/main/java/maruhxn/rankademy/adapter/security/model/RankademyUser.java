@@ -3,17 +3,21 @@ package maruhxn.rankademy.adapter.security.model;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public record RankademyUser(
-        UserInfo userInfo
-) implements UserDetails {
+        UserInfo userInfo,
+        Map<String, Object> attributes
+) implements UserDetails, OAuth2User {
 
     public static RankademyUser from(UserInfo userInfo) {
-        return new RankademyUser(userInfo);
+        return new RankademyUser(userInfo, new HashMap<>());
+    }
+
+    public static RankademyUser from(UserInfo userInfo, Map<String, Object> attributes) {
+        return new RankademyUser(userInfo, attributes);
     }
 
     @Override
@@ -44,5 +48,15 @@ public record RankademyUser(
 
     public String getNickname() {
         return userInfo.username();
+    }
+
+    @Override
+    public String getName() {
+        return userInfo.username();
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return new HashMap<>(attributes);
     }
 }

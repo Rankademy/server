@@ -10,6 +10,7 @@ import maruhxn.rankademy.domain.user.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
@@ -23,11 +24,12 @@ public class RestLogoutSuccessHandler implements LogoutSuccessHandler {
     private final UserReader userReader;
 
     @Override
+    @Transactional
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         String bearerRefreshToken = request.getHeader(REFRESH_TOKEN_HEADER);
         String refreshToken = jwtProvider.getTokenFromBearer(bearerRefreshToken);
         String email = jwtProvider.getEmail(refreshToken);
-        User user = userReader.findByEmail(email);
+        User user = userReader.getByEmail(email);
         user.invalidateAllTokens();
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }

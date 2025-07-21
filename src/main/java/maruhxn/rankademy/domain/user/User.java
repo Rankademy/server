@@ -1,12 +1,12 @@
 package maruhxn.rankademy.domain.user;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import maruhxn.rankademy.domain.shared.AbstractEntity;
-import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
-import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
-import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
-import maruhxn.rankademy.domain.user.dto.UserRegisterRequest;
+import maruhxn.rankademy.domain.user.dto.*;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
 import maruhxn.rankademy.domain.user.service.UserTitleProvider;
 import org.hibernate.annotations.NaturalId;
@@ -36,6 +36,7 @@ public class User extends AbstractEntity {
 
     private String passwordHash;
 
+    @Enumerated(EnumType.STRING)
     private UserAuthStatus authStatus;
 
     private String description;
@@ -51,13 +52,17 @@ public class User extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "oauth_account_id")
+    private Set<OAuthAccount> oauthAccounts = new HashSet<>();
+
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "univMail.address", column = @Column(name = "univ_mail", length = 150))
     })
     private UnivInfo univInfo;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "summoner_info_id")
     private SummonerInfo summonerInfo;
 
@@ -69,32 +74,41 @@ public class User extends AbstractEntity {
             joinColumns = @JoinColumn(name = "user_id"))
     private Set<RefreshToken> refreshTokens = new HashSet<>();
 
-    public List<String> getTitles() {
-        return titles == null ? null : java.util.Collections.unmodifiableList(titles);
+
+    public User(String username, Email email) {
+        this.username = username;
+        this.email = email;
+        this.joinedAt = LocalDateTime.now();
+        this.authStatus = UserAuthStatus.UNAUTHORIZED;
+        this.role = Role.ROLE_USER;
     }
 
-    @Builder
-    public User(String username, Email email, String passwordHash, UserAuthStatus authStatus, String description, LocalDateTime joinedAt, LolPosition mainPosition, LolPosition subPosition, Role role) {
+    public User(String username, Email email, String passwordHash) {
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
-        this.authStatus = authStatus;
-        this.description = description;
-        this.joinedAt = joinedAt;
-        this.mainPosition = mainPosition;
-        this.subPosition = subPosition;
-        this.role = role;
+        this.joinedAt = LocalDateTime.now();
+        this.authStatus = UserAuthStatus.UNAUTHORIZED;
+        this.role = Role.ROLE_USER;
     }
 
     public static User register(UserRegisterRequest registerRequest, PasswordEncoder passwordEncoder) {
-        return User.builder()
-                .email(new Email(registerRequest.email()))
-                .username(requireNonNull(registerRequest.username()))
-                .passwordHash(requireNonNull(passwordEncoder.encode(registerRequest.password())))
-                .authStatus(UserAuthStatus.UNAUTHORIZED)
-                .joinedAt(LocalDateTime.now())
-                .role(Role.ROLE_USER)
-                .build();
+        return new User(
+                requireNonNull(registerRequest.username()),
+                new Email(registerRequest.email()),
+                requireNonNull(passwordEncoder.encode(registerRequest.password()))
+        );
+    }
+
+    public static User oauth2Register(UserOAuth2CreateRequest userOAuth2CreateRequest) {
+        User user = new User(
+                requireNonNull(userOAuth2CreateRequest.username()),
+                new Email(userOAuth2CreateRequest.email())
+        );
+
+        user.addOAuthAccount(userOAuth2CreateRequest.provider(), userOAuth2CreateRequest.providerId());
+
+        return user;
     }
 
     public boolean verifyPassword(String password, PasswordEncoder passwordEncoder) {
@@ -106,8 +120,6 @@ public class User extends AbstractEntity {
     }
 
     public boolean isAuthorized() {
-        Assert.state(authStatus == UserAuthStatus.UNAUTHORIZED, "이미 인증처리가 완료되었습니다.");
-
         if ((univInfo == null || !univInfo.univVerified()) ||
                 summonerInfo == null) {
             authStatus = UserAuthStatus.UNAUTHORIZED;
@@ -117,7 +129,6 @@ public class User extends AbstractEntity {
         authStatus = UserAuthStatus.AUTHORIZED;
         return true;
     }
-
 
     public void enrollUnivInfo(EnrollUnivRequest enrollUnivRequest) {
         if (this.univInfo == null) {
@@ -178,5 +189,17 @@ public class User extends AbstractEntity {
     public void rotateRefreshToken(String oldToken, String newToken) {
         this.refreshTokens.remove(new RefreshToken(oldToken));
         this.refreshTokens.add(new RefreshToken(newToken));
+    }
+
+    public void addOAuthAccount(OAuth2Provider provider, String oauthId) {
+        this.oauthAccounts.add(new OAuthAccount(provider, oauthId));
+    }
+
+    public boolean hasPassword() {
+        return passwordHash != null && !passwordHash.isBlank();
+    }
+
+    public boolean isRegisteredViaOAuthOnly() {
+        return !hasPassword() && !oauthAccounts.isEmpty();
     }
 }
