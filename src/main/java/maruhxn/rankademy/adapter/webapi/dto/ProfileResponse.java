@@ -2,9 +2,9 @@ package maruhxn.rankademy.adapter.webapi.dto;
 
 import lombok.Builder;
 import maruhxn.rankademy.domain.user.LolPosition;
-import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.domain.user.SummonerInfo;
 import maruhxn.rankademy.domain.user.UnivInfo;
+import maruhxn.rankademy.domain.user.User;
 
 @Builder
 public record ProfileResponse(

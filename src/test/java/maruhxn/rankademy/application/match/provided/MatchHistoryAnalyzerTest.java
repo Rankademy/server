@@ -7,7 +7,6 @@ import maruhxn.rankademy.application.match.required.MatchHistoryCollector;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.match.MatchData;
 import maruhxn.rankademy.domain.user.User;
-import maruhxn.rankademy.domain.user.UserFixture;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.UUID;
 
+import static maruhxn.rankademy.domain.user.UserFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -55,10 +55,10 @@ class MatchHistoryAnalyzerTest {
 
     @Test
     void fetchAndAnalyzeMatches() throws IOException {
-        User user = UserFixture.createUser();
-        user.enrollUnivInfo(UserFixture.createEnrollUnivRequest());
+        User user = createUser();
+        user.enrollUnivInfo(createEnrollUnivRequest());
         user.completeUnivAuthentication();
-        user.connectSummonerInfo(UserFixture.createSummonerInfoConnector(), UserFixture.createRiotAuthRequest());
+        user.connectSummonerInfo(createSummonerInfoConnector("MfiVjqqTLQ_XhERTcyHydIdiFmlQhK9zNTfKSel_DECSZHGgTIITI7QmHGGaPDbpjlPVOqAahCtHzA"), createRiotAuthRequest());
         userRepository.save(user);
         em.flush();
         em.clear();
