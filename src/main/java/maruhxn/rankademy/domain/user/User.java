@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import maruhxn.rankademy.domain.group.GroupMember;
 import maruhxn.rankademy.domain.shared.AbstractEntity;
 import maruhxn.rankademy.domain.user.dto.*;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
@@ -73,6 +74,9 @@ public class User extends AbstractEntity {
     @CollectionTable(name = "refresh_tokens",
             joinColumns = @JoinColumn(name = "user_id"))
     private Set<RefreshToken> refreshTokens = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<GroupMember> groupMembers = new HashSet<>();
 
 
     public User(String username, Email email) {

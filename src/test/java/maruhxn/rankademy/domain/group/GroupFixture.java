@@ -1,0 +1,64 @@
+package maruhxn.rankademy.domain.group;
+
+import maruhxn.rankademy.domain.group.dto.GroupCreateRequest;
+import maruhxn.rankademy.domain.group.dto.RecruitmentPostCreateRequest;
+import maruhxn.rankademy.domain.user.User;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.time.LocalDateTime;
+
+import static maruhxn.rankademy.domain.user.UserFixture.*;
+
+public class GroupFixture {
+
+    public static Group createGroup(User leader) {
+        return Group.create(
+                createGroupCreateRequest(),
+                leader
+        );
+    }
+
+    public static GroupCreateRequest createGroupCreateRequest() {
+        return new GroupCreateRequest(
+                "테스트 그룹",
+                "테스트 그룹입니다.",
+                "logo.jpg"
+        );
+    }
+
+    public static RecruitmentPostCreateRequest createRecruitmentRequest() {
+        return RecruitmentPostCreateRequest.builder()
+                .title("그룹원 모집합니다")
+                .content("열정적인 그룹원을 모집합니다.")
+                .requirements("티어 제한 없음")
+                .capacity(5)
+                .recruitmentStartDate(LocalDateTime.now())
+                .recruitmentEndDate(LocalDateTime.now().plusDays(7))
+                .build();
+    }
+
+    public static User createMember() {
+        User member = createUser("member@rankademy.app", "member");
+        member.enrollUnivInfo(createEnrollUnivRequest());
+        member.completeUnivAuthentication();
+        member.connectSummonerInfo(createSummonerInfoConnector("member-puuid"), createRiotAuthRequest("member", "KR1"));
+        return member;
+    }
+
+    public static User createMember(Long id) {
+        User member = createUser("member@rankademy.app", "member");
+        ReflectionTestUtils.setField(member, "id", id);
+        member.enrollUnivInfo(createEnrollUnivRequest());
+        member.completeUnivAuthentication();
+        member.connectSummonerInfo(createSummonerInfoConnector("member-puuid"), createRiotAuthRequest("member", "KR1"));
+        return member;
+    }
+
+    public static User createLeader() {
+        User leader = createUser("leader@rankademy.app", "leader");
+        leader.enrollUnivInfo(createEnrollUnivRequest());
+        leader.completeUnivAuthentication();
+        leader.connectSummonerInfo(createSummonerInfoConnector("leader-puuid"), createRiotAuthRequest("leader", "KR1"));
+        return leader;
+    }
+}
