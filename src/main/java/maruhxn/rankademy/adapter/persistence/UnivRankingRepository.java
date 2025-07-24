@@ -18,7 +18,7 @@ public class UnivRankingRepository {
 
     private final EntityManager em;
 
-    public List<UnivRankingResponse> getUnivRanking() {
+    public List<UnivRankingResponse> getUnivRanking(int page) {
         List<UnivRankingResponse> results = em.createQuery(
                         "SELECT NEW maruhxn.rankademy.adapter.webapi.dto.UnivRankingResponse(" +
                                 "u.univInfo.univName, " +
@@ -33,6 +33,7 @@ public class UnivRankingRepository {
                                 "GROUP BY u.univInfo.univName " +
                                 "ORDER BY SUM(s.winCount) DESC",
                         UnivRankingResponse.class)
+                .setFirstResult(10 * page)
                 .setMaxResults(10)
                 .getResultList();
 
@@ -62,7 +63,7 @@ public class UnivRankingRepository {
                 }).toList();
     }
 
-    public List<UnivStudentRankingResponse> getUnivStudentRanking(String univName) {
+    public List<UnivStudentRankingResponse> getUnivStudentRanking(String univName, int page) {
         List<User> users = em.createQuery(
                         "SELECT u FROM User u " +
                                 "JOIN FETCH u.summonerInfo s " +
@@ -71,6 +72,7 @@ public class UnivRankingRepository {
                         User.class
                 )
                 .setParameter("univName", univName)
+                .setFirstResult(10 * page)
                 .setMaxResults(10)
                 .getResultList();
 

@@ -1,20 +1,29 @@
-package maruhxn.rankademy.adapter.persistence;
+package maruhxn.rankademy.adapter.webapi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
+import maruhxn.rankademy.RankademyTestConfiguration;
 import maruhxn.rankademy.adapter.webapi.dto.UnivRankingResponse;
 import maruhxn.rankademy.adapter.webapi.dto.UnivStudentRankingResponse;
+import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.match.service.MostChampionCalculator;
 import maruhxn.rankademy.domain.user.ChampionPlayRecord;
 import maruhxn.rankademy.domain.user.TierInfo;
 import maruhxn.rankademy.domain.user.User;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import org.springframework.test.web.servlet.assertj.MvcTestResult;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import static maruhxn.rankademy.domain.user.Rank.I;
@@ -22,16 +31,27 @@ import static maruhxn.rankademy.domain.user.Rank.II;
 import static maruhxn.rankademy.domain.user.Tier.*;
 import static maruhxn.rankademy.domain.user.UserFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-@DataJpaTest
-@Import(UnivRankingRepository.class)
-class UnivRankingRepositoryTest {
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
+@Import(RankademyTestConfiguration.class)
+class RankingApiTest {
+
+    static final String BASE_URL = "/api/v1/rankings/univ";
 
     @Autowired
-    UnivRankingRepository univRankingRepository;
+    MockMvcTester mvcTester;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
+    UserRepository userRepository;
 
     @Autowired
     EntityManager em;
@@ -83,43 +103,41 @@ class UnivRankingRepositoryTest {
     }
 
     @Test
-    @DisplayName("getUnivRanking 메서드는 대학교 랭킹 목록을 올바르게 반환한다")
-    void getUnivRanking() {
-        // when
-        List<UnivRankingResponse> univRanking = univRankingRepository.getUnivRanking(0);
+    void getUnivRanking() throws UnsupportedEncodingException, JsonProcessingException {
+        MvcTestResult result = mvcTester.get().uri(BASE_URL)
+                .exchange();
+        assertThat(result).hasStatusOk();
 
-        // then
-        UnivRankingResponse seoultech = univRanking.stream().filter(u -> u.univName().equals("서울과학기술대학교")).findFirst().get();
-        assertThat(seoultech.totalUserCnt()).isEqualTo(2);
-        assertThat(seoultech.winCount()).isEqualTo(200);
-        assertThat(seoultech.rankerDto().username()).isEqualTo("user2");
+        List<UnivRankingResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+        });
 
-        UnivRankingResponse korea = univRanking.stream().filter(u -> u.univName().equals("고려대학교")).findFirst().get();
-        assertThat(korea.totalUserCnt()).isEqualTo(1);
-        assertThat(korea.winCount()).isEqualTo(100);
-        assertThat(korea.rankerDto().username()).isEqualTo("user3");
+        UnivRankingResponse seoultech = response.stream().filter(u -> u.univName().equals("서울과학기술대학교")).findFirst().get();
+        UnivRankingResponse korea = response.stream().filter(u -> u.univName().equals("고려대학교")).findFirst().get();
+
+        assertAll(
+                () -> assertThat(response).hasSize(2),
+                () -> assertThat(seoultech.totalUserCnt()).isEqualTo(2),
+                () -> assertThat(seoultech.winCount()).isEqualTo(200),
+                () -> assertThat(seoultech.rankerDto().username()).isEqualTo("user2"),
+                () -> assertThat(korea.totalUserCnt()).isEqualTo(1),
+                () -> assertThat(korea.winCount()).isEqualTo(100),
+                () -> assertThat(korea.rankerDto().username()).isEqualTo("user3")
+        );
     }
 
     @Test
-    @DisplayName("getUnivStudentRanking 메서드는 특정 대학교의 학생 랭킹을 올바르게 반환한다")
-    void getUnivStudentRanking() {
-        // when
-        List<UnivStudentRankingResponse> snutUnivStudentRanking = univRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0);
+    void getUnivStudentRanking() throws UnsupportedEncodingException, JsonProcessingException {
+        MvcTestResult result = mvcTester.get().uri(BASE_URL + "/서울과학기술대학교")
+                .exchange();
+        assertThat(result).hasStatusOk();
 
-        // then
-        assertThat(snutUnivStudentRanking).hasSize(2);
-        assertThat(snutUnivStudentRanking.get(0).summonerName()).isEqualTo("summoner2");
-        assertThat(snutUnivStudentRanking.get(0).tierInfo().tier()).isEqualTo(EMERALD);
-        assertThat(snutUnivStudentRanking.get(0).topMosts()).containsExactly("champ4", "champ5", "champ6");
-        assertThat(snutUnivStudentRanking.get(1).summonerName()).isEqualTo("summoner1");
-        assertThat(snutUnivStudentRanking.get(1).tierInfo().tier()).isEqualTo(GOLD);
-        assertThat(snutUnivStudentRanking.get(1).topMosts()).containsExactly("champ1", "champ2", "champ3");
+        List<UnivStudentRankingResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
 
-        List<UnivStudentRankingResponse> koreaUnivStudentRanking = univRankingRepository.getUnivStudentRanking("고려대학교", 0);
-        assertThat(koreaUnivStudentRanking).hasSize(1);
-        assertThat(koreaUnivStudentRanking.get(0).summonerName()).isEqualTo("summoner3");
-        assertThat(koreaUnivStudentRanking.get(0).tierInfo().tier()).isEqualTo(BRONZE);
-        assertThat(koreaUnivStudentRanking.get(0).topMosts()).containsExactly("champ7", "champ8", "champ9");
-
+        assertThat(response).hasSize(2);
+        assertThat(response.get(0).summonerName()).isEqualTo("summoner2");
+        assertThat(response.get(0).tierInfo().tier()).isEqualTo(EMERALD);
+        assertThat(response.get(0).topMosts()).containsExactly("champ4", "champ5", "champ6");
+        assertThat(response.get(1).summonerName()).isEqualTo("summoner1");
+        assertThat(response.get(1).tierInfo().tier()).isEqualTo(GOLD);
     }
 }
