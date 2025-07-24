@@ -9,8 +9,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public class UserFixture {
+
+    public static UserRegisterRequest createUserRegisterRequest(String email, String username) {
+        return new UserRegisterRequest(email, username, "verysecret");
+    }
 
     public static UserRegisterRequest createUserRegisterRequest(String email) {
         return new UserRegisterRequest(email, "maruhxn", "verysecret");
@@ -38,21 +43,65 @@ public class UserFixture {
         return UserFixture::createSummonerInfo;
     }
 
+
+    public static SummonerInfoConnector createSummonerInfoConnector(String puuid) {
+        return request -> createSummonerInfo(request, puuid);
+    }
+
+
+    public static SummonerInfoConnector createSummonerInfoConnector(TierInfo tierInfo) {
+        return request -> createSummonerInfo(request, tierInfo);
+    }
+
     public static SummonerInfo createSummonerInfo(RiotAuthRequest request) {
         return new SummonerInfo(
-                "MfiVjqqTLQ_XhERTcyHydIdiFmlQhK9zNTfKSel_DECSZHGgTIITI7QmHGGaPDbpjlPVOqAahCtHzA",
+                UUID.randomUUID().toString(),
                 request.summonerName(),
                 request.summonerTag(),
                 12345,
-                new TierInfo("BRONZE", "II", 50),
+                new TierInfo(Tier.BRONZE, Rank.II, 50),
                 100,
-                50.0,
+                100,
+                LocalDateTime.now()
+        );
+    }
+
+    public static SummonerInfo createSummonerInfo(RiotAuthRequest request, String puuid) {
+        return new SummonerInfo(
+                puuid,
+                request.summonerName(),
+                request.summonerTag(),
+                12345,
+                new TierInfo(Tier.BRONZE, Rank.II, 50),
+                100,
+                100,
+                LocalDateTime.now()
+        );
+    }
+
+    public static SummonerInfo createSummonerInfo(RiotAuthRequest request, TierInfo tierInfo) {
+        return new SummonerInfo(
+                UUID.randomUUID().toString(),
+                request.summonerName(),
+                request.summonerTag(),
+                12345,
+                tierInfo,
+                100,
+                100,
                 LocalDateTime.now()
         );
     }
 
     public static User createUser() {
         return User.register(createUserRegisterRequest(), createPasswordEncoder());
+    }
+
+    public static User createUser(String email) {
+        return User.register(createUserRegisterRequest(email), createPasswordEncoder());
+    }
+
+    public static User createUser(String email, String username) {
+        return User.register(createUserRegisterRequest(email, username), createPasswordEncoder());
     }
 
     public static User createUser(Long id) {
@@ -77,6 +126,10 @@ public class UserFixture {
 
     public static RiotAuthRequest createRiotAuthRequest() {
         return new RiotAuthRequest("maruhxn", "KOR");
+    }
+
+    public static RiotAuthRequest createRiotAuthRequest(String summonerName, String summonerTag) {
+        return new RiotAuthRequest(summonerName, summonerTag);
     }
 
     public static UserTitleProvider createTitleProvider() {

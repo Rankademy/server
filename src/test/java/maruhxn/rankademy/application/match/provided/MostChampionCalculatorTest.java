@@ -2,10 +2,10 @@ package maruhxn.rankademy.application.match.provided;
 
 import jakarta.persistence.EntityManager;
 import maruhxn.rankademy.RankademyTestConfiguration;
-import maruhxn.rankademy.domain.user.ChampionPlayRecord;
 import maruhxn.rankademy.domain.match.MatchData;
 import maruhxn.rankademy.domain.match.service.MostChampionCalculator;
 import maruhxn.rankademy.domain.match.service.MyChampionIdParser;
+import maruhxn.rankademy.domain.user.ChampionPlayRecord;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

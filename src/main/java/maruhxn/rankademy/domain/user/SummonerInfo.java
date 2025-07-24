@@ -39,9 +39,9 @@ public class SummonerInfo extends AbstractEntity {
     @Embedded
     private TierInfo tierInfo;
 
-    private int totalMatchCnt;
+    private int winCount;
 
-    private double winRate;
+    private int lossCount;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "summoner_most_champion",
@@ -52,29 +52,26 @@ public class SummonerInfo extends AbstractEntity {
     private LocalDateTime enrolledAt;
 
     @Builder
-    public SummonerInfo(String puuid, String summonerName, String summonerTag, int summonerIconNum, TierInfo tierInfo, int totalMatchCnt, double winRate, LocalDateTime enrolledAt) {
+    public SummonerInfo(String puuid, String summonerName, String summonerTag, int summonerIconNum, TierInfo tierInfo, int winCount, int lossCount, LocalDateTime enrolledAt) {
         this.puuid = puuid;
         this.summonerName = summonerName;
         this.summonerTag = summonerTag;
         this.summonerIconNum = summonerIconNum;
         this.tierInfo = tierInfo;
-        this.totalMatchCnt = totalMatchCnt;
-        this.winRate = winRate;
+        this.winCount = winCount;
+        this.lossCount = lossCount;
         this.enrolledAt = enrolledAt;
     }
 
     public static SummonerInfo of(String puuid, RiotAuthRequest riotAuthRequest, int summonerIconId, RiotLeagueEntryResponse soloRankEntry) {
-        int totalWins = soloRankEntry.wins();
-        int totalMatches = soloRankEntry.wins() + soloRankEntry.losses();
-
         return SummonerInfo.builder()
                 .puuid(requireNonNull(puuid))
                 .summonerName(riotAuthRequest.summonerName())
                 .summonerTag(riotAuthRequest.summonerTag())
                 .summonerIconNum(summonerIconId)
                 .tierInfo(TierInfo.from(soloRankEntry))
-                .winRate((double) totalWins / totalMatches * 100)
-                .totalMatchCnt(totalMatches)
+                .winCount(soloRankEntry.wins())
+                .lossCount(soloRankEntry.losses())
                 .enrolledAt(LocalDateTime.now())
                 .build();
     }
@@ -84,5 +81,13 @@ public class SummonerInfo extends AbstractEntity {
         List<ChampionPlayRecord> mostChampions =
                 mostChampionCalculator.calculateMostChampionsTop3(newMatches, puuid);
         this.mostChampions.addAll(mostChampions);
+    }
+
+    public int getTotalMatchCnt() {
+        return winCount + lossCount;
+    }
+
+    public double getWinRate() {
+        return (double) winCount / getTotalMatchCnt() * 100;
     }
 }

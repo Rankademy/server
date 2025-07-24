@@ -17,7 +17,10 @@ public enum PermitAllUrls {
     FAVICON("/favicon.*", GET),
     ICON("/*/icon-*", GET),
     REGISTER("/api/v1/auth/register", POST),
-    REFRESH("/api/v1/auth/refresh", GET);
+    REFRESH("/api/v1/auth/refresh", GET),
+    UNIV_RANKING("/api/v1/rankings/univ", GET),
+    UNIV_STUDENT_RANKING("/api/v1/rankings/univ/{univName}", GET),
+    ;
 
     private final String url;
     private final HttpMethod method;

@@ -35,7 +35,6 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ProblemDetail exceptionHandler(Exception ex) {
-
         return ProblemDetailBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR, ex);
     }
 }

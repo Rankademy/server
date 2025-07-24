@@ -26,7 +26,6 @@ import java.util.Date;
 import static maruhxn.rankademy.adapter.security.Constants.REFRESH_TOKEN_HEADER;
 import static maruhxn.rankademy.domain.user.UserFixture.createUser;
 import static maruhxn.rankademy.domain.user.UserFixture.createUserRegisterRequest;
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
