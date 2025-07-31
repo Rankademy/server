@@ -104,13 +104,14 @@ public class Group extends AbstractEntity {
         this.addMember(requireNonNull(user), GroupRole.MEMBER);
     }
 
-    public void rejectJoinRequest(User user) {
-        this.joinRequests.removeIf(request -> request.userId().equals(user.getId()));
+    public void rejectJoinRequest(Long userId) {
+        this.joinRequests.removeIf(request -> request.userId().equals(userId));
     }
 
-    public void createGroupRecruitmentPost(RecruitmentPostCreateRequest request) {
+    public GroupRecruitmentPost createGroupRecruitmentPost(RecruitmentPostCreateRequest request) {
         Assert.isNull(this.recruitmentPost, "이미 모집 공고가 존재합니다.");
         this.recruitmentPost = GroupRecruitmentPost.create(request);
+        return this.recruitmentPost;
     }
 
     public void closeRecruitment() {

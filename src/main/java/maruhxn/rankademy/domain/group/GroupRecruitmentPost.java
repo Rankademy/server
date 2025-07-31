@@ -48,7 +48,6 @@ public class GroupRecruitmentPost extends AbstractEntity {
         this.capacity = capacity;
         this.recruitmentStartDate = recruitmentStartDate;
         this.recruitmentEndDate = recruitmentEndDate;
-        this.lastUppedAt = LocalDateTime.now();
     }
 
     public static GroupRecruitmentPost create(RecruitmentPostCreateRequest request) {
@@ -72,8 +71,10 @@ public class GroupRecruitmentPost extends AbstractEntity {
     }
 
     public void up(LocalDateTime uppedAt) {
-        boolean isAfterOneDay = lastUppedAt != null && Duration.between(lastUppedAt, uppedAt).toHours() > 24;
-        Assert.state(isAfterOneDay, "24시간 이내에는 다시 up할 수 없습니다.");
+        if (lastUppedAt != null) {
+            boolean isAfterOneDay = Duration.between(lastUppedAt, uppedAt).toHours() > 24;
+            Assert.state(isAfterOneDay, "24시간 이내에는 다시 up할 수 없습니다.");
+        }
         this.lastUppedAt = uppedAt;
     }
 }

@@ -115,7 +115,7 @@ class GroupTest {
         group.addJoinRequest(anotherApplicant);
 
         // when: 가입 거절
-        group.rejectJoinRequest(anotherApplicant);
+        group.rejectJoinRequest(anotherApplicant.getId());
 
         // then
         assertThat(group.getJoinRequests()).isEmpty();

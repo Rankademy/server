@@ -52,7 +52,8 @@ class GroupRecruitmentPostTest {
     @DisplayName("게시글을 끌어올린다")
     void up() {
         // given
-        LocalDateTime beforeUp = post.getLastUppedAt();
+        LocalDateTime beforeUp = LocalDateTime.now();
+        post.up(beforeUp);
         LocalDateTime uppedAt = post.getLastUppedAt().plusDays(2);
 
         // when
@@ -66,7 +67,9 @@ class GroupRecruitmentPostTest {
     @DisplayName("게시글을 끌어올리기는 하루에 한 번만 가능하다")
     void up_Fail() {
         // given
-        LocalDateTime uppedAt = post.getLastUppedAt().plusHours(23).plusMinutes(59);
+        LocalDateTime now = LocalDateTime.now();
+        post.up(now);
+        LocalDateTime uppedAt = now.plusHours(23).plusMinutes(59);
 
         // when
         assertThatThrownBy(() -> post.up(uppedAt))
