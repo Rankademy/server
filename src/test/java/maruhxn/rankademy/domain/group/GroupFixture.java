@@ -54,6 +54,14 @@ public class GroupFixture {
         return member;
     }
 
+    public static User createMember(String email, String username) {
+        User member = createUser(email, username);
+        member.enrollUnivInfo(createEnrollUnivRequest("서울과학기술대학교", username + "@seoultech.ac.kr"));
+        member.completeUnivAuthentication();
+        member.connectSummonerInfo(createSummonerInfoConnector(username + "-puuid"), createRiotAuthRequest(username, "KR1"));
+        return member;
+    }
+
     public static User createLeader() {
         User leader = createUser("leader@rankademy.app", "leader");
         leader.enrollUnivInfo(createEnrollUnivRequest());
@@ -61,4 +69,5 @@ public class GroupFixture {
         leader.connectSummonerInfo(createSummonerInfoConnector("leader-puuid"), createRiotAuthRequest("leader", "KR1"));
         return leader;
     }
+
 }
