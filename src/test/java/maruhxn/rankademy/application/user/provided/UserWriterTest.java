@@ -123,8 +123,8 @@ class UserWriterTest {
         user = userWriter.enrollUnivInfo(user.getId(), enrollUnivRequest);
         em.flush();
 
-        assertThat(user.getUnivInfo().univName()).isEqualTo(enrollUnivRequest.univName());
-        assertThat(user.getUnivInfo().univVerified()).isEqualTo(false);
+        assertThat(user.getUnivInfo().getUnivName()).isEqualTo(enrollUnivRequest.univName());
+        assertThat(user.getUnivInfo().isUnivVerified()).isEqualTo(false);
     }
 
     @Test
@@ -134,7 +134,7 @@ class UserWriterTest {
         EnrollUnivRequest enrollUnivRequest = createEnrollUnivRequest("서울과학기술대학교", "test@test.ac.kr");
 
         assertThatThrownBy(() -> userWriter.enrollUnivInfo(user.getId(), enrollUnivRequest))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
 
         EnrollUnivRequest enrollUnivRequest2 = createEnrollUnivRequest("없는대학교", "test@test.ac.kr");

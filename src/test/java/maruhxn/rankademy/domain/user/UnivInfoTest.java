@@ -13,8 +13,8 @@ class UnivInfoTest {
         EnrollUnivRequest request = createEnrollUnivRequest();
         UnivInfo univInfo = UnivInfo.from(request);
 
-        assertThat(univInfo.univName()).isEqualTo(request.univName());
-        assertThat(univInfo.univMail().address()).isEqualTo(request.univMail());
+        assertThat(univInfo.getUnivName()).isEqualTo(request.univName());
+        assertThat(univInfo.getUnivMail().address()).isEqualTo(request.univMail());
     }
 
 }

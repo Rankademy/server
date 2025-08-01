@@ -131,13 +131,14 @@ class RankingApiTest {
                 .exchange();
         assertThat(result).hasStatusOk();
 
-        List<UnivStudentRankingResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+        List<UnivStudentRankingResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+        });
 
         assertThat(response).hasSize(2);
         assertThat(response.get(0).summonerName()).isEqualTo("summoner2");
-        assertThat(response.get(0).tierInfo().tier()).isEqualTo(EMERALD);
+        assertThat(response.get(0).tierInfo().getTier()).isEqualTo(EMERALD);
         assertThat(response.get(0).topMosts()).containsExactly("champ4", "champ5", "champ6");
         assertThat(response.get(1).summonerName()).isEqualTo("summoner1");
-        assertThat(response.get(1).tierInfo().tier()).isEqualTo(GOLD);
+        assertThat(response.get(1).tierInfo().getTier()).isEqualTo(GOLD);
     }
 }

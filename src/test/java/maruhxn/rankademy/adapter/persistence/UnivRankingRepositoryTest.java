@@ -109,16 +109,16 @@ class UnivRankingRepositoryTest {
         // then
         assertThat(snutUnivStudentRanking).hasSize(2);
         assertThat(snutUnivStudentRanking.get(0).summonerName()).isEqualTo("summoner2");
-        assertThat(snutUnivStudentRanking.get(0).tierInfo().tier()).isEqualTo(EMERALD);
+        assertThat(snutUnivStudentRanking.get(0).tierInfo().getTier()).isEqualTo(EMERALD);
         assertThat(snutUnivStudentRanking.get(0).topMosts()).containsExactly("champ4", "champ5", "champ6");
         assertThat(snutUnivStudentRanking.get(1).summonerName()).isEqualTo("summoner1");
-        assertThat(snutUnivStudentRanking.get(1).tierInfo().tier()).isEqualTo(GOLD);
+        assertThat(snutUnivStudentRanking.get(1).tierInfo().getTier()).isEqualTo(GOLD);
         assertThat(snutUnivStudentRanking.get(1).topMosts()).containsExactly("champ1", "champ2", "champ3");
 
         List<UnivStudentRankingResponse> koreaUnivStudentRanking = univRankingRepository.getUnivStudentRanking("고려대학교", 0);
         assertThat(koreaUnivStudentRanking).hasSize(1);
         assertThat(koreaUnivStudentRanking.get(0).summonerName()).isEqualTo("summoner3");
-        assertThat(koreaUnivStudentRanking.get(0).tierInfo().tier()).isEqualTo(BRONZE);
+        assertThat(koreaUnivStudentRanking.get(0).tierInfo().getTier()).isEqualTo(BRONZE);
         assertThat(koreaUnivStudentRanking.get(0).topMosts()).containsExactly("champ7", "champ8", "champ9");
 
     }

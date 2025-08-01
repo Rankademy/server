@@ -3,30 +3,39 @@ package maruhxn.rankademy.domain.user;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 
 import static java.util.Objects.requireNonNull;
 
 @Embeddable
-public record UnivInfo(
-        @Column(length = 100)
-        String univName,
+@Getter
+@NoArgsConstructor
+public class UnivInfo {
+    @Column(length = 100)
+    private String univName;
 
-        Email univMail,
+    private Email univMail;
 
-        boolean univVerified,
+    private boolean univVerified;
 
-        boolean inCollege,
+    private boolean inCollege;
 
-        int admissionYear,
+    private int admissionYear;
 
-        @Column(length = 100)
-        String major
-) {
+    @Column(length = 100)
+    private String major;
+
 
     @Builder
-    public UnivInfo {
-        // 학교명과 학교메일 형식이 매칭되는지 확인 필요
+    public UnivInfo(String univName, Email univMail, boolean univVerified, boolean inCollege, int admissionYear, String major) {
+        this.univName = univName;
+        this.univMail = univMail;
+        this.univVerified = univVerified;
+        this.inCollege = inCollege;
+        this.admissionYear = admissionYear;
+        this.major = major;
     }
 
     static UnivInfo from(EnrollUnivRequest enrollUnivRequest) {
@@ -53,12 +62,12 @@ public record UnivInfo(
 
     public UnivInfo authenticate() {
         return UnivInfo.builder()
-                .univName(requireNonNull(this.univName()))
-                .univMail(this.univMail())
+                .univName(requireNonNull(this.getUnivName()))
+                .univMail(this.getUnivMail())
                 .univVerified(true)
-                .inCollege(this.inCollege())
-                .admissionYear(this.admissionYear())
-                .major(requireNonNull(this.major()))
+                .inCollege(this.isInCollege())
+                .admissionYear(this.getAdmissionYear())
+                .major(requireNonNull(this.getMajor()))
                 .build();
     }
 }

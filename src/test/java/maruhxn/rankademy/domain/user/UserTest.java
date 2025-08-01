@@ -134,7 +134,7 @@ class UserTest {
 
         // then
         assertThat(user.getUnivInfo()).isNotNull();
-        assertThat(user.getUnivInfo().univName()).isEqualTo(request.univName());
+        assertThat(user.getUnivInfo().getUnivName()).isEqualTo(request.univName());
     }
 
     @Test

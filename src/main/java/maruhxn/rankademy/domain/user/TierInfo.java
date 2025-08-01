@@ -4,28 +4,39 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import maruhxn.rankademy.domain.user.dto.RiotLeagueEntryResponse;
 import maruhxn.rankademy.domain.user.service.TierMapper;
 
 @Embeddable
-public record TierInfo(
-        @Column(nullable = false)
-        @Enumerated(EnumType.STRING)
-        Tier tier,
+@Getter
+@NoArgsConstructor
+public class TierInfo {
 
-        @Column(name = "tier_rank")
-        @Enumerated(EnumType.STRING)
-        Rank rank,
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Tier tier;
 
-        @Column(nullable = false)
-        int lp,
+    @Column(name = "tier_rank")
+    @Enumerated(EnumType.STRING)
+    private Rank rank;
 
-        @Column(nullable = false)
-        int mappedTier
-) {
+    @Column(nullable = false)
+    private int lp;
+
+    @Column(nullable = false)
+    private int mappedTier;
 
     public TierInfo(Tier tier, Rank rank, int lp) {
         this(tier, rank, lp, TierMapper.tierToScore(tier, rank, lp));
+    }
+
+    public TierInfo(Tier tier, Rank rank, int lp, int mappedTier) {
+        this.tier = tier;
+        this.rank = rank;
+        this.lp = lp;
+        this.mappedTier = mappedTier;
     }
 
     static TierInfo from(RiotLeagueEntryResponse soloRankEntry) {

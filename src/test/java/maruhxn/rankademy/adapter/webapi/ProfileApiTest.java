@@ -94,10 +94,10 @@ class ProfileApiTest {
                 () -> assertThat(response.id()).isEqualTo(target.getId()),
                 () -> assertThat(response.username()).isEqualTo(target.getUsername()),
                 () -> assertThat(response.univInfo()).isNotNull(),
-                () -> assertThat(response.univInfo().univName()).isEqualTo(target.getUnivInfo().univName()),
-                () -> assertThat(response.univInfo().univMail()).isEqualTo(target.getUnivInfo().univMail().address()),
+                () -> assertThat(response.univInfo().univName()).isEqualTo(target.getUnivInfo().getUnivName()),
+                () -> assertThat(response.univInfo().univMail()).isEqualTo(target.getUnivInfo().getUnivMail().address()),
                 () -> assertThat(response.univInfo().univVerified()).isEqualTo(false),
-                () -> assertThat(response.univInfo().major()).isEqualTo(target.getUnivInfo().major()),
+                () -> assertThat(response.univInfo().major()).isEqualTo(target.getUnivInfo().getMajor()),
                 () -> assertThat(response.mainPosition()).isNull(),
                 () -> assertThat(response.summonerInfo()).isNull()
         );
@@ -122,10 +122,10 @@ class ProfileApiTest {
                 () -> assertThat(response2.id()).isEqualTo(target2.getId()),
                 () -> assertThat(response2.username()).isEqualTo(target2.getUsername()),
                 () -> assertThat(response2.univInfo()).isNotNull(),
-                () -> assertThat(response2.univInfo().univName()).isEqualTo(target.getUnivInfo().univName()),
-                () -> assertThat(response2.univInfo().univMail()).isEqualTo(target.getUnivInfo().univMail().address()),
+                () -> assertThat(response2.univInfo().univName()).isEqualTo(target.getUnivInfo().getUnivName()),
+                () -> assertThat(response2.univInfo().univMail()).isEqualTo(target.getUnivInfo().getUnivMail().address()),
                 () -> assertThat(response2.univInfo().univVerified()).isEqualTo(true),
-                () -> assertThat(response2.univInfo().major()).isEqualTo(target.getUnivInfo().major()),
+                () -> assertThat(response2.univInfo().major()).isEqualTo(target.getUnivInfo().getMajor()),
                 () -> assertThat(response2.summonerInfo()).isNotNull(),
                 () -> assertThat(response2.summonerInfo().summonerName()).isEqualTo(target2.getSummonerInfo().getSummonerName()),
                 () -> assertThat(response2.summonerInfo().summonerTag()).isEqualTo(target2.getSummonerInfo().getSummonerTag())
@@ -139,7 +139,7 @@ class ProfileApiTest {
 
         var request = new ProfileUpdateRequest(
                 "new-username",
-                "it's description",
+                "it's about",
                 LolPosition.TOP,
                 LolPosition.JG
         );
@@ -217,7 +217,7 @@ class ProfileApiTest {
         assertThat(result).hasStatusOk();
 
         User target = userRepository.findById(user.getId()).orElseThrow();
-        assertThat(target.getUnivInfo().univVerified()).isTrue();
+        assertThat(target.getUnivInfo().isUnivVerified()).isTrue();
     }
 
     @Test

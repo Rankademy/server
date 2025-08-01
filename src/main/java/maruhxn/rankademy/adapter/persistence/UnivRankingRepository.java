@@ -97,8 +97,8 @@ public class UnivRankingRepository {
                             mostChampionIds,
                             u.getMainPosition(),
                             u.getSubPosition(),
-                            u.getUnivInfo().admissionYear(),
-                            u.getUnivInfo().major()
+                            u.getUnivInfo().getAdmissionYear(),
+                            u.getUnivInfo().getMajor()
                     );
                 })
                 .toList();

@@ -26,7 +26,7 @@ public record ProfileResponse(
                 .email(user.getEmail().address())
                 .univInfo(univInfo == null ?
                         null :
-                        new UnivInfoResponse(univInfo.univName(), univInfo.univMail().address(), univInfo.univVerified(), univInfo.major())
+                        new UnivInfoResponse(univInfo.getUnivName(), univInfo.getUnivMail().address(), univInfo.isUnivVerified(), univInfo.getMajor())
                 )
                 .description(user.getDescription())
                 .mainPosition(user.getMainPosition())

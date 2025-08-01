@@ -34,9 +34,9 @@ public class UserAuthService implements UserAuthorizer {
         }
 
         univMailCertifier.sendCertifyMail(
-                user.getUnivInfo().univMail().address(),
-                user.getUnivInfo().univName(),
-                user.getUnivInfo().inCollege()
+                user.getUnivInfo().getUnivMail().address(),
+                user.getUnivInfo().getUnivName(),
+                user.getUnivInfo().isInCollege()
         );
     }
 
@@ -46,8 +46,8 @@ public class UserAuthService implements UserAuthorizer {
         User user = userReader.get(userId);
 
         univMailCertifier.certifyCode(
-                user.getUnivInfo().univMail().address(),
-                user.getUnivInfo().univName(),
+                user.getUnivInfo().getUnivMail().address(),
+                user.getUnivInfo().getUnivName(),
                 code
         );
 

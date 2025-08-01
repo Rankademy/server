@@ -76,9 +76,9 @@ class TierMapperTest {
         @DisplayName("0점은 UNRANKED로 변환된다")
         void scoreToTier_UNRANKED() {
             TierInfo tierInfo = TierMapper.scoreToTier(-1);
-            assertThat(tierInfo.tier()).isEqualTo(Tier.UNRANKED);
-            assertThat(tierInfo.rank()).isEqualTo(Rank.EMPTY);
-            assertThat(tierInfo.lp()).isEqualTo(0);
+            assertThat(tierInfo.getTier()).isEqualTo(Tier.UNRANKED);
+            assertThat(tierInfo.getRank()).isEqualTo(Rank.EMPTY);
+            assertThat(tierInfo.getLp()).isEqualTo(0);
         }
 
         @Test
@@ -91,9 +91,9 @@ class TierMapperTest {
             TierInfo tierInfo = TierMapper.scoreToTier(score);
 
             // then
-            assertThat(tierInfo.tier()).isEqualTo(Tier.PLATINUM);
-            assertThat(tierInfo.rank()).isEqualTo(Rank.II);
-            assertThat(tierInfo.lp()).isEqualTo(75);
+            assertThat(tierInfo.getTier()).isEqualTo(Tier.PLATINUM);
+            assertThat(tierInfo.getRank()).isEqualTo(Rank.II);
+            assertThat(tierInfo.getLp()).isEqualTo(75);
         }
 
         @Test
@@ -106,9 +106,9 @@ class TierMapperTest {
             TierInfo tierInfo = TierMapper.scoreToTier(score);
 
             // then
-            assertThat(tierInfo.tier()).isEqualTo(Tier.IRON);
-            assertThat(tierInfo.rank()).isEqualTo(Rank.IV);
-            assertThat(tierInfo.lp()).isEqualTo(0);
+            assertThat(tierInfo.getTier()).isEqualTo(Tier.IRON);
+            assertThat(tierInfo.getRank()).isEqualTo(Rank.IV);
+            assertThat(tierInfo.getLp()).isEqualTo(0);
         }
 
         @Test
@@ -121,9 +121,9 @@ class TierMapperTest {
             TierInfo tierInfo = TierMapper.scoreToTier(score);
 
             // then
-            assertThat(tierInfo.tier()).isEqualTo(Tier.MASTER);
-            assertThat(tierInfo.rank()).isNull();
-            assertThat(tierInfo.lp()).isEqualTo(0);
+            assertThat(tierInfo.getTier()).isEqualTo(Tier.MASTER);
+            assertThat(tierInfo.getRank()).isNull();
+            assertThat(tierInfo.getLp()).isEqualTo(0);
         }
 
         @Test
@@ -136,9 +136,9 @@ class TierMapperTest {
             TierInfo tierInfo = TierMapper.scoreToTier(score);
 
             // then
-            assertThat(tierInfo.tier()).isEqualTo(Tier.MASTER);
-            assertThat(tierInfo.rank()).isNull();
-            assertThat(tierInfo.lp()).isEqualTo(500);
+            assertThat(tierInfo.getTier()).isEqualTo(Tier.MASTER);
+            assertThat(tierInfo.getRank()).isNull();
+            assertThat(tierInfo.getLp()).isEqualTo(500);
         }
 
         @Test
@@ -151,9 +151,9 @@ class TierMapperTest {
             TierInfo tierInfo = TierMapper.scoreToTier(score);
 
             // then
-            assertThat(tierInfo.tier()).isEqualTo(Tier.GOLD);
-            assertThat(tierInfo.rank()).isEqualTo(Rank.I);
-            assertThat(tierInfo.lp()).isEqualTo(0);
+            assertThat(tierInfo.getTier()).isEqualTo(Tier.GOLD);
+            assertThat(tierInfo.getRank()).isEqualTo(Rank.I);
+            assertThat(tierInfo.getLp()).isEqualTo(0);
         }
 
         @Test
@@ -166,9 +166,9 @@ class TierMapperTest {
             TierInfo tierInfo = TierMapper.scoreToTier(score);
 
             // then
-            assertThat(tierInfo.tier()).isEqualTo(Tier.GOLD);
-            assertThat(tierInfo.rank()).isEqualTo(Rank.II);
-            assertThat(tierInfo.lp()).isEqualTo(99);
+            assertThat(tierInfo.getTier()).isEqualTo(Tier.GOLD);
+            assertThat(tierInfo.getRank()).isEqualTo(Rank.II);
+            assertThat(tierInfo.getLp()).isEqualTo(99);
         }
     }
 }

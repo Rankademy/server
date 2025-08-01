@@ -65,7 +65,7 @@ class UserAuthorizerTest {
         em.flush();
         em.clear();
 
-        assertThat(user.getUnivInfo().univVerified()).isTrue();
+        assertThat(user.getUnivInfo().isUnivVerified()).isTrue();
     }
 
     @Test

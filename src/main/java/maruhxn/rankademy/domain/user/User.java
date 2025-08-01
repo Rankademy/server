@@ -124,7 +124,7 @@ public class User extends AbstractEntity {
     }
 
     public boolean isAuthorized() {
-        if ((univInfo == null || !univInfo.univVerified()) ||
+        if ((univInfo == null || !univInfo.isUnivVerified()) ||
                 summonerInfo == null) {
             authStatus = UserAuthStatus.UNAUTHORIZED;
             return false;
@@ -140,7 +140,7 @@ public class User extends AbstractEntity {
             return;
         }
 
-        boolean isEmailChanged = !this.univInfo.univMail().address().equals(enrollUnivRequest.univMail());
+        boolean isEmailChanged = !this.univInfo.getUnivMail().address().equals(enrollUnivRequest.univMail());
 
         if (isEmailChanged) { // 이메일이 바뀌었으면 학생 재인증 필요
             this.authStatus = UserAuthStatus.UNAUTHORIZED;
@@ -152,7 +152,7 @@ public class User extends AbstractEntity {
 
     public void completeUnivAuthentication() {
         Assert.state(this.univInfo != null, "학교 정보를 등록해주세요.");
-        Assert.state(!this.univInfo.univVerified(), "이미 학교 인증이 완료되었습니다.");
+        Assert.state(!this.univInfo.isUnivVerified(), "이미 학교 인증이 완료되었습니다.");
         this.univInfo = this.univInfo.authenticate();
     }
 

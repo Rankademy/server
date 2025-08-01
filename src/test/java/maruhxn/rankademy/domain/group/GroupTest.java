@@ -33,7 +33,7 @@ class GroupTest {
 
         assertThat(groupMember.getUser()).isEqualTo(leader);
         assertThat(groupMember.getRole()).isEqualTo(GroupRole.LEADER);
-        assertThat(group.getUnivName()).isEqualTo(leader.getUnivInfo().univName());
+        assertThat(group.getUnivName()).isEqualTo(leader.getUnivInfo().getUnivName());
     }
 
     @Test
