@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import static maruhxn.rankademy.domain.group.GroupFixture.createMember;
 import static maruhxn.rankademy.domain.group.GroupFixture.createRecruitmentRequest;
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -65,6 +64,21 @@ class GroupTest {
     }
 
     @Test
+    void addMember_And_CloseRecruitment() {
+        // 48명 추가
+        for (int i = 1; i < 49; i++) {
+            group.addMember(createMember(String.format("test%d@test.com", i), String.format("tester%d", i)), GroupRole.MEMBER);
+        }
+
+        assertThat(group.isRecruiting()).isTrue();
+        assertThat(group.isFull()).isFalse();
+
+        group.addMember(createMember(), GroupRole.MEMBER);
+        assertThat(group.isRecruiting()).isFalse();
+        assertThat(group.isFull()).isTrue();
+    }
+
+    @Test
     @DisplayName("다른 학교 소속의 유저는 그룹에 가입할 수 없다")
     void addMemberWithDifferentUniv() {
         // given
@@ -101,7 +115,7 @@ class GroupTest {
         assertThat(group.isRecruiting()).isFalse();
 
         assertThatThrownBy(() -> group.addJoinRequest(requester))
-            .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test

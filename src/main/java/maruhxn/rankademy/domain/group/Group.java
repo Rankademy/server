@@ -84,17 +84,23 @@ public class Group extends AbstractEntity {
         Assert.isTrue(this.univName.equals(user.getUnivInfo().getUnivName()), "동일한 학교 소속의 유저만 가입할 수 있습니다.");
         Assert.state(user.isAuthorized(), "인증된 사용자만 가입할 수 있습니다.");
 
-        GroupMember groupMember = GroupMember.builder()
-                .group(this)
-                .user(user)
-                .role(role)
-                .build();
+        GroupMember groupMember = new GroupMember(this, user);
+        groupMember.setRole(role);
 
         this.members.add(groupMember);
+
+        // 정원이 가득 차면 모집 종료
+        if (this.members.size() >= this.capacity) {
+            this.closeRecruitment();
+        }
     }
 
     public void removeMember(User user) {
         this.members.removeIf(member -> member.getUser().equals(user));
+    }
+
+    public boolean isFull() {
+        return this.members.size() >= this.capacity;
     }
 
     public void addJoinRequest(User user) {

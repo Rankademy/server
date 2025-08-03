@@ -2,7 +2,6 @@ package maruhxn.rankademy.domain.group;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import maruhxn.rankademy.domain.shared.AbstractEntity;
@@ -30,10 +29,13 @@ public class GroupMember extends AbstractEntity {
     @Column(nullable = false)
     private GroupRole role;
 
-    @Builder
-    public GroupMember(Group group, User user, GroupRole role) {
+    public GroupMember(Group group, User user) {
         this.group = group;
         this.user = user;
+        this.role = GroupRole.MEMBER;
+    }
+
+    public void setRole(GroupRole role) {
         this.role = role;
     }
 }
