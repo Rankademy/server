@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static maruhxn.rankademy.domain.group.GroupFixture.createMember;
 import static maruhxn.rankademy.domain.group.GroupFixture.createRecruitmentRequest;
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -33,7 +34,9 @@ class GroupTest {
 
         assertThat(groupMember.getUser()).isEqualTo(leader);
         assertThat(groupMember.getRole()).isEqualTo(GroupRole.LEADER);
+        assertThat(group.isRecruiting()).isTrue();
         assertThat(group.getUnivName()).isEqualTo(leader.getUnivInfo().getUnivName());
+        assertThat(group.getRecruitmentPost()).isNull();
     }
 
     @Test
@@ -90,6 +93,18 @@ class GroupTest {
     }
 
     @Test
+    @DisplayName("모집 기간이 아닌 경우 가입 신청이 불가능하다")
+    void joinRequest_Fail() {
+        User requester = createMember(1L);
+
+        group.closeRecruitment();
+        assertThat(group.isRecruiting()).isFalse();
+
+        assertThatThrownBy(() -> group.addJoinRequest(requester))
+            .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
     @DisplayName("그룹 가입 신청, 수락, 거절")
     void joinRequest() {
         // given
@@ -123,19 +138,30 @@ class GroupTest {
     }
 
     @Test
-    @DisplayName("그룹원 모집 공고를 등록하고 종료할 수 있다")
+    @DisplayName("모집 종료 시, 모집 공고는 비활성화된다")
     void manageRecruitment() {
         // when: 모집 공고 등록
-        group.createGroupRecruitmentPost(createRecruitmentRequest());
+        group.upsertRecruitmentPost(createRecruitmentRequest());
 
         // then
         assertThat(group.getRecruitmentPost()).isNotNull();
-        assertThat(group.getRecruitmentPost().getTitle()).isEqualTo("그룹원 모집합니다");
+        assertThat(group.getRecruitmentPost().isActive()).isTrue();
 
-        // when: 모집 공고 종료
+        // when: 모집 종료
         group.closeRecruitment();
 
         // then
-        assertThat(group.getRecruitmentPost()).isNull();
+        assertThat(group.getRecruitmentPost().isActive()).isFalse();
+    }
+
+    @Test
+    @DisplayName("모집이 시작되면 기존 모집 공고가 활성화된다")
+    void startRecruitment() {
+        group.upsertRecruitmentPost(createRecruitmentRequest());
+        group.getRecruitmentPost().deactivate();
+
+        group.startRecruitment();
+
+        assertThat(group.getRecruitmentPost().isActive()).isTrue();
     }
 }

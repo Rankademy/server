@@ -1,6 +1,5 @@
 package maruhxn.rankademy.domain.group;
 
-import maruhxn.rankademy.domain.group.dto.RecruitmentPostUpdateRequest;
 import maruhxn.rankademy.domain.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 
 import static maruhxn.rankademy.domain.group.GroupFixture.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -21,31 +21,8 @@ class GroupRecruitmentPostTest {
     void setUp() {
         User leader = createLeader();
         Group group = createGroup(leader);
-        group.createGroupRecruitmentPost(createRecruitmentRequest());
+        group.upsertRecruitmentPost(createRecruitmentRequest());
         post = group.getRecruitmentPost();
-    }
-
-    @Test
-    @DisplayName("게시글 정보를 업데이트한다")
-    void update() {
-        // given
-        String updatedTitle = "수정된 제목";
-        String updatedContent = "수정된 내용";
-        String updatedRequirements = "수정된 요구사항";
-        Integer updatedCapacity = 10;
-        LocalDateTime updatedStartDate = LocalDateTime.now().plusDays(1);
-        LocalDateTime updatedEndDate = LocalDateTime.now().plusDays(10);
-
-        // when
-        post.update(new RecruitmentPostUpdateRequest(updatedTitle, updatedContent, updatedRequirements, updatedCapacity, updatedStartDate, updatedEndDate));
-
-        // then
-        assertThat(post.getTitle()).isEqualTo(updatedTitle);
-        assertThat(post.getContent()).isEqualTo(updatedContent);
-        assertThat(post.getRequirements()).isEqualTo(updatedRequirements);
-        assertThat(post.getCapacity()).isEqualTo(updatedCapacity);
-        assertThat(post.getRecruitmentStartDate()).isEqualTo(updatedStartDate);
-        assertThat(post.getRecruitmentEndDate()).isEqualTo(updatedEndDate);
     }
 
     @Test
@@ -74,5 +51,16 @@ class GroupRecruitmentPostTest {
         // when
         assertThatThrownBy(() -> post.up(uppedAt))
                 .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void activateAndDeactivate() {
+        post.deactivate();
+
+        assertThat(post.isActive()).isFalse();
+
+        post.activate();
+
+        assertThat(post.isActive()).isTrue();
     }
 }

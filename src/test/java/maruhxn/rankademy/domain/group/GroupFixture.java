@@ -1,11 +1,9 @@
 package maruhxn.rankademy.domain.group;
 
+import maruhxn.rankademy.domain.group.dto.CreateRecruitmentPostRequest;
 import maruhxn.rankademy.domain.group.dto.GroupCreateRequest;
-import maruhxn.rankademy.domain.group.dto.RecruitmentPostCreateRequest;
 import maruhxn.rankademy.domain.user.User;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.time.LocalDateTime;
 
 import static maruhxn.rankademy.domain.user.UserFixture.*;
 
@@ -26,14 +24,11 @@ public class GroupFixture {
         );
     }
 
-    public static RecruitmentPostCreateRequest createRecruitmentRequest() {
-        return RecruitmentPostCreateRequest.builder()
+    public static CreateRecruitmentPostRequest createRecruitmentRequest() {
+        return CreateRecruitmentPostRequest.builder()
                 .title("그룹원 모집합니다")
                 .content("열정적인 그룹원을 모집합니다.")
                 .requirements("티어 제한 없음")
-                .capacity(5)
-                .recruitmentStartDate(LocalDateTime.now())
-                .recruitmentEndDate(LocalDateTime.now().plusDays(7))
                 .build();
     }
 

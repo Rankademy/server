@@ -7,8 +7,8 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import maruhxn.rankademy.domain.group.dto.RecruitmentPostCreateRequest;
-import maruhxn.rankademy.domain.group.dto.RecruitmentPostUpdateRequest;
+import lombok.ToString;
+import maruhxn.rankademy.domain.group.dto.CreateRecruitmentPostRequest;
 import maruhxn.rankademy.domain.shared.AbstractEntity;
 import org.springframework.util.Assert;
 
@@ -16,8 +16,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "group_recruitment_post")
 @Getter
+@ToString(callSuper = true)
+@Table(name = "group_recruitment_post")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GroupRecruitmentPost extends AbstractEntity {
 
@@ -30,44 +31,26 @@ public class GroupRecruitmentPost extends AbstractEntity {
     @Lob
     private String requirements;
 
-    @Column(nullable = false)
-    private Integer capacity;
-
-    @Column(nullable = false)
-    private LocalDateTime recruitmentStartDate;
-
-    @Column(nullable = false)
-    private LocalDateTime recruitmentEndDate;
-
     private LocalDateTime lastUppedAt;
 
-    public GroupRecruitmentPost(String title, String content, String requirements, Integer capacity, LocalDateTime recruitmentStartDate, LocalDateTime recruitmentEndDate) {
+    private LocalDateTime createdAt;
+
+    private boolean isActive;
+
+    public GroupRecruitmentPost(String title, String content, String requirements) {
         this.title = title;
         this.content = content;
         this.requirements = requirements;
-        this.capacity = capacity;
-        this.recruitmentStartDate = recruitmentStartDate;
-        this.recruitmentEndDate = recruitmentEndDate;
+        this.createdAt = LocalDateTime.now();
+        this.isActive = true;
     }
 
-    public static GroupRecruitmentPost create(RecruitmentPostCreateRequest request) {
+    public static GroupRecruitmentPost create(CreateRecruitmentPostRequest request) {
         return new GroupRecruitmentPost(
                 request.title(),
                 request.content(),
-                request.requirements(),
-                request.capacity(),
-                request.recruitmentStartDate(),
-                request.recruitmentEndDate()
+                request.requirements()
         );
-    }
-
-    public void update(RecruitmentPostUpdateRequest request) {
-        this.title = request.title();
-        this.content = request.content();
-        this.requirements = request.requirements();
-        this.capacity = request.capacity();
-        this.recruitmentStartDate = request.recruitmentStartDate();
-        this.recruitmentEndDate = request.recruitmentEndDate();
     }
 
     public void up(LocalDateTime uppedAt) {
@@ -76,5 +59,13 @@ public class GroupRecruitmentPost extends AbstractEntity {
             Assert.state(isAfterOneDay, "24시간 이내에는 다시 up할 수 없습니다.");
         }
         this.lastUppedAt = uppedAt;
+    }
+
+    public void activate() {
+        this.isActive = true;
+    }
+
+    public void deactivate() {
+        this.isActive = false;
     }
 }
