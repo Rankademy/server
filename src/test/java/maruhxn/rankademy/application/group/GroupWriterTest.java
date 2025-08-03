@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static maruhxn.rankademy.domain.group.GroupFixture.createGroup;
 import static maruhxn.rankademy.domain.group.GroupFixture.createLeader;
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -68,10 +69,7 @@ class GroupWriterTest {
     @DisplayName("그룹 정보 수정")
     void updateGroupTest() {
         // given
-        Group group = createGroup(leader);
-        groupRepository.save(group);
-        em.flush();
-        em.clear();
+        Group group = generateGroup();
         GroupUpdateRequest request = new GroupUpdateRequest("수정된 그룹", "수정된 그룹입니다.", "updated_logo.jpg");
 
         // when
@@ -84,5 +82,33 @@ class GroupWriterTest {
         assertThat(updatedGroup.getName()).isEqualTo("수정된 그룹");
         assertThat(updatedGroup.getAbout()).isEqualTo("수정된 그룹입니다.");
         assertThat(updatedGroup.getLogoImage()).isEqualTo("updated_logo.jpg");
+    }
+
+    @Test
+    void startAndCloseRecruitment() {
+        Group group = generateGroup();
+        group.closeRecruitment();
+
+        assertThat(group.isRecruiting()).isFalse();
+
+        group = groupWriter.startRecruitment(group.getId());
+        em.flush();
+        em.clear();
+
+        assertThat(group.isRecruiting()).isTrue();
+
+        group = groupWriter.closeRecruitment(group.getId());
+        em.flush();
+        em.clear();
+
+        assertThat(group.isRecruiting()).isFalse();
+    }
+
+    private Group generateGroup() {
+        Group group = createGroup(leader);
+        groupRepository.save(group);
+        em.flush();
+        em.clear();
+        return group;
     }
 }
