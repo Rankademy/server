@@ -3,15 +3,11 @@ package maruhxn.rankademy.application.group;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.application.group.provided.GroupMemberManager;
 import maruhxn.rankademy.application.group.provided.GroupReader;
-import maruhxn.rankademy.application.group.required.GroupMemberQueryRepository;
 import maruhxn.rankademy.application.user.provided.UserReader;
 import maruhxn.rankademy.domain.group.Group;
-import maruhxn.rankademy.domain.group.GroupMember;
 import maruhxn.rankademy.domain.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,13 +15,6 @@ public class GroupMemberService implements GroupMemberManager {
 
     private final UserReader userReader;
     private final GroupReader groupReader;
-    private final GroupMemberQueryRepository groupMemberQueryRepository;
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<GroupMember> getGroupMembers(Long groupId, int page) {
-        return groupMemberQueryRepository.getGroupMembers(groupId, page);
-    }
 
     @Override
     @Transactional
