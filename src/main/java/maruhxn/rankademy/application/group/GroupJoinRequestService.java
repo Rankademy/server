@@ -16,7 +16,7 @@ public class GroupJoinRequestService implements GroupJoinRequestManager {
     private final GroupReader groupReader;
 
     @Override
-    public void addJoinRequest(Long userId, Long groupId) {
+    public void sendJoinRequest(Long userId, Long groupId) {
         Group group = groupReader.get(groupId);
         User user = userReader.get(userId);
 

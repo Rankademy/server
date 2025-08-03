@@ -52,9 +52,9 @@ class GroupJoinRequestManagerTest {
 
     @Test
     @DisplayName("그룹 가입 신청")
-    void addJoinRequest() {
+    void sendJoinRequest() {
         // when
-        groupJoinRequestManager.addJoinRequest(member.getId(), group.getId());
+        groupJoinRequestManager.sendJoinRequest(member.getId(), group.getId());
 
         // then
         assertThat(group.getJoinRequests()).hasSize(1);
@@ -92,12 +92,12 @@ class GroupJoinRequestManagerTest {
 
     @Test
     @DisplayName("이미 가입된 사용자가 가입 신청 시 예외 발생")
-    void addJoinRequestFailWithAlreadyJoinedUser() {
+    void sendJoinRequestFailWithAlreadyJoinedUser() {
         // given
         group.addMember(member, maruhxn.rankademy.domain.group.GroupRole.MEMBER);
 
         // when & then
-        assertThatThrownBy(() -> groupJoinRequestManager.addJoinRequest(member.getId(), group.getId()))
+        assertThatThrownBy(() -> groupJoinRequestManager.sendJoinRequest(member.getId(), group.getId()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("이미 가입된 유저입니다.");
     }

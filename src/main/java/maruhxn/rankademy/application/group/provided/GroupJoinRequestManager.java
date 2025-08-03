@@ -2,7 +2,7 @@ package maruhxn.rankademy.application.group.provided;
 
 public interface GroupJoinRequestManager {
 
-    void addJoinRequest(Long userId, Long groupId);
+    void sendJoinRequest(Long userId, Long groupId);
 
     void acceptJoinRequest(Long userId, Long groupId);
 
