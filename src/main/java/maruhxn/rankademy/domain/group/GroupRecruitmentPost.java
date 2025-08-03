@@ -68,4 +68,10 @@ public class GroupRecruitmentPost extends AbstractEntity {
     public void deactivate() {
         this.isActive = false;
     }
+
+    public void update(CreateRecruitmentPostRequest request) {
+        this.title = request.title();
+        this.content = request.content();
+        this.requirements = request.requirements();
+    }
 }

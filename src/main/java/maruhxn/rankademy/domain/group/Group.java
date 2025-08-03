@@ -127,8 +127,11 @@ public class Group extends AbstractEntity {
     }
 
     public GroupRecruitmentPost upsertRecruitmentPost(CreateRecruitmentPostRequest request) {
-        Assert.isNull(this.recruitmentPost, "이미 모집 공고가 존재합니다.");
-        this.recruitmentPost = GroupRecruitmentPost.create(request);
+        if (this.recruitmentPost == null) {
+            this.recruitmentPost = GroupRecruitmentPost.create(request);
+        } else {
+            this.recruitmentPost.update(request);
+        }
         return this.recruitmentPost;
     }
 

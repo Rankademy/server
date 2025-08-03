@@ -1,5 +1,6 @@
 package maruhxn.rankademy.domain.group;
 
+import maruhxn.rankademy.domain.group.dto.CreateRecruitmentPostRequest;
 import maruhxn.rankademy.domain.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +23,21 @@ class GroupRecruitmentPostTest {
         Group group = createGroup(leader);
         group.upsertRecruitmentPost(createRecruitmentRequest());
         post = group.getRecruitmentPost();
+    }
+
+    @Test
+    void update() {
+        CreateRecruitmentPostRequest request = new CreateRecruitmentPostRequest(
+                "수정된 제목",
+                "수정된 내용",
+                "수정된 요구사항"
+        );
+
+        post.update(request);
+
+        assertThat(post.getTitle()).isEqualTo(request.title());
+        assertThat(post.getContent()).isEqualTo(request.content());
+        assertThat(post.getRequirements()).isEqualTo(request.requirements());
     }
 
     @Test
