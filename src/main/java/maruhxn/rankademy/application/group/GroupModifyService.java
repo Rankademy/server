@@ -36,4 +36,18 @@ public class GroupModifyService implements GroupWriter {
         group.updateGroupInfo(request);
         return groupRepository.save(group);
     }
+
+    @Override
+    public Group startRecruitment(Long groupId) {
+        Group group = groupReader.get(groupId);
+        group.startRecruitment();
+        return groupRepository.save(group);
+    }
+
+    @Override
+    public Group closeRecruitment(Long groupId) {
+        Group group = groupReader.get(groupId);
+        group.closeRecruitment();
+        return groupRepository.save(group);
+    }
 }

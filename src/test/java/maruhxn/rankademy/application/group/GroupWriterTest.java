@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static maruhxn.rankademy.domain.group.GroupFixture.createGroup;
 import static maruhxn.rankademy.domain.group.GroupFixture.createLeader;
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest

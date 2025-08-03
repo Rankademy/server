@@ -6,8 +6,7 @@ import maruhxn.rankademy.application.group.required.GroupRepository;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.group.Group;
 import maruhxn.rankademy.domain.group.GroupRecruitmentPost;
-import maruhxn.rankademy.domain.group.dto.RecruitmentPostCreateRequest;
-import maruhxn.rankademy.domain.group.dto.RecruitmentPostUpdateRequest;
+import maruhxn.rankademy.domain.group.dto.CreateRecruitmentPostRequest;
 import maruhxn.rankademy.domain.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,18 +46,20 @@ class RecruitPostWriterTest {
 
         group = createGroup(leader);
         groupRepository.save(group);
+
+        System.out.println("설정 완료");
     }
 
     @Test
     @DisplayName("모집 공고 생성")
     void createRecruitPost() {
         // given
-        RecruitmentPostCreateRequest request = createRecruitmentRequest();
+        CreateRecruitmentPostRequest request = createRecruitmentRequest();
         em.flush();
         em.clear();
 
         // when
-        GroupRecruitmentPost newPost = recruitPostWriter.createRecruitPost(group.getId(), request);
+        GroupRecruitmentPost newPost = recruitPostWriter.upsertRecruitmentPost(group.getId(), request);
         em.flush();
         em.clear();
 
@@ -67,29 +68,25 @@ class RecruitPostWriterTest {
         assertThat(newPost.getTitle()).isEqualTo(request.title());
         assertThat(newPost.getContent()).isEqualTo(request.content());
         assertThat(newPost.getRequirements()).isEqualTo(request.requirements());
-        assertThat(newPost.getCapacity()).isEqualTo(request.capacity());
     }
 
     @Test
-    @DisplayName("모집 공고 수정")
+    @DisplayName("기존 모집 공고 수정")
     void updateRecruitPost() {
         // given
-        RecruitmentPostCreateRequest createRequest = createRecruitmentRequest();
-        recruitPostWriter.createRecruitPost(group.getId(), createRequest);
+        CreateRecruitmentPostRequest createRequest = createRecruitmentRequest();
+        recruitPostWriter.upsertRecruitmentPost(group.getId(), createRequest);
         em.flush();
         em.clear();
 
-        RecruitmentPostUpdateRequest updateRequest = new RecruitmentPostUpdateRequest(
+        CreateRecruitmentPostRequest updateRequest = new CreateRecruitmentPostRequest(
                 "수정된 모집 공고",
                 "수정된 내용",
-                createRequest.requirements(),
-                createRequest.capacity(),
-                createRequest.recruitmentStartDate(),
-                createRequest.recruitmentEndDate()
+                createRequest.requirements()
         );
 
         // when
-        GroupRecruitmentPost updatedPost = recruitPostWriter.updateRecruitPost(group.getId(), updateRequest);
+        GroupRecruitmentPost updatedPost = recruitPostWriter.upsertRecruitmentPost(group.getId(), updateRequest);
         em.flush();
         em.clear();
 
@@ -103,8 +100,8 @@ class RecruitPostWriterTest {
     @DisplayName("모집 공고 끌어올리기")
     void upRecruitPost() {
         // given
-        RecruitmentPostCreateRequest createRequest = createRecruitmentRequest();
-        recruitPostWriter.createRecruitPost(group.getId(), createRequest);
+        CreateRecruitmentPostRequest createRequest = createRecruitmentRequest();
+        recruitPostWriter.upsertRecruitmentPost(group.getId(), createRequest);
         em.flush();
         em.clear();
 
@@ -121,8 +118,8 @@ class RecruitPostWriterTest {
     @DisplayName("모집 공고 끌어올리기 - 24시간 이내 재요청 시 예외 발생")
     void upRecruitPostFail() {
         // given
-        RecruitmentPostCreateRequest createRequest = createRecruitmentRequest();
-        recruitPostWriter.createRecruitPost(group.getId(), createRequest);
+        CreateRecruitmentPostRequest createRequest = createRecruitmentRequest();
+        recruitPostWriter.upsertRecruitmentPost(group.getId(), createRequest);
         recruitPostWriter.up(group.getId());
         em.flush();
         em.clear();

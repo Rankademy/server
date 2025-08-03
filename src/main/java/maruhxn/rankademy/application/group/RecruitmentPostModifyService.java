@@ -6,8 +6,7 @@ import maruhxn.rankademy.application.group.provided.RecruitPostWriter;
 import maruhxn.rankademy.application.group.required.GroupRepository;
 import maruhxn.rankademy.domain.group.Group;
 import maruhxn.rankademy.domain.group.GroupRecruitmentPost;
-import maruhxn.rankademy.domain.group.dto.RecruitmentPostCreateRequest;
-import maruhxn.rankademy.domain.group.dto.RecruitmentPostUpdateRequest;
+import maruhxn.rankademy.domain.group.dto.CreateRecruitmentPostRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -24,18 +23,9 @@ public class RecruitmentPostModifyService implements RecruitPostWriter {
     private final GroupRepository groupRepository;
 
     @Override
-    public GroupRecruitmentPost createRecruitPost(Long groupId, RecruitmentPostCreateRequest request) {
+    public GroupRecruitmentPost upsertRecruitmentPost(Long groupId, CreateRecruitmentPostRequest request) {
         Group group = groupReader.get(groupId);
-        GroupRecruitmentPost recruitmentPost = group.createGroupRecruitmentPost(request);
-        groupRepository.save(group);
-        return recruitmentPost;
-    }
-
-    @Override
-    public GroupRecruitmentPost updateRecruitPost(Long groupId, RecruitmentPostUpdateRequest request) {
-        Group group = groupReader.get(groupId);
-        GroupRecruitmentPost recruitmentPost = group.getRecruitmentPost();
-        recruitmentPost.update(request);
+        GroupRecruitmentPost recruitmentPost = group.upsertRecruitmentPost(request);
         groupRepository.save(group);
         return recruitmentPost;
     }
