@@ -22,10 +22,13 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static maruhxn.rankademy.domain.user.UserFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -40,10 +43,10 @@ class MatchHistoryAnalyzerTest {
     UserRepository userRepository;
 
     @Autowired
-    MatchDataRepository matchDataRepository;
-
-    @Autowired
     EntityManager em;
+
+    @MockitoBean
+    private MatchDataRepository matchDataRepository;
 
     @MockitoBean
     MatchHistoryCollector matchHistoryCollector;
@@ -64,23 +67,33 @@ class MatchHistoryAnalyzerTest {
         em.clear();
 
         Long userId = user.getId();
-
         String jsonData = getMatchJsonData();
 
+        List<MatchData> mockMatches = Arrays.asList(
+                MatchData.builder()
+                        .matchId(UUID.randomUUID().toString())
+                        .userId(userId)
+                        .jsonData(jsonData)
+                        .build());
+
         when(matchHistoryCollector.collectAllMatches(user))
-                .thenReturn(Arrays.asList(
-                        MatchData.builder()
-                                .matchId(UUID.randomUUID().toString())
-                                .userId(userId)
-                                .jsonData(jsonData)
-                                .build()));
+                .thenReturn(mockMatches);
+
+        // matchDataRepository.saveAll() 호출을 모킹
+        when(matchDataRepository.saveAll(any())).thenReturn(mockMatches);
+
+        // matchDataRepository.findAll() 호출을 모킹
+        when(matchDataRepository.findAll()).thenReturn(mockMatches);
 
         matchHistoryAnalyzer.fetchAndAnalyzeMatches(userId);
         em.flush();
         em.clear();
 
         user = userRepository.findById(userId).get();
-        assertThat(matchDataRepository.findAll()).isNotEmpty();
+
+        // MongoDB 저장 로직이 호출되었는지 검증
+        verify(matchDataRepository).saveAll(mockMatches);
+
         assertThat(user.getSummonerInfo().getMostChampions()).hasSize(1);
     }
 
