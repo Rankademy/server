@@ -16,9 +16,20 @@ public class GroupFixture {
         );
     }
 
+    public static Group createGroup(User leader, String groupName) {
+        return Group.create(
+                createGroupCreateRequest(groupName),
+                leader
+        );
+    }
+
     public static GroupCreateRequest createGroupCreateRequest() {
+        return createGroupCreateRequest("테스트 그룹");
+    }
+
+    public static GroupCreateRequest createGroupCreateRequest(String groupName) {
         return new GroupCreateRequest(
-                "테스트 그룹",
+                groupName,
                 "테스트 그룹입니다.",
                 "logo.jpg"
         );
@@ -58,10 +69,14 @@ public class GroupFixture {
     }
 
     public static User createLeader() {
-        User leader = createUser("leader@rankademy.app", "leader");
+        return createLeader("leader");
+    }
+
+    public static User createLeader(String leaderName) {
+        User leader = createUser(leaderName + "@rankademy.app", leaderName);
         leader.enrollUnivInfo(createEnrollUnivRequest());
         leader.completeUnivAuthentication();
-        leader.connectSummonerInfo(createSummonerInfoConnector("leader-puuid"), createRiotAuthRequest("leader", "KR1"));
+        leader.connectSummonerInfo(createSummonerInfoConnector(leaderName + "-puuid"), createRiotAuthRequest(leaderName, "KR1"));
         return leader;
     }
 

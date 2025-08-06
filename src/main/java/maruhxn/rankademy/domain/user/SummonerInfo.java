@@ -76,6 +76,15 @@ public class SummonerInfo extends AbstractEntity {
                 .build();
     }
 
+    public void update(String summonerName, String summonerTag, int summonerIconNum, TierInfo tierInfo, int winCount, int lossCount) {
+        this.summonerName = summonerName;
+        this.summonerTag = summonerTag;
+        this.summonerIconNum = summonerIconNum;
+        this.tierInfo = tierInfo;
+        this.winCount = winCount;
+        this.lossCount = lossCount;
+    }
+
     public void updateMostChampions(MostChampionCalculator mostChampionCalculator, List<MatchData> newMatches) {
         this.mostChampions.clear();
         List<ChampionPlayRecord> mostChampions =

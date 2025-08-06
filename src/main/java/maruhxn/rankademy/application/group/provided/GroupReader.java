@@ -1,11 +1,28 @@
 package maruhxn.rankademy.application.group.provided;
 
+import maruhxn.rankademy.application.group.provided.dto.*;
 import maruhxn.rankademy.domain.group.Group;
-import maruhxn.rankademy.domain.group.GroupRecruitmentPost;
+
+import java.util.List;
 
 public interface GroupReader {
 
     Group get(Long groupId);
 
-    GroupRecruitmentPost getRecruitmentPost(Long groupId);
+    List<MyGroupResponse> getMyGroupList(Long userId);
+
+    List<GroupResponse> getRankingList(int page, String keyword, GroupSortKey sortKey);
+
+    GroupDetailResponse getDetail(Long userId, Long groupId);
+
+    List<RecruitmentPostResponse> getRecruitmentPostList(int page);
+
+    RecruitmentPostDetailResponse getRecruitmentPostDetail(Long userId, Long groupId);
+
+    List<GroupMemberResponse> getGroupMembers(Long groupId, int page);
+
+    List<JoinRequestResponse> getJoinRequests(Long groupId, int page);
+
+    List<RecentCompetitionResponse> getRecentCompetitions(Long groupId);
+
 }

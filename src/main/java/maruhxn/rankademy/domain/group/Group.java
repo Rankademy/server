@@ -12,7 +12,9 @@ import maruhxn.rankademy.domain.user.User;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -23,7 +25,7 @@ import static java.util.Objects.requireNonNull;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Group extends AbstractEntity {
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 50, unique = true)
     private String name;
 
     @Lob
@@ -40,7 +42,7 @@ public class Group extends AbstractEntity {
     private boolean isRecruiting;
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<GroupMember> members = new HashSet<>();
+    private List<GroupMember> members = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "recruitment_post_id")

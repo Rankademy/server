@@ -30,7 +30,7 @@ public record GroupDetailResponse(
                 memberCnt,
                 leader,
                 createdAt,
-                isJoined)
-        ;
+                isJoined
+        );
     }
 }
