@@ -38,6 +38,12 @@ public class GroupModifyService implements GroupWriter {
     }
 
     @Override
+    public void delete(Long groupId) {
+        Group group = groupReader.get(groupId);
+        groupRepository.delete(group);
+    }
+
+    @Override
     public Group startRecruitment(Long groupId) {
         Group group = groupReader.get(groupId);
         group.startRecruitment();

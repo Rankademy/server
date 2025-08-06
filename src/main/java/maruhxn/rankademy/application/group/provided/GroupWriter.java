@@ -11,6 +11,8 @@ public interface GroupWriter {
 
     Group update(Long groupId, @Valid GroupUpdateRequest request);
 
+    void delete(Long groupId);
+
     Group startRecruitment(Long groupId);
 
     Group closeRecruitment(Long groupId);
