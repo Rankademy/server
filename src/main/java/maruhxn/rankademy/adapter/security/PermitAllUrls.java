@@ -20,6 +20,11 @@ public enum PermitAllUrls {
     REFRESH("/api/v1/auth/refresh", GET),
     UNIV_RANKING("/api/v1/rankings/univ", GET),
     UNIV_STUDENT_RANKING("/api/v1/rankings/univ/{univName}", GET),
+    GROUP_RANKING("/api/v1/groups*", GET),
+    GROUP_DETAIL("/api/v1/groups/{groupId}", GET),
+    GROUP_RECENT_COMPETITIONS("/api/v1/groups/{groupId}/recent-competitions", GET),
+    GROUP_MEMBERS("/api/v1/groups/{groupId}/members", GET),
+
     ;
 
     private final String url;

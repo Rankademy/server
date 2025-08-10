@@ -118,9 +118,12 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                                         leaderUser.summonerInfo.summonerIconNum
                                 ),
                                 group.createdAt,
-                                JPAExpressions.selectOne()
+                                userId == null
+                                        ? Expressions.constant(false)
+                                        : JPAExpressions.selectOne()
                                         .from(groupMember)
-                                        .where(groupMember.group.id.eq(groupId).and(groupMember.user.id.eq(userId)))
+                                        .where(groupMember.group.id.eq(groupId)
+                                                .and(groupMember.user.id.eq(userId)))
                                         .exists()
                         )
                 )
