@@ -2,6 +2,7 @@ package maruhxn.rankademy.domain.group;
 
 import maruhxn.rankademy.domain.group.dto.GroupUpdateRequest;
 import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.domain.user.UserFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -83,7 +84,8 @@ class GroupTest {
     void addMemberWithDifferentUniv() {
         // given
         User otherUnivUser = createMember();
-        otherUnivUser.enrollUnivInfo(maruhxn.rankademy.domain.user.UserFixture.createEnrollUnivRequest("다른대학교", "test@other.ac.kr"));
+        otherUnivUser.enrollUnivInfo(UserFixture.createEnrollUnivRequest("다른대학교", "test@other.ac.kr"));
+        otherUnivUser.completeUnivAuthentication();
 
         // when & then
         assertThatThrownBy(() -> group.addMember(otherUnivUser, GroupRole.MEMBER))

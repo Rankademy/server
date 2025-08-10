@@ -44,11 +44,7 @@ public class GroupFixture {
     }
 
     public static User createMember() {
-        User member = createUser("member@rankademy.app", "member");
-        member.enrollUnivInfo(createEnrollUnivRequest());
-        member.completeUnivAuthentication();
-        member.connectSummonerInfo(createSummonerInfoConnector("member-puuid"), createRiotAuthRequest("member", "KR1"));
-        return member;
+        return createMember("member@rankademy.app", "member");
     }
 
     public static User createMember(Long id) {
