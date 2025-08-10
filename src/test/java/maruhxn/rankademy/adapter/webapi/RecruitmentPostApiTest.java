@@ -106,7 +106,7 @@ class RecruitmentPostApiTest {
         // then
         assertThat(result).hasStatusOk();
         RecruitmentPostDetailResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), RecruitmentPostDetailResponse.class);
-        assertThat(response.postId()).isEqualTo(group.getId());
+        assertThat(response.postId()).isEqualTo(group.getRecruitmentPost().getId());
     }
 
     @Test
