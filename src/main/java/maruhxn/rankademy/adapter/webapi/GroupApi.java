@@ -46,7 +46,7 @@ public class GroupApi {
     @PreAuthorize("principal.userInfo().authorized")
     public Long createGroup(
             @AuthenticationPrincipal RankademyUser rankademyUser,
-            @RequestBody @Valid GroupCreateRequest request // TODO: 이미지
+            @RequestBody @Valid GroupCreateRequest request
     ) {
         Group group = groupWriter.create(rankademyUser.getId(), request);
         return group.getId();
@@ -77,20 +77,18 @@ public class GroupApi {
 
     @PutMapping("/{groupId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@groupLeaderChecker.isGroupLeader(#rankademyUser.userInfo(), #groupId)")
+    @PreAuthorize("@groupLeaderChecker.isGroupLeader(principal.userInfo(), #groupId)")
     public void updateGroup(
-            @AuthenticationPrincipal RankademyUser rankademyUser,
             @PathVariable("groupId") Long groupId,
-            @RequestBody @Valid GroupUpdateRequest request // TODO: 이미지
+            @RequestBody @Valid GroupUpdateRequest request
     ) {
         groupWriter.update(groupId, request);
     }
 
     @PostMapping("/{groupId}/recruitment")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("@groupLeaderChecker.isGroupLeader(#rankademyUser.userInfo(), #groupId)")
+    @PreAuthorize("@groupLeaderChecker.isGroupLeader(principal.userInfo(), #groupId)")
     public void startRecruitment(
-            @AuthenticationPrincipal RankademyUser rankademyUser,
             @PathVariable("groupId") Long groupId
     ) {
         groupWriter.startRecruitment(groupId);
@@ -98,9 +96,8 @@ public class GroupApi {
 
     @DeleteMapping("/{groupId}/recruitment")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@groupLeaderChecker.isGroupLeader(#rankademyUser.userInfo(), #groupId)")
+    @PreAuthorize("@groupLeaderChecker.isGroupLeader(principal.userInfo(), #groupId)")
     public void closeRecruitment(
-            @AuthenticationPrincipal RankademyUser rankademyUser,
             @PathVariable("groupId") Long groupId
     ) {
         groupWriter.closeRecruitment(groupId);
@@ -108,9 +105,8 @@ public class GroupApi {
 
     @DeleteMapping("/{groupId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@groupLeaderChecker.isGroupLeader(#rankademyUser.userInfo(), #groupId)")
+    @PreAuthorize("@groupLeaderChecker.isGroupLeader(principal.userInfo(), #groupId)")
     public void deleteGroup(
-            @AuthenticationPrincipal RankademyUser rankademyUser,
             @PathVariable("groupId") Long groupId
     ) {
         groupWriter.delete(groupId);

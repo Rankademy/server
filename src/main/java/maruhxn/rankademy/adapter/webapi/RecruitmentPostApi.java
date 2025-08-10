@@ -39,9 +39,8 @@ public class RecruitmentPostApi {
 
     @PostMapping("/{groupId}/posts")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("@groupLeaderChecker.isGroupLeader(#rankademyUser.userInfo(), #groupId)")
+    @PreAuthorize("@groupLeaderChecker.isGroupLeader(principal.userInfo(), #groupId)")
     public void upsertRecruitmentPost(
-            @AuthenticationPrincipal RankademyUser rankademyUser,
             @PathVariable Long groupId,
             @RequestBody CreateRecruitmentPostRequest request
     ) {
@@ -50,9 +49,8 @@ public class RecruitmentPostApi {
 
     @PatchMapping("/{groupId}/posts/up")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@groupLeaderChecker.isGroupLeader(#rankademyUser.userInfo(), #groupId)")
+    @PreAuthorize("@groupLeaderChecker.isGroupLeader(principal.userInfo(), #groupId)")
     public void upRecruitmentPost(
-            @AuthenticationPrincipal RankademyUser rankademyUser,
             @PathVariable Long groupId
     ) {
         recruitPostWriter.up(groupId);
