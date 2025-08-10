@@ -24,7 +24,8 @@ public enum PermitAllUrls {
     GROUP_DETAIL("/api/v1/groups/{groupId}", GET),
     GROUP_RECENT_COMPETITIONS("/api/v1/groups/{groupId}/recent-competitions", GET),
     GROUP_MEMBERS("/api/v1/groups/{groupId}/members", GET),
-
+    GROUP_RECRUITMENT_POST_LIST("/api/v1/groups/posts", GET),
+    GROUP_RECRUITMENT_POST_DETAIL("/api/v1/groups/{groupId}/post", GET),
     ;
 
     private final String url;

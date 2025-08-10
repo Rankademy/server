@@ -57,7 +57,6 @@ class RecruitmentPostApiTest {
     EntityManager em;
 
     @Test
-    @WithAnonymousUser
     @DisplayName("그룹 모집 공고 목록 조회")
     void getRecruitmentPostList() throws Exception {
         // given
@@ -107,27 +106,6 @@ class RecruitmentPostApiTest {
         assertThat(result).hasStatusOk();
         RecruitmentPostDetailResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), RecruitmentPostDetailResponse.class);
         assertThat(response.postId()).isEqualTo(group.getRecruitmentPost().getId());
-    }
-
-    @Test
-    @WithAnonymousUser
-    @DisplayName("그룹 모집 공고 상세 조회 - 인증되지 않은 사용자")
-    void getRecruitmentPostDetails_withAnonymousUser() throws Exception {
-        // given
-        User leader = GroupFixture.createLeader();
-        userRepository.save(leader);
-        Group group = GroupFixture.createGroup(leader);
-        groupRepository.save(group);
-
-        em.flush();
-        em.clear();
-
-        // when
-        MvcTestResult result = mvcTester.get().uri(BASE_URL + "/" + group.getId() + "/post")
-                .exchange();
-
-        // then
-        assertThat(result).hasStatus(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
