@@ -11,7 +11,6 @@ public record UserInfo(
         String password,
         boolean isAuthorized,
         String role
-//        String provider
 ) {
     public static UserInfo from(User user) {
         return UserInfo.builder()

@@ -41,6 +41,10 @@ public class Group extends AbstractEntity {
 
     private boolean isRecruiting;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "leader_id")
+    private User leader;
+
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GroupMember> members = new ArrayList<>();
 
@@ -54,12 +58,13 @@ public class Group extends AbstractEntity {
 
     private LocalDateTime createdAt;
 
-    public Group(String name, String about, String logoImage, User createdBy) {
+    public Group(String name, String about, String logoImage, User leader) {
         this.name = name;
         this.about = about;
         this.logoImage = logoImage;
-        this.univName = createdBy.getUnivInfo().getUnivName();
-        this.addMember(createdBy, GroupRole.LEADER);
+        this.univName = leader.getUnivInfo().getUnivName();
+        this.leader = leader;
+        this.addMember(leader, GroupRole.LEADER);
         this.createdAt = LocalDateTime.now();
         this.capacity = 50;
         this.isRecruiting = true;
@@ -83,8 +88,8 @@ public class Group extends AbstractEntity {
     }
 
     public void addMember(User user, GroupRole role) {
-        Assert.isTrue(this.univName.equals(user.getUnivInfo().getUnivName()), "동일한 학교 소속의 유저만 가입할 수 있습니다.");
         Assert.state(user.isAuthorized(), "인증된 사용자만 가입할 수 있습니다.");
+        Assert.isTrue(this.univName.equals(user.getUnivInfo().getUnivName()), "동일한 학교 소속의 유저만 가입할 수 있습니다.");
 
         GroupMember groupMember = new GroupMember(this, user);
         groupMember.setRole(role);
