@@ -40,3 +40,4 @@ out/
 **/src/*/resources/*.yml
 **/src/*/resources/*.json
 **/src/main/generated/**
+**/src/*/resources/files/**
