@@ -20,7 +20,7 @@ import java.util.Set;
 import static java.util.Objects.requireNonNull;
 
 @Entity
-@Table(name = "groups")
+@Table(name = "`groups`")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Group extends AbstractEntity {
