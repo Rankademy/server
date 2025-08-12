@@ -96,6 +96,6 @@ public class LocalFileProvider implements FileProvider {
 
     @Override
     public String buildImageUrl(String storedFileName) {
-        return String.format("%s/api/v1/images?imageName=%s", SERVER_URL, storedFileName);
+        return String.format("%s/api/v1/files?fileName=%s", SERVER_URL, storedFileName);
     }
 }

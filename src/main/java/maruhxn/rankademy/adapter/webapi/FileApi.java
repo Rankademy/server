@@ -21,11 +21,11 @@ public class FileApi {
      * 이미지 조회
      */
     @GetMapping
-    public ResponseEntity<Resource> getImage(@RequestParam("imageName") String imageName) {
-        Resource file = fileProvider.getFile(imageName);
+    public ResponseEntity<Resource> getImage(@RequestParam("fileName") String fileName) {
+        Resource file = fileProvider.getFile(fileName);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + imageName + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + fileName + "\"")
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(file);
     }
@@ -46,7 +46,7 @@ public class FileApi {
      */
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteFile(@RequestParam("imageName") String imageName) {
-        fileProvider.delete(imageName);
+    public void deleteFile(@RequestParam("fileName") String fileName) {
+        fileProvider.delete(fileName);
     }
 }

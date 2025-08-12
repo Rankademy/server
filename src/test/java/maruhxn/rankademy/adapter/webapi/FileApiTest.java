@@ -73,23 +73,23 @@ class FileApiTest {
                 .exchange();
 
         assertThat(uploadResult).hasStatus(HttpStatus.CREATED);
-        String imageUrl = uploadResult.getResponse().getContentAsString();
-        String imageName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
-        assertThat(imageUrl).contains(imageName);
+        String fileUrl = uploadResult.getResponse().getContentAsString();
+        String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+        assertThat(fileUrl).contains(fileName);
 
         // 2. Get
         MvcTestResult getResult = mvcTester.get().uri(BASE_URL)
-                .param("imageName", imageName)
+                .param("fileName", fileName)
                 .exchange();
 
         assertThat(getResult).hasStatusOk();
         assertThat(getResult.getResponse().getHeader("Content-Type")).isEqualTo(MediaType.IMAGE_JPEG_VALUE);
-        assertThat(getResult.getResponse().getHeader("Content-Disposition")).isEqualTo("inline; filename=\"" + imageName + "\"");
+        assertThat(getResult.getResponse().getHeader("Content-Disposition")).isEqualTo("inline; filename=\"" + fileName + "\"");
 
 
         // 3. Delete
         MvcTestResult deleteResult = mvcTester.delete().uri(BASE_URL)
-                .param("imageName", imageName)
+                .param("fileName", fileName)
                 .with(user(mockUser))
                 .exchange();
 

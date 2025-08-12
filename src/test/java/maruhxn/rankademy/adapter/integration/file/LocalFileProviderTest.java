@@ -103,6 +103,6 @@ class LocalFileProviderTest {
         String imageUrl = localFileProvider.buildImageUrl(storedFileName);
 
         // then
-        assertThat(imageUrl).isEqualTo("http://localhost:8080/api/v1/images?imageName=test-image.png");
+        assertThat(imageUrl).isEqualTo("http://localhost:8080/api/v1/files?fileName=test-image.png");
     }
 }

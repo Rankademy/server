@@ -26,7 +26,7 @@ public enum PermitAllUrls {
     GROUP_MEMBERS("/api/v1/groups/{groupId}/members", GET),
     GROUP_RECRUITMENT_POST_LIST("/api/v1/groups/posts", GET),
     GROUP_RECRUITMENT_POST_DETAIL("/api/v1/groups/{groupId}/post", GET),
-    GET_IMAGE("/api/v1/files*", GET),
+    GET_IMAGE("/api/v1/files**", GET),
     ;
 
     private final String url;
