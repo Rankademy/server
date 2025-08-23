@@ -56,7 +56,7 @@ class CompetitionTest {
         competition.submitSetResult(request);
 
         // then
-        assertThat(competition.getStatus()).isEqualTo(CompetitionStatus.RESULT_SUBMITTED);
+        assertThat(competition.getStatus()).isEqualTo(CompetitionStatus.COMPLETED);
         assertThat(competition.getTotalSets()).isEqualTo(3);
         assertThat(competition.getFinalWinnerTeamId()).isEqualTo(winnerTeamId);
         assertThat(competition.getMemo()).isEqualTo("Team 1 won");

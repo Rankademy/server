@@ -68,13 +68,13 @@ public class Competition extends AbstractEntity {
         this.totalSets = request.totalSets();
         this.finalWinnerTeamId = request.finalWinnerId();
         this.memo = request.memo();
-        this.status = CompetitionStatus.RESULT_SUBMITTED;
+        this.status = CompetitionStatus.COMPLETED;
         this.setResults = request.setResults().stream().map(SetResult::of).toList();
     }
 
     private boolean validateTeams(SubmitCompetitionResultRequest request) {
         return Set.of(request.team1Id(), request.team2Id())
-                .containsAll(Set.of(team1.getId(), team2.getId()));
+                .containsAll(Set.of(requireNonNull(team1.getId()), requireNonNull(team2.getId())));
     }
 
     public Team getFinalWinner() {
