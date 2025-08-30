@@ -1,5 +1,6 @@
 package maruhxn.rankademy.domain.team;
 
+import maruhxn.rankademy.domain.team.dto.TeamCreateRequest;
 import maruhxn.rankademy.domain.user.LolPosition;
 import maruhxn.rankademy.domain.user.TierInfo;
 import maruhxn.rankademy.domain.user.User;
@@ -8,6 +9,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -47,25 +49,27 @@ public class TeamFixture {
         return members;
     }
 
-    public static Team createTeamWithReflection(User representative) {
-        Set<TeamMember> members = createTeamMembersWithReflection(representative);
-        return Team.create(
-                1L,
-                "test team",
+    public static TeamCreateRequest createTeamCreateRequest(Long representativeId, Set<TeamMember> members) {
+        return new TeamCreateRequest(1L, "test team", "test intro", representativeId, members);
+    }
+
+    public static TeamCreateRequest createTeamCreateRequest(Long representativeId, Set<TeamMember> members, Long groupId) {
+        return new TeamCreateRequest(
+                groupId,
+                UUID.randomUUID().toString(),
                 "test intro",
-                representative.getId(),
+                representativeId,
                 members
         );
     }
 
+    public static Team createTeamWithReflection(User representative) {
+        Set<TeamMember> members = createTeamMembersWithReflection(representative);
+        return Team.create(createTeamCreateRequest(representative.getId(), members));
+    }
+
     public static Team createTeamWithReflection(User representative, Long groupId) {
         Set<TeamMember> members = createTeamMembersWithReflection(representative);
-        return Team.create(
-                groupId,
-                "test team" + groupId,
-                "test intro",
-                representative.getId(),
-                members
-        );
+        return Team.create(createTeamCreateRequest(representative.getId(), members, groupId));
     }
 }

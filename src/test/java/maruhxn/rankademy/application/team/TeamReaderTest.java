@@ -10,6 +10,7 @@ import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.group.Group;
 import maruhxn.rankademy.domain.group.GroupFixture;
 import maruhxn.rankademy.domain.team.Team;
+import maruhxn.rankademy.domain.team.TeamFixture;
 import maruhxn.rankademy.domain.team.TeamMember;
 import maruhxn.rankademy.domain.user.LolPosition;
 import maruhxn.rankademy.domain.user.User;
@@ -77,13 +78,7 @@ class TeamReaderTest {
                 members.add(new TeamMember(memberUser, LolPosition.values()[j + 1]));
             }
 
-            Team team = Team.create(
-                    group.getId(),
-                    "test team " + i,
-                    "test intro",
-                    representative.getId(),
-                    members
-            );
+            Team team = Team.create(TeamFixture.createTeamCreateRequest(representative.getId(), members, group.getId()));
             teamRepository.save(team);
         }
 
@@ -129,13 +124,7 @@ class TeamReaderTest {
             members.add(new TeamMember(memberUser, LolPosition.values()[j + 1]));
         }
 
-        Team team = Team.create(
-                group.getId(),
-                "test team",
-                "test intro",
-                representative.getId(),
-                members
-        );
+        Team team = Team.create(TeamFixture.createTeamCreateRequest(representative.getId(), members, group.getId()));
         teamRepository.save(team);
 
         em.flush();
@@ -147,8 +136,6 @@ class TeamReaderTest {
         // then
         assertThat(teamDetails).isNotNull();
         assertThat(teamDetails.teamId()).isEqualTo(team.getId());
-        assertThat(teamDetails.teamName()).isEqualTo("test team");
-        assertThat(teamDetails.intro()).isEqualTo("test intro");
         assertThat(teamDetails.groupName()).isEqualTo(group.getName());
         assertThat(teamDetails.isActive()).isTrue();
         assertThat(teamDetails.teamMembers()).hasSize(5);

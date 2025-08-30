@@ -1,6 +1,7 @@
 package maruhxn.rankademy.domain.competition;
 
 import maruhxn.rankademy.domain.team.Team;
+import maruhxn.rankademy.domain.team.TeamFixture;
 import maruhxn.rankademy.domain.team.TeamMember;
 import maruhxn.rankademy.domain.user.*;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -11,7 +12,7 @@ import java.util.stream.IntStream;
 
 public class CompetitionFixture {
 
-    private static Team createTeamWithMembers(Long teamId, Long leaderId, String leaderName) {
+    private static Team createTeamWithMembers(Long groupId, Long leaderId, String leaderName) {
         User leader = UserFixture.createUser(leaderName + "@test.com", leaderName);
         ReflectionTestUtils.setField(leader, "id", leaderId);
         leader.enrollUnivInfo(UserFixture.createEnrollUnivRequest());
@@ -37,8 +38,8 @@ public class CompetitionFixture {
 
         members.add(new TeamMember(leader, LolPosition.values()[4]));
 
-        Team team = Team.create(teamId, "Team " + teamId, "Intro " + teamId, leaderId, members);
-        ReflectionTestUtils.setField(team, "id", teamId);
+        Team team = Team.create(TeamFixture.createTeamCreateRequest(leaderId, members, groupId));
+        ReflectionTestUtils.setField(team, "id", groupId);
         return team;
     }
 

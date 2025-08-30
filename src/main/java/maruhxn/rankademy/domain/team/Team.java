@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import maruhxn.rankademy.domain.shared.AbstractEntity;
+import maruhxn.rankademy.domain.team.dto.TeamCreateRequest;
 import maruhxn.rankademy.domain.user.TierInfo;
 import maruhxn.rankademy.domain.user.service.TierMapper;
 import org.springframework.util.Assert;
@@ -69,9 +70,13 @@ public class Team extends AbstractEntity {
     }
 
     // === 도메인 메서드 ===
-    public static Team create(Long groupId, String name, String intro, Long representativeId, Set<TeamMember> roster) {
-        Team team = new Team(groupId, name, intro, representativeId);
-        team.setTeamMembers(roster);
+    public static Team create(TeamCreateRequest createRequest) {
+        Team team = new Team(
+                createRequest.groupId(),
+                createRequest.name(),
+                createRequest.intro(),
+                createRequest.representativeId());
+        team.setTeamMembers(createRequest.members());
         return team;
     }
 
