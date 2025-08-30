@@ -5,6 +5,7 @@ import maruhxn.rankademy.application.competitionrequest.provided.CompetitionRequ
 import maruhxn.rankademy.application.competitionrequest.required.CompetitionRequestRepository;
 import maruhxn.rankademy.application.team.required.TeamRepository;
 import maruhxn.rankademy.domain.competitionrequest.CompetitionRequest;
+import maruhxn.rankademy.domain.competitionrequest.service.CompetitionRequestAcceptor;
 import maruhxn.rankademy.domain.competitionrequest.service.CompetitionRequestSender;
 import maruhxn.rankademy.domain.team.Team;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class CompetitionRequestService implements CompetitionRequestManager {
     private final CompetitionRequestSender sender;
     private final TeamRepository teamRepository;
     private final CompetitionRequestRepository competitionRequestRepository;
+    private final CompetitionRequestAcceptor competitionRequestAcceptor;
 
     @Override
     public CompetitionRequest sendRequest(Long actingUserId, Long fromTeamId, Long toTeamId) {
@@ -37,7 +39,7 @@ public class CompetitionRequestService implements CompetitionRequestManager {
     public void acceptRequest(Long actingUserId, Long requestId) {
         CompetitionRequest competitionRequest = competitionRequestRepository.findById(requestId)
                 .orElseThrow(() -> new NoSuchElementException("대항전 요청 정보를 찾을 수 없습니다. requestId: " + requestId));
-        competitionRequest.accept();
+        competitionRequestAcceptor.accept(competitionRequest);
     }
 
     @Override
