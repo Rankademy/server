@@ -6,12 +6,15 @@ import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.domain.user.UserFixture;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
+
 public class CompetitionRequestFixture {
 
-    public static CompetitionRequest createCompetitionRequest(Team fromTeam, Team toTeam) {
+    public static CompetitionRequest createCompetitionRequest(Team fromTeam, Team toTeam, LocalDateTime now) {
         return new CompetitionRequest(
                 fromTeam.getId(),
-                toTeam.getId()
+                toTeam.getId(),
+                now
         );
     }
 

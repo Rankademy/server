@@ -1,12 +1,11 @@
 package maruhxn.rankademy.domain.competitionrequest;
 
 import maruhxn.rankademy.domain.team.Team;
-import maruhxn.rankademy.domain.user.User;
-import maruhxn.rankademy.domain.user.UserFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
+
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -22,21 +21,19 @@ class CompetitionRequestTest {
     void setUp() {
         fromTeam = CompetitionRequestFixture.createTeam(998L, 1L);
         toTeam = CompetitionRequestFixture.createTeam(999L, 2L);
-        competitionRequest = CompetitionRequestFixture.createCompetitionRequest(fromTeam, toTeam);
+        competitionRequest = CompetitionRequestFixture.createCompetitionRequest(fromTeam, toTeam, LocalDateTime.now());
     }
 
     @Test
     @DisplayName("대항전 요청 생성에 성공한다")
     void createCompetitionRequest() {
-        // given
-
         // when
-        CompetitionRequest newRequest = new CompetitionRequest(fromTeam.getId(), toTeam.getId());
+        CompetitionRequest newRequest = new CompetitionRequest(fromTeam.getId(), toTeam.getId(), LocalDateTime.now());
 
         // then
         assertThat(newRequest).isNotNull();
-        assertThat(newRequest.getFromTeam()).isEqualTo(fromTeam.getId());
-        assertThat(newRequest.getToTeam()).isEqualTo(toTeam.getId());
+        assertThat(newRequest.getFromTeamId()).isEqualTo(fromTeam.getId());
+        assertThat(newRequest.getToTeamId()).isEqualTo(toTeam.getId());
         assertThat(newRequest.getStatus()).isEqualTo(CompetitionRequestStatus.PENDING);
         assertThat(newRequest.getRequestedAt()).isNotNull();
     }
@@ -47,7 +44,7 @@ class CompetitionRequestTest {
         // given
 
         // when
-        competitionRequest.accept(fromTeam, toTeam);
+        competitionRequest.accept();
 
         // then
         assertThat(competitionRequest.getStatus()).isEqualTo(CompetitionRequestStatus.ACCEPTED);
@@ -57,28 +54,12 @@ class CompetitionRequestTest {
     @DisplayName("이미 처리된 요청은 수락할 수 없다")
     void acceptRequest_whenAlreadyAccepted() {
         // given
-        competitionRequest.accept(fromTeam, toTeam);
+        competitionRequest.accept();
 
         // when & then
-        assertThatThrownBy(() -> competitionRequest.accept(fromTeam, toTeam))
+        assertThatThrownBy(() -> competitionRequest.accept())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("대기 중인 요청이 아닙니다.");
-    }
-
-    @Test
-    @DisplayName("같은 그룹의 팀끼리는 대항전을 수락할 수 없다")
-    void acceptRequest_withSameGroup() {
-        // given
-        User representative = UserFixture.createUser("sameGroupRep@test.com", "sameGroupRepName");
-        ReflectionTestUtils.setField(representative, "id", 997L);
-        Team sameGroupTeam = CompetitionRequestFixture.createTeam(representative.getId(), fromTeam.getGroupId());
-
-        CompetitionRequest sameGroupRequest = CompetitionRequestFixture.createCompetitionRequest(fromTeam, sameGroupTeam);
-
-        // when & then
-        assertThatThrownBy(() -> sameGroupRequest.accept(fromTeam, sameGroupTeam))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("같은 그룹끼리는 대항전 요청을 보낼 수 없습니다.");
     }
 
     @Test
