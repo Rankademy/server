@@ -18,7 +18,7 @@ public class CompetitionRequestFixture {
     public static Team createTeam(Long representativeId, Long groupId) {
         User representative = UserFixture.createUser("tester@test.com", "fromRepName");
         ReflectionTestUtils.setField(representative, "id", representativeId);
-        Team team = TeamFixture.createTeam(representative, groupId);
+        Team team = TeamFixture.createTeamWithReflection(representative, groupId);
         ReflectionTestUtils.setField(team, "id", representativeId);
         return team;
     }

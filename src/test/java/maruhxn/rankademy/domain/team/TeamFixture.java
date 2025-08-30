@@ -27,7 +27,7 @@ public class TeamFixture {
         return new TeamMember(user, position);
     }
 
-    public static Set<TeamMember> createTeamMembers(User representative) {
+    public static Set<TeamMember> createTeamMembersWithReflection(User representative) {
         Set<User> users = IntStream.range(0, 4)
                 .mapToObj(i ->
                         {
@@ -47,8 +47,8 @@ public class TeamFixture {
         return members;
     }
 
-    public static Team createTeam(User representative) {
-        Set<TeamMember> members = createTeamMembers(representative);
+    public static Team createTeamWithReflection(User representative) {
+        Set<TeamMember> members = createTeamMembersWithReflection(representative);
         return Team.create(
                 1L,
                 "test team",
@@ -58,8 +58,8 @@ public class TeamFixture {
         );
     }
 
-    public static Team createTeam(User representative, Long groupId) {
-        Set<TeamMember> members = createTeamMembers(representative);
+    public static Team createTeamWithReflection(User representative, Long groupId) {
+        Set<TeamMember> members = createTeamMembersWithReflection(representative);
         return Team.create(
                 groupId,
                 "test team" + groupId,

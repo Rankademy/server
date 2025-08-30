@@ -35,23 +35,20 @@ public class Team extends AbstractEntity {
     @Column(nullable = false)
     private Long representativeId;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JoinColumn(name = "team_member_id")
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<TeamMember> teamMembers = new HashSet<>();
 
     private LocalDateTime createdAt;
 
-    public Team(Long groupId, String name, String intro, Long representativeId, Set<TeamMember> teamMembers) {
-        Assert.state(teamMembers != null && teamMembers.size() == 5, "팀원 5명의 정보를 모두 입력해주세요");
-        Assert.state(checkPositionDuplication(teamMembers), "라인은 중복될 수 없습니다");
-//        Assert.state(checkSameGroup(roster), "모든 멤버는 동일 그룹이어야 합니다.");
-        Assert.state(teamMembers.stream().anyMatch(slot -> slot.getUser().getId().equals(representativeId)), "대표자는 팀 멤버에 속해있어야 합니다");
+    private boolean isActive;
+
+    public Team(Long groupId, String name, String intro, Long representativeId) {
         this.groupId = requireNonNull(groupId);
         this.name = requireNonNull(name);
         this.intro = requireNonNull(intro);
         this.representativeId = requireNonNull(representativeId);
-        this.teamMembers = teamMembers;
         this.createdAt = LocalDateTime.now();
+        this.isActive = true;
     }
 
     private static boolean checkPositionDuplication(Set<TeamMember> roster) {
@@ -61,9 +58,21 @@ public class Team extends AbstractEntity {
                 .size() == 5;
     }
 
+    // === 연관관계 메서드 ===
+    public void setTeamMembers(Set<TeamMember> teamMembers) {
+        Assert.state(teamMembers != null && teamMembers.size() == 5, "팀원 5명의 정보를 모두 입력해주세요");
+        Assert.state(checkPositionDuplication(teamMembers), "라인은 중복될 수 없습니다");
+//        Assert.state(checkSameGroup(roster), "모든 멤버는 동일 그룹이어야 합니다.");
+        Assert.state(teamMembers.stream().anyMatch(slot -> slot.getUser().getId().equals(representativeId)), "대표자는 팀 멤버에 속해있어야 합니다");
+        this.teamMembers = teamMembers;
+        teamMembers.forEach(tm -> tm.setTeam(this));
+    }
+
     // === 도메인 메서드 ===
     public static Team create(Long groupId, String name, String intro, Long representativeId, Set<TeamMember> roster) {
-        return new Team(groupId, name, intro, representativeId, roster);
+        Team team = new Team(groupId, name, intro, representativeId);
+        team.setTeamMembers(roster);
+        return team;
     }
 
     public TierInfo averageTierInfo() {
@@ -78,5 +87,13 @@ public class Team extends AbstractEntity {
 
     public boolean isRepresentative(Long userId) {
         return representativeId.equals(userId);
+    }
+
+    public void activate() {
+        this.isActive = true;
+    }
+
+    public void deactivate() {
+        this.isActive = false;
     }
 }

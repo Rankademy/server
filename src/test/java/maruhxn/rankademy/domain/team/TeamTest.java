@@ -19,7 +19,7 @@ class TeamTest {
     void createTeam() {
         // given
         User representative = UserFixture.createUser(999L);
-        Set<TeamMember> members = TeamFixture.createTeamMembers(representative);
+        Set<TeamMember> members = TeamFixture.createTeamMembersWithReflection(representative);
 
         // when
         Team team = Team.create(1L, "test team", "test intro", representative.getId(), members);
@@ -38,7 +38,7 @@ class TeamTest {
     void createTeam_withLessThanFiveMembers() {
         // given
         User representative = UserFixture.createUser(999L);
-        Set<TeamMember> members = TeamFixture.createTeamMembers(representative);
+        Set<TeamMember> members = TeamFixture.createTeamMembersWithReflection(representative);
         members.remove(members.iterator().next()); // 4명으로 만듦
 
         // when & then
@@ -53,7 +53,7 @@ class TeamTest {
     void createTeam_withDuplicatePositions() {
         // given
         User representative = UserFixture.createUser(999L);
-        Set<TeamMember> members = TeamFixture.createTeamMembers(representative);
+        Set<TeamMember> members = TeamFixture.createTeamMembersWithReflection(representative);
         Iterator<TeamMember> iterator = members.iterator();
         TeamMember firstMember = iterator.next();
         TeamMember secondMember = iterator.next();
@@ -74,7 +74,7 @@ class TeamTest {
     void createTeam_withRepresentativeNotInRoster() {
         // given
         User representative = UserFixture.createUser(999L);
-        Set<TeamMember> members = TeamFixture.createTeamMembers(representative);
+        Set<TeamMember> members = TeamFixture.createTeamMembersWithReflection(representative);
         Long otherPersonId = -1L;
 
         // when & then
@@ -115,7 +115,7 @@ class TeamTest {
         // given
         User representative = UserFixture.createUser(999L);
         User otherUser = UserFixture.createUser("other@test.com", "other");
-        Team team = TeamFixture.createTeam(representative);
+        Team team = TeamFixture.createTeamWithReflection(representative);
 
         // when
         boolean isRep = team.isRepresentative(representative.getId());
