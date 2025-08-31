@@ -1,6 +1,7 @@
 package maruhxn.rankademy.application.competition;
 
 import jakarta.persistence.EntityManager;
+import maruhxn.rankademy.application.competition.provided.CompetitionReader;
 import maruhxn.rankademy.application.competition.provided.dto.CompetitionDetailResponse;
 import maruhxn.rankademy.application.competition.provided.dto.CompetitionResultResponse;
 import maruhxn.rankademy.application.competition.required.CompetitionRepository;
@@ -34,11 +35,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Transactional
-@DisplayName("CompetitionQueryService 테스트")
-class CompetitionQueryServiceTest {
+@DisplayName("CompetitionReader 테스트")
+class CompetitionReaderTest {
 
     @Autowired
-    private CompetitionQueryService competitionQueryService;
+    CompetitionReader reader;
 
     @Autowired
     UserRepository userRepository;
@@ -89,7 +90,7 @@ class CompetitionQueryServiceTest {
         em.clear();
 
         // when
-        CompetitionDetailResponse result = competitionQueryService.getDetail(competition.getId());
+        CompetitionDetailResponse result = reader.getDetail(competition.getId());
 
         // then
         assertThat(result.competitionId()).isEqualTo(competition.getId());
@@ -126,7 +127,7 @@ class CompetitionQueryServiceTest {
         Long competitionId = 1L;
 
         // when & then
-        assertThatThrownBy(() -> competitionQueryService.getDetail(competitionId))
+        assertThatThrownBy(() -> reader.getDetail(competitionId))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("대항전 정보를 찾을 수 없습니다. competitionId: " + competitionId);
     }
@@ -139,7 +140,7 @@ class CompetitionQueryServiceTest {
         competitionRepository.save(competition);
 
         // when & then
-        assertThatThrownBy(() -> competitionQueryService.getDetail(competition.getId()))
+        assertThatThrownBy(() -> reader.getDetail(competition.getId()))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("팀 정보를 찾을 수 없습니다. team1Id: " + 1L);
     }
@@ -153,7 +154,7 @@ class CompetitionQueryServiceTest {
         competitionRepository.save(competition);
 
         // when & then
-        assertThatThrownBy(() -> competitionQueryService.getDetail(competition.getId()))
+        assertThatThrownBy(() -> reader.getDetail(competition.getId()))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("팀 정보를 찾을 수 없습니다. team2Id: " + 2L);
     }
@@ -185,7 +186,7 @@ class CompetitionQueryServiceTest {
 
         System.out.println("시작");
         // when
-        CompetitionResultResponse result = competitionQueryService.getResult(competition.getId());
+        CompetitionResultResponse result = reader.getResult(competition.getId());
 
         // then
         assertThat(result.competitionId()).isEqualTo(competition.getId());
