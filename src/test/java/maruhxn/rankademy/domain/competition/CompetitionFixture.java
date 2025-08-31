@@ -1,49 +1,37 @@
 package maruhxn.rankademy.domain.competition;
 
-import maruhxn.rankademy.domain.team.Team;
-import maruhxn.rankademy.domain.team.TeamFixture;
-import maruhxn.rankademy.domain.team.TeamMember;
-import maruhxn.rankademy.domain.user.*;
-import org.springframework.test.util.ReflectionTestUtils;
+import maruhxn.rankademy.domain.competition.dto.SubmitCompetitionResultRequest;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CompetitionFixture {
 
-    private static Team createTeamWithMembers(Long groupId, Long leaderId, String leaderName) {
-        User leader = UserFixture.createUser(leaderName + "@test.com", leaderName);
-        ReflectionTestUtils.setField(leader, "id", leaderId);
-        leader.enrollUnivInfo(UserFixture.createEnrollUnivRequest());
-        leader.completeUnivAuthentication();
-        leader.connectSummonerInfo(
-                UserFixture.createSummonerInfoConnector(leaderName + "-puuid", new TierInfo(Tier.DIAMOND, Rank.I, 50)),
-                UserFixture.createRiotAuthRequest(leaderName, "KR" + leaderId)
-        );
-
-        Set<TeamMember> members = IntStream.range(0, 4)
-                .mapToObj(i -> {
-                    User user = UserFixture.createUser("member" + i + "@test.com", "member" + i);
-                    ReflectionTestUtils.setField(user, "id", (long) (leaderId * 10 + i));
-                    user.enrollUnivInfo(UserFixture.createEnrollUnivRequest());
-                    user.completeUnivAuthentication();
-                    user.connectSummonerInfo(
-                            UserFixture.createSummonerInfoConnector("member" + i + "-puuid", new TierInfo(Tier.GOLD, Rank.IV, 0)),
-                            UserFixture.createRiotAuthRequest("member" + i, "KR_M" + i)
-                    );
-                    return new TeamMember(user, LolPosition.values()[i]);
-                })
-                .collect(Collectors.toSet());
-
-        members.add(new TeamMember(leader, LolPosition.values()[4]));
-
-        Team team = Team.create(TeamFixture.createTeamCreateRequest(leaderId, members, groupId));
-        ReflectionTestUtils.setField(team, "id", groupId);
-        return team;
-    }
-
     public static Competition createCompetition() {
         return Competition.createAfterAccept(1L, 2L);
+    }
+
+    public static SubmitCompetitionResultRequest createSubmitCompetitionResultRequest(
+            Long team1Id,
+            Long team2Id,
+            int totalSets,
+            Long finalWinnerId
+    ) {
+        Long loserId = finalWinnerId == team1Id ? team2Id : team1Id;
+
+        List<SubmitCompetitionResultRequest.SetResultDto> setResults = new ArrayList<>();
+        for (int i = 1; i <= totalSets; i++) {
+            Long winTeamId = i % 2 == 0 ? loserId : finalWinnerId;
+            setResults.add(new SubmitCompetitionResultRequest.SetResultDto(i, winTeamId, "image" + i));
+        }
+
+        return new SubmitCompetitionResultRequest(
+                team1Id,
+                team2Id,
+                totalSets,
+                setResults,
+                String.format("Win Team Id: %d", finalWinnerId),
+                team1Id
+        );
     }
 }

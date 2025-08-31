@@ -7,9 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static maruhxn.rankademy.domain.competition.CompetitionFixture.createSubmitCompetitionResultRequest;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("도메인 - Competition")
@@ -72,12 +71,10 @@ class CompetitionTest {
         Competition competition = CompetitionFixture.createCompetition();
         Long team1Id = competition.getTeam1Id();
 
-        SubmitCompetitionResultRequest request = new SubmitCompetitionResultRequest(
+        SubmitCompetitionResultRequest request = createSubmitCompetitionResultRequest(
                 team1Id,
-                999L, // Invalid team ID
-                0,
-                List.of(),
-                "Invalid memo",
+                999L,
+                1,
                 team1Id
         );
 
@@ -95,12 +92,10 @@ class CompetitionTest {
         Long team1Id = competition.getTeam1Id();
         Long team2Id = competition.getTeam2Id();
 
-        SubmitCompetitionResultRequest request = new SubmitCompetitionResultRequest(
+        SubmitCompetitionResultRequest request = createSubmitCompetitionResultRequest(
                 team1Id,
                 team2Id,
-                0,
-                List.of(),
-                "Team 1 won",
+                1,
                 team1Id
         );
 
@@ -183,6 +178,6 @@ class CompetitionTest {
 
         // when
         assertThatThrownBy(() -> competition.oppose(opposeResultRequest))
-            .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(IllegalStateException.class);
     }
 }
