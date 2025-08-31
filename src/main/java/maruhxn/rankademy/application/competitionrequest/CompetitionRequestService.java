@@ -7,9 +7,9 @@ import maruhxn.rankademy.application.team.required.TeamRepository;
 import maruhxn.rankademy.domain.competitionrequest.CompetitionRequest;
 import maruhxn.rankademy.domain.competitionrequest.service.CompetitionRequestAcceptor;
 import maruhxn.rankademy.domain.competitionrequest.service.CompetitionRequestSender;
+import maruhxn.rankademy.domain.shared.DomainEventPublisher;
 import maruhxn.rankademy.domain.shared.event.SendCompetitionRequestEvent;
 import maruhxn.rankademy.domain.team.Team;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +25,7 @@ public class CompetitionRequestService implements CompetitionRequestManager {
     private final TeamRepository teamRepository;
     private final CompetitionRequestRepository competitionRequestRepository;
     private final CompetitionRequestAcceptor competitionRequestAcceptor;
-    private final ApplicationEventPublisher publisher;
+    private final DomainEventPublisher publisher;
 
     @Override
     public CompetitionRequest sendRequest(Long actingUserId, Long fromTeamId, Long toTeamId) {
@@ -35,7 +35,7 @@ public class CompetitionRequestService implements CompetitionRequestManager {
                 .orElseThrow(() -> new NoSuchElementException("팀 정보를 찾을 수 없습니다. toTeamId: " + toTeamId));
 
         LocalDateTime now = LocalDateTime.now();
-        publisher.publishEvent(new SendCompetitionRequestEvent(from.getId(), to.getId(), actingUserId, now));
+        publisher.publish(new SendCompetitionRequestEvent(from.getId(), to.getId(), actingUserId, now));
         return sender.sendRequest(from, to, actingUserId, now);
     }
 

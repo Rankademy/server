@@ -6,8 +6,8 @@ import maruhxn.rankademy.application.competition.required.CompetitionRepository;
 import maruhxn.rankademy.domain.competition.Competition;
 import maruhxn.rankademy.domain.competition.dto.OpposeResultRequest;
 import maruhxn.rankademy.domain.competition.dto.SubmitCompetitionResultRequest;
+import maruhxn.rankademy.domain.shared.DomainEventPublisher;
 import maruhxn.rankademy.domain.shared.event.CompetitionResultSubmitEvent;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,13 +19,13 @@ import java.util.NoSuchElementException;
 public class CompetitionResultService implements CompetitionResultManager {
 
     private final CompetitionRepository competitionRepository;
-    private final ApplicationEventPublisher publisher;
+    private final DomainEventPublisher publisher;
 
     @Override
     public void submitResult(Long actingUserId, Long competitionId, SubmitCompetitionResultRequest request) {
         Competition competition = getCompetition(competitionId);
         competition.submitSetResult(request);
-        publisher.publishEvent(new CompetitionResultSubmitEvent(competitionId, actingUserId));
+        publisher.publish(new CompetitionResultSubmitEvent(competitionId, actingUserId));
     }
 
     @Override
