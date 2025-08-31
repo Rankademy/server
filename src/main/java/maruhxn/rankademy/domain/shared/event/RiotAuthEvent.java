@@ -1,6 +1,12 @@
 package maruhxn.rankademy.domain.shared.event;
 
-public record RiotAuthEvent(
-        Long userId
-) {
+import lombok.Getter;
+
+@Getter
+public class RiotAuthEvent extends DomainEvent {
+    private final Long userId;
+
+    public RiotAuthEvent(Long userId) {
+        this.userId = userId;
+    }
 }

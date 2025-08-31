@@ -24,6 +24,6 @@ public class CompetitionRequestAcceptListener {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void createCompetition(CompetitionAcceptEvent event) {
-        competitionRepository.save(Competition.createAfterAccept(event.fromTeamId(), event.toTeamId()));
+        competitionRepository.save(Competition.createAfterAccept(event.getFromTeamId(), event.getToTeamId()));
     }
 }

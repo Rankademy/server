@@ -1,10 +1,16 @@
 package maruhxn.rankademy.domain.shared.event;
 
-import java.time.LocalDateTime;
+import lombok.Getter;
 
-public record CompetitionResultSubmitEvent(
-        Long competitionId,
-        Long actingUserId,
-        LocalDateTime submittedAt
-) {
+@Getter
+public class CompetitionResultSubmitEvent extends DomainEvent {
+
+    private final Long competitionId;
+
+    private final Long actingUserId;
+
+    public CompetitionResultSubmitEvent(Long competitionId, Long actingUserId) {
+        this.competitionId = competitionId;
+        this.actingUserId = actingUserId;
+    }
 }

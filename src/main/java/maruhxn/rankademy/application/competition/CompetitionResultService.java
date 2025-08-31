@@ -11,7 +11,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
 @Service
@@ -26,7 +25,7 @@ public class CompetitionResultService implements CompetitionResultManager {
     public void submitResult(Long actingUserId, Long competitionId, SubmitCompetitionResultRequest request) {
         Competition competition = getCompetition(competitionId);
         competition.submitSetResult(request);
-        publisher.publishEvent(new CompetitionResultSubmitEvent(competitionId, actingUserId, LocalDateTime.now()));
+        publisher.publishEvent(new CompetitionResultSubmitEvent(competitionId, actingUserId));
     }
 
     @Override
