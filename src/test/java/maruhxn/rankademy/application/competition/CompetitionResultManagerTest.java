@@ -1,6 +1,7 @@
 package maruhxn.rankademy.application.competition;
 
 import jakarta.persistence.EntityManager;
+import maruhxn.rankademy.application.competition.provided.CompetitionResultManager;
 import maruhxn.rankademy.application.competition.required.CompetitionRepository;
 import maruhxn.rankademy.application.group.required.GroupRepository;
 import maruhxn.rankademy.application.team.required.TeamRepository;
@@ -24,7 +25,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -34,27 +34,28 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Transactional
-@DisplayName("CompetitionResultService 테스트")
-class CompetitionResultServiceTest {
+@DisplayName("CompetitionResultManager 테스트")
+class CompetitionResultManagerTest {
 
     @Autowired
-    private CompetitionResultService competitionResultService;
+    CompetitionResultManager competitionResultManager;
 
     @Autowired
-    private CompetitionRepository competitionRepository;
+    CompetitionRepository competitionRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    UserRepository userRepository;
 
     @Autowired
-    private GroupRepository groupRepository;
+    GroupRepository groupRepository;
 
     @Autowired
-    private TeamRepository teamRepository;
+    TeamRepository teamRepository;
 
     @Autowired
-    private EntityManager em;
+    EntityManager em;
 
+    private Long actingUserId = 1L;
     private Competition competition;
     private Team team1;
     private Team team2;
@@ -113,7 +114,7 @@ class CompetitionResultServiceTest {
         );
 
         // when
-        competitionResultService.submitResult(competition.getId(), request);
+        competitionResultManager.submitResult(actingUserId, competition.getId(), request);
         em.flush();
         em.clear();
 
@@ -137,7 +138,7 @@ class CompetitionResultServiceTest {
         );
 
         // when & then
-        assertThatThrownBy(() -> competitionResultService.submitResult(invalidCompetitionId, request))
+        assertThatThrownBy(() -> competitionResultManager.submitResult(actingUserId, invalidCompetitionId, request))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("대항전 정보를 찾을 수 없습니다. competitionId: " + invalidCompetitionId);
     }
@@ -147,20 +148,20 @@ class CompetitionResultServiceTest {
     void opposeResult() {
         // given
         // 먼저 결과를 제출
-        SubmitCompetitionResultRequest submitRequest =createSubmitCompetitionResultRequest(
+        SubmitCompetitionResultRequest submitRequest = createSubmitCompetitionResultRequest(
                 team1.getId(),
                 team2.getId(),
                 3,
                 team1.getId()
         );
-        competitionResultService.submitResult(competition.getId(), submitRequest);
+        competitionResultManager.submitResult(actingUserId, competition.getId(), submitRequest);
         em.flush();
         em.clear();
 
         OpposeResultRequest opposeRequest = new OpposeResultRequest("이의가 있습니다.");
 
         // when
-        competitionResultService.opposeResult(competition.getId(), opposeRequest);
+        competitionResultManager.opposeResult(competition.getId(), opposeRequest);
         em.flush();
         em.clear();
 
@@ -177,7 +178,7 @@ class CompetitionResultServiceTest {
         OpposeResultRequest opposeRequest = new OpposeResultRequest("이의가 있습니다.");
 
         // when & then
-        assertThatThrownBy(() -> competitionResultService.opposeResult(invalidCompetitionId, opposeRequest))
+        assertThatThrownBy(() -> competitionResultManager.opposeResult(invalidCompetitionId, opposeRequest))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("대항전 정보를 찾을 수 없습니다. competitionId: " + invalidCompetitionId);
     }

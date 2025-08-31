@@ -5,7 +5,7 @@ import maruhxn.rankademy.domain.competition.dto.SubmitCompetitionResultRequest;
 
 public interface CompetitionResultManager {
 
-    void submitResult(Long competitionId, SubmitCompetitionResultRequest request);
+    void submitResult(Long actingUserId, Long competitionId, SubmitCompetitionResultRequest request);
 
     void opposeResult(Long competitionId, OpposeResultRequest request);
 

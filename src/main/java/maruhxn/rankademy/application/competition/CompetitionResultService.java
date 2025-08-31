@@ -6,9 +6,12 @@ import maruhxn.rankademy.application.competition.required.CompetitionRepository;
 import maruhxn.rankademy.domain.competition.Competition;
 import maruhxn.rankademy.domain.competition.dto.OpposeResultRequest;
 import maruhxn.rankademy.domain.competition.dto.SubmitCompetitionResultRequest;
+import maruhxn.rankademy.domain.shared.event.CompetitionResultSubmitEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
 @Service
@@ -17,12 +20,13 @@ import java.util.NoSuchElementException;
 public class CompetitionResultService implements CompetitionResultManager {
 
     private final CompetitionRepository competitionRepository;
+    private final ApplicationEventPublisher publisher;
 
     @Override
-    public void submitResult(Long competitionId, SubmitCompetitionResultRequest request) {
+    public void submitResult(Long actingUserId, Long competitionId, SubmitCompetitionResultRequest request) {
         Competition competition = getCompetition(competitionId);
-
         competition.submitSetResult(request);
+        publisher.publishEvent(new CompetitionResultSubmitEvent(competitionId, actingUserId, LocalDateTime.now()));
     }
 
     @Override
