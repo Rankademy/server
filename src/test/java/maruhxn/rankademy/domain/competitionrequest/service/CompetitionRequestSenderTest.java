@@ -1,7 +1,6 @@
 package maruhxn.rankademy.domain.competitionrequest.service;
 
 import maruhxn.rankademy.domain.competitionrequest.CompetitionRequest;
-import maruhxn.rankademy.domain.shared.event.SendCompetitionRequestEvent;
 import maruhxn.rankademy.domain.team.Team;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,15 +8,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CompetitionRequestSender 테스트")
@@ -31,9 +27,6 @@ class CompetitionRequestSenderTest {
 
     @Mock
     private ParticipationCounter counter;
-
-    @Mock
-    private ApplicationEventPublisher publisher;
 
     @Mock
     private Team fromTeam;
@@ -65,7 +58,6 @@ class CompetitionRequestSenderTest {
         assertThat(competitionRequest).isNotNull();
         assertThat(competitionRequest.getFromTeamId()).isEqualTo(100L);
         assertThat(competitionRequest.getToTeamId()).isEqualTo(200L);
-        verify(publisher).publishEvent(any(SendCompetitionRequestEvent.class));
     }
 
     @Test
