@@ -1,5 +1,6 @@
 package maruhxn.rankademy.adapter.persistence.config;
 
+import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -16,6 +17,6 @@ public class JpaConfig {
 
     @Bean
     public JPAQueryFactory jpaQueryFactory(EntityManager em) {
-        return new JPAQueryFactory(em);
+        return new JPAQueryFactory(JPQLTemplates.DEFAULT, em);
     }
 }
