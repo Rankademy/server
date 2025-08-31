@@ -44,8 +44,6 @@ public class CompetitionFixture {
     }
 
     public static Competition createCompetition() {
-        Team team1 = createTeamWithMembers(1L, 1L, "leader1");
-        Team team2 = createTeamWithMembers(2L, 2L, "leader2");
-        return Competition.createAfterAccept(team1, team2);
+        return Competition.createAfterAccept(1L, 2L);
     }
 }

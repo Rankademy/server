@@ -1,13 +1,15 @@
 package maruhxn.rankademy.domain.competition;
 
+import maruhxn.rankademy.domain.competition.dto.OpposeResultRequest;
 import maruhxn.rankademy.domain.competition.dto.SubmitCompetitionResultRequest;
-import maruhxn.rankademy.domain.team.Team;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("도메인 - Competition")
@@ -22,9 +24,9 @@ class CompetitionTest {
         // when & then
         assertThat(competition).isNotNull();
         assertThat(competition.getStatus()).isEqualTo(CompetitionStatus.SCHEDULED);
-        assertThat(competition.getTeam1()).isNotNull();
-        assertThat(competition.getTeam2()).isNotNull();
-        assertThat(competition.getTeam1()).isNotEqualTo(competition.getTeam2());
+        assertThat(competition.getTeam1Id()).isNotNull();
+        assertThat(competition.getTeam2Id()).isNotNull();
+        assertThat(competition.getTeam1Id()).isNotEqualTo(competition.getTeam2Id());
         assertThat(competition.getScheduledAt()).isNotNull();
     }
 
@@ -33,23 +35,22 @@ class CompetitionTest {
     void submitSetResult_Success() {
         // given
         Competition competition = CompetitionFixture.createCompetition();
-        Team team1 = competition.getTeam1();
-        Team team2 = competition.getTeam2();
-        Long winnerTeamId = team1.getId();
+        Long team1Id = competition.getTeam1Id();
+        Long team2Id = competition.getTeam2Id();
 
         List<SubmitCompetitionResultRequest.SetResultDto> setResults = List.of(
-                new SubmitCompetitionResultRequest.SetResultDto(1, team1.getId(), "key1"),
-                new SubmitCompetitionResultRequest.SetResultDto(2, team2.getId(), "key2"),
-                new SubmitCompetitionResultRequest.SetResultDto(3, team1.getId(), "key3")
+                new SubmitCompetitionResultRequest.SetResultDto(1, team1Id, "key1"),
+                new SubmitCompetitionResultRequest.SetResultDto(2, team2Id, "key2"),
+                new SubmitCompetitionResultRequest.SetResultDto(3, team1Id, "key3")
         );
 
         SubmitCompetitionResultRequest request = new SubmitCompetitionResultRequest(
-                team1.getId(),
-                team2.getId(),
+                team1Id,
+                team2Id,
                 3,
                 setResults,
                 "Team 1 won",
-                winnerTeamId
+                team1Id
         );
 
         // when
@@ -58,10 +59,10 @@ class CompetitionTest {
         // then
         assertThat(competition.getStatus()).isEqualTo(CompetitionStatus.COMPLETED);
         assertThat(competition.getTotalSets()).isEqualTo(3);
-        assertThat(competition.getFinalWinnerTeamId()).isEqualTo(winnerTeamId);
+        assertThat(competition.getFinalWinnerTeamId()).isEqualTo(team1Id);
         assertThat(competition.getMemo()).isEqualTo("Team 1 won");
         assertThat(competition.getSetResults()).hasSize(3);
-        assertThat(competition.getFinalWinner()).isEqualTo(team1);
+        assertThat(competition.getFinalWinnerId()).isEqualTo(team1Id);
     }
 
     @Test
@@ -69,16 +70,15 @@ class CompetitionTest {
     void submitSetResult_Fail_With_InvalidTeams() {
         // given
         Competition competition = CompetitionFixture.createCompetition();
-        Team team1 = competition.getTeam1();
-        Long winnerTeamId = team1.getId();
+        Long team1Id = competition.getTeam1Id();
 
         SubmitCompetitionResultRequest request = new SubmitCompetitionResultRequest(
-                team1.getId(),
+                team1Id,
                 999L, // Invalid team ID
                 0,
                 List.of(),
                 "Invalid memo",
-                winnerTeamId
+                team1Id
         );
 
         // when & then
@@ -92,17 +92,16 @@ class CompetitionTest {
     void submitSetResult_Fail_With_AlreadySubmitted() {
         // given
         Competition competition = CompetitionFixture.createCompetition();
-        Team team1 = competition.getTeam1();
-        Team team2 = competition.getTeam2();
-        Long winnerTeamId = team1.getId();
+        Long team1Id = competition.getTeam1Id();
+        Long team2Id = competition.getTeam2Id();
 
         SubmitCompetitionResultRequest request = new SubmitCompetitionResultRequest(
-                team1.getId(),
-                team2.getId(),
+                team1Id,
+                team2Id,
                 0,
                 List.of(),
                 "Team 1 won",
-                winnerTeamId
+                team1Id
         );
 
         competition.submitSetResult(request); // First submission
@@ -115,32 +114,75 @@ class CompetitionTest {
 
     @Test
     @DisplayName("최종 승리팀을 올바르게 반환한다")
-    void getFinalWinner() {
+    void getFinalWinnerId() {
         // given
         Competition competition = CompetitionFixture.createCompetition();
-        Team team1 = competition.getTeam1();
-        Team team2 = competition.getTeam2();
-        Long winnerTeamId = team2.getId();
+        Long team1Id = competition.getTeam1Id();
+        Long team2Id = competition.getTeam2Id();
 
         List<SubmitCompetitionResultRequest.SetResultDto> setResults = List.of(
-                new SubmitCompetitionResultRequest.SetResultDto(1, team2.getId(), "key1")
+                new SubmitCompetitionResultRequest.SetResultDto(1, team2Id, "key1")
         );
 
         SubmitCompetitionResultRequest request = new SubmitCompetitionResultRequest(
-                team1.getId(),
-                team2.getId(),
+                team1Id,
+                team2Id,
                 1,
                 setResults,
                 "Team 2 won",
-                winnerTeamId
+                team2Id
         );
 
         competition.submitSetResult(request);
 
         // when
-        Team finalWinner = competition.getFinalWinner();
+        Long finalWinnerId = competition.getFinalWinnerId();
 
         // then
-        assertThat(finalWinner).isEqualTo(team2);
+        assertThat(finalWinnerId).isEqualTo(team2Id);
+    }
+
+    @Test
+    @DisplayName("경기 결과에 이의를 제기한다")
+    void oppose() {
+        Competition competition = CompetitionFixture.createCompetition();
+        Long team1Id = competition.getTeam1Id();
+        Long team2Id = competition.getTeam2Id();
+
+        List<SubmitCompetitionResultRequest.SetResultDto> setResults = List.of(
+                new SubmitCompetitionResultRequest.SetResultDto(1, team2Id, "key1")
+        );
+
+        SubmitCompetitionResultRequest request = new SubmitCompetitionResultRequest(
+                team1Id,
+                team2Id,
+                1,
+                setResults,
+                "Team 2 won",
+                team2Id
+        );
+
+        competition.submitSetResult(request);
+
+        OpposeResultRequest opposeResultRequest = new OpposeResultRequest("OCR 결과 잘못됨");
+
+        // when
+        competition.oppose(opposeResultRequest);
+
+        // then
+        assertThat(competition.getStatus()).isEqualTo(CompetitionStatus.OPPOSED);
+        assertThat(competition.getOpposedReason()).isEqualTo(opposeResultRequest.reason());
+    }
+
+    @Test
+    @DisplayName("등록되지 않은 경기 결과에 대해서는 이의 신청할 수 없다")
+    void opposeFail() {
+        Competition competition = CompetitionFixture.createCompetition();
+
+        OpposeResultRequest opposeResultRequest = new OpposeResultRequest("OCR 결과 잘못됨");
+
+        // when
+        assertThatThrownBy(() -> competition.oppose(opposeResultRequest))
+            .isInstanceOf(IllegalStateException.class);
     }
 }

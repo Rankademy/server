@@ -5,9 +5,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import maruhxn.rankademy.domain.competition.dto.OpposeResultRequest;
 import maruhxn.rankademy.domain.competition.dto.SubmitCompetitionResultRequest;
 import maruhxn.rankademy.domain.shared.AbstractEntity;
-import maruhxn.rankademy.domain.team.Team;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
@@ -24,11 +24,9 @@ import static java.util.Objects.requireNonNull;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Competition extends AbstractEntity {
 
-    @ManyToOne
-    private Team team1;
+    private Long team1Id;
 
-    @ManyToOne
-    private Team team2;
+    private Long team2Id;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -40,26 +38,26 @@ public class Competition extends AbstractEntity {
     @Column(nullable = false)
     private int totalSets;
 
-    @Column(nullable = false)
     private Long finalWinnerTeamId;
 
     @Column(nullable = false)
     private LocalDateTime scheduledAt;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "set_results",
-            joinColumns = @JoinColumn(name = "competition_id"))
+    @OneToMany(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "set_result_id")
     private List<SetResult> setResults = new ArrayList<>();
 
-    public Competition(Team team1, Team team2) {
-        this.team1 = requireNonNull(team1);
-        this.team2 = requireNonNull(team2);
+    private String opposedReason;
+
+    public Competition(Long team1Id, Long team2Id) {
+        this.team1Id = requireNonNull(team1Id);
+        this.team2Id = requireNonNull(team2Id);
         this.status = CompetitionStatus.SCHEDULED;
         this.scheduledAt = LocalDateTime.now();
     }
 
-    public static Competition createAfterAccept(Team team1, Team team2) {
-        return new Competition(team1, team2);
+    public static Competition createAfterAccept(Long team1Id, Long team2Id) {
+        return new Competition(team1Id, team2Id);
     }
 
     public void submitSetResult(SubmitCompetitionResultRequest request) {
@@ -74,11 +72,17 @@ public class Competition extends AbstractEntity {
 
     private boolean validateTeams(SubmitCompetitionResultRequest request) {
         return Set.of(request.team1Id(), request.team2Id())
-                .containsAll(Set.of(requireNonNull(team1.getId()), requireNonNull(team2.getId())));
+                .containsAll(Set.of(requireNonNull(team1Id), requireNonNull(team2Id)));
     }
 
-    public Team getFinalWinner() {
-        return finalWinnerTeamId.equals(team1.getId()) ? team1 : team2;
+    public Long getFinalWinnerId() {
+        return finalWinnerTeamId.equals(team1Id) ? team1Id : team2Id;
+    }
+
+    public void oppose(OpposeResultRequest request) {
+        Assert.state(this.status == CompetitionStatus.COMPLETED, "등록 완료된 경기 결과에 대해서만 이의 신청이 가능합니다.");
+        this.status = CompetitionStatus.OPPOSED;
+        this.opposedReason = request.reason();
     }
 
 }

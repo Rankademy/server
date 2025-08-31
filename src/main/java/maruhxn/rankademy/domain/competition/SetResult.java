@@ -1,26 +1,38 @@
 package maruhxn.rankademy.domain.competition;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import maruhxn.rankademy.domain.competition.dto.SubmitCompetitionResultRequest;
+import maruhxn.rankademy.domain.shared.AbstractEntity;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-@Embeddable
-public record SetResult(
-        @Column(nullable = false)
-        int setNumber,
+import static java.util.Objects.requireNonNull;
 
-        @Column(nullable = false)
-        Long winnerTeamId,
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class SetResult extends AbstractEntity {
 
-        @Column(nullable = false)
-        String resultImageKey
-) {
-    public SetResult {
-        if (setNumber <= 0) throw new IllegalArgumentException("세트 번호는 0보다 작을 수 없습니다");
-        if (!StringUtils.hasText(resultImageKey)) {
-            throw new IllegalArgumentException("세트 결과 이미지는 필수입니다.");
-        }
+    @Column(nullable = false)
+    int setNumber;
+
+    @Column(nullable = false)
+    Long winnerTeamId;
+
+    @Column(nullable = false)
+    String resultImageKey;
+
+    public SetResult(int setNumber, Long winnerTeamId, String resultImageKey) {
+        Assert.isTrue(setNumber > 0, "세트 번호는 0보다 작을 수 없습니다");
+        requireNonNull(winnerTeamId, "각 세트의 승리 팀 ID는 비어있을 수 없습니다");
+        Assert.isTrue(StringUtils.hasText(resultImageKey), "세트 결과 이미지는 필수입니다");
+        this.setNumber = setNumber;
+        this.winnerTeamId = winnerTeamId;
+        this.resultImageKey = resultImageKey;
     }
 
     public static SetResult of(SubmitCompetitionResultRequest.SetResultDto dto) {
