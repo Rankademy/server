@@ -5,13 +5,21 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import maruhxn.rankademy.adapter.persistence.competition.CompetitionAssembler;
+import maruhxn.rankademy.adapter.persistence.competition.CompetitionCountReader;
+import maruhxn.rankademy.adapter.persistence.competition.CompetitionPageRowReader;
+import maruhxn.rankademy.adapter.persistence.competition.TeamAndSetLoader;
 import maruhxn.rankademy.application.competition.provided.dto.CompetitionResultResponse;
+import maruhxn.rankademy.application.competition.provided.dto.CompetitionPageResponse;
 import maruhxn.rankademy.application.competition.required.CompetitionQueryRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static maruhxn.rankademy.domain.competition.QCompetition.competition;
 import static maruhxn.rankademy.domain.competition.QSetResult.setResult;
@@ -27,6 +35,11 @@ import static maruhxn.rankademy.domain.user.QUser.user;
 public class CompetitionQueryRepositoryImpl implements CompetitionQueryRepository {
 
     private final JPAQueryFactory queryFactory;
+
+    private final CompetitionCountReader countReader;
+    private final CompetitionPageRowReader rowReader;
+    private final TeamAndSetLoader loader;
+    private final CompetitionAssembler assembler;
 
     @Override
     public CompetitionResultResponse getResult(Long competitionId) {
@@ -119,5 +132,43 @@ public class CompetitionQueryRepositoryImpl implements CompetitionQueryRepositor
 
     // 내부 전용 DTO
     public record Head(Long competitionId, Long team1Id, Long team2Id, Long finalWinnerTeamId) {
+    }
+
+    @Override
+    public CompetitionPageResponse getMyCompetitionHistory(Long userId, int page) {
+        long total = countReader.countForUser(userId);
+        if (total == 0) return new CompetitionPageResponse(0L, List.of());
+
+        var rows = rowReader.fetchUserPageRows(userId, page, 10);
+        if (rows.isEmpty()) return new CompetitionPageResponse(total, List.of());
+
+        var compIds = rows.stream().map(CompetitionPageRowReader.Row::cid).toList();
+        var teamIds = rows.stream()
+                .flatMap(r -> Stream.of(r.myTid(), r.otherTid()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        var teamInfo = loader.loadTeams(teamIds);
+        var setMap = loader.loadSetResults(compIds);
+
+        return assembler.assemble(total, rows, teamInfo, setMap);
+    }
+
+    @Override
+    public CompetitionPageResponse getGroupCompetitionHistory(Long groupId, int page) {
+        long total = countReader.countForGroup(groupId);
+        if (total == 0) return new CompetitionPageResponse(0L, List.of());
+
+        var rows = rowReader.fetchGroupPageRows(groupId, page, 10);
+        if (rows.isEmpty()) return new CompetitionPageResponse(total, List.of());
+
+        var compIds = rows.stream().map(CompetitionPageRowReader.Row::cid).toList();
+        var teamIds = rows.stream()
+                .flatMap(r -> Stream.of(r.myTid(), r.otherTid()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        var teamInfo = loader.loadTeams(teamIds);
+        var setMap = loader.loadSetResults(compIds);
+
+        return assembler.assemble(total, rows, teamInfo, setMap);
     }
 }

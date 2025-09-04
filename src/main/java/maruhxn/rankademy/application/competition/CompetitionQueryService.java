@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.application.competition.provided.CompetitionReader;
 import maruhxn.rankademy.application.competition.provided.dto.CompetitionDetailResponse;
 import maruhxn.rankademy.application.competition.provided.dto.CompetitionResultResponse;
+import maruhxn.rankademy.application.competition.provided.dto.CompetitionPageResponse;
 import maruhxn.rankademy.application.competition.required.CompetitionQueryRepository;
 import maruhxn.rankademy.application.competition.required.CompetitionRepository;
 import maruhxn.rankademy.application.team.provided.dto.TeamDetailResponse;
@@ -43,5 +44,15 @@ public class CompetitionQueryService implements CompetitionReader {
     @Override
     public CompetitionResultResponse getResult(Long id) {
         return competitionQueryRepository.getResult(id);
+    }
+
+    @Override
+    public CompetitionPageResponse getMyCompetitionHistory(Long userId, int page) {
+        return competitionQueryRepository.getMyCompetitionHistory(userId, page);
+    }
+
+    @Override
+    public CompetitionPageResponse getGroupCompetitionHistory(Long groupId, int page) {
+        return competitionQueryRepository.getGroupCompetitionHistory(groupId, page);
     }
 }
