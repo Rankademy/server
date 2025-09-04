@@ -43,8 +43,9 @@ public class Competition extends AbstractEntity {
     @Column(nullable = false)
     private LocalDateTime scheduledAt;
 
-    @OneToMany(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "set_result_id")
+    private LocalDateTime submittedAt;
+
+    @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SetResult> setResults = new ArrayList<>();
 
     private String opposedReason;
@@ -67,7 +68,11 @@ public class Competition extends AbstractEntity {
         this.finalWinnerTeamId = request.finalWinnerId();
         this.memo = request.memo();
         this.status = CompetitionStatus.COMPLETED;
-        this.setResults = request.setResults().stream().map(SetResult::of).toList();
+        this.submittedAt = LocalDateTime.now();
+
+        request.setResults().stream()
+                .map(dto -> SetResult.of(this, dto))
+                .forEach(setResult -> this.setResults.add(setResult));
     }
 
     private boolean validateTeams(SubmitCompetitionResultRequest request) {
