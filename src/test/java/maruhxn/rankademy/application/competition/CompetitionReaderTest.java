@@ -278,4 +278,56 @@ class CompetitionReaderTest {
         assertThat(result.totalCount()).isEqualTo(0);
         assertThat(result.competitions()).hasSize(0);
     }
+
+    @Test
+    @DisplayName("그룹 대항전 내역 조회 - 성공")
+    void getGroupCompetitionHistory() {
+        // given
+        Team team1 = createTeam("leader1", group1.getId());
+        Team team2 = createTeam("leader2", group2.getId());
+        Team team3 = createTeam("leader3", group1.getId());
+        Team team4 = createTeam("leader4", group2.getId());
+
+        Competition competition1 = Competition.createAfterAccept(team1.getId(), team2.getId());
+        SubmitCompetitionResultRequest request = new SubmitCompetitionResultRequest(
+                team1.getId(),
+                team2.getId(),
+                3,
+                List.of(
+                        new SubmitCompetitionResultRequest.SetResultDto(1, team1.getId(), "image1"),
+                        new SubmitCompetitionResultRequest.SetResultDto(2, team2.getId(), "image2"),
+                        new SubmitCompetitionResultRequest.SetResultDto(3, team1.getId(), "image3")
+                ),
+                "Team 1 won",
+                team1.getId()
+        );
+        competition1.submitSetResult(request);
+        competitionRepository.save(competition1);
+
+        Competition competition2 = Competition.createAfterAccept(team1.getId(), team3.getId());
+        competitionRepository.save(competition2);
+
+        Competition competition3 = Competition.createAfterAccept(team2.getId(), team4.getId());
+        competitionRepository.save(competition3);
+
+        em.flush();
+        em.clear();
+
+        // when
+        var result1 = reader.getGroupCompetitionHistory(group1.getId(), 0);
+        var result2 = reader.getGroupCompetitionHistory(group1.getId(), 1);
+
+        // then
+        assertThat(result1.totalCount()).isEqualTo(2);
+        assertThat(result1.competitions()).hasSize(2);
+        assertThat(result1.competitions().getLast().competitionId()).isEqualTo(competition1.getId());
+        assertThat(result1.competitions().getLast().status()).isEqualTo(CompetitionStatus.COMPLETED);
+        List<Long> competitionIds = result1.competitions().stream()
+                .map(CompetitionPageResponse.CompetitionListItemResponse::competitionId)
+                .toList();
+        assertThat(competitionIds).containsExactlyInAnyOrder(competition1.getId(), competition2.getId());
+
+        assertThat(result2.totalCount()).isEqualTo(2);
+        assertThat(result2.competitions()).hasSize(0);
+    }
 }

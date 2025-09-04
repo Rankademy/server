@@ -75,7 +75,7 @@ public class CompetitionPageRowReader {
 
         return queryFactory
                 .select(Projections.constructor(Row.class,
-                        c.id, myTid, otherTid, otherUniv, submittedAt, isWin))
+                        c.id, myTid, otherTid, otherUniv, submittedAt, isWin, c.status))
                 .from(c)
                 .leftJoin(t1).on(t1.id.eq(c.team1Id))
                 .leftJoin(t2).on(t2.id.eq(c.team2Id))
