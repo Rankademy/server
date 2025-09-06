@@ -15,6 +15,7 @@ import maruhxn.rankademy.domain.team.TeamMember;
 import maruhxn.rankademy.domain.team.dto.TeamCreateRequest;
 import maruhxn.rankademy.domain.user.LolPosition;
 import maruhxn.rankademy.domain.user.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,27 +51,35 @@ class CompetitionRequestQueryServiceTest {
     @Autowired
     private EntityManager em;
 
+    private User user;
+    private Group group;
+    private Team myTeam;
+
+    @BeforeEach
+    void setUp() {
+        user = GroupFixture.createLeader("user");
+        userRepository.save(user);
+        group = GroupFixture.createGroup(user, "group");
+        groupRepository.save(group);
+        myTeam = createTeam("myTeam", group.getId(), user);
+        teamRepository.save(myTeam);
+    }
+
     @Test
     @DisplayName("대항전 요청 목록 조회 - 페이징")
     void getRequests_withPaging() {
         // given
+
         // Create 25 requests
         for (int i = 0; i < 25; i++) {
-            User user1 = GroupFixture.createLeader("user1_" + i);
-            userRepository.save(user1);
-            Group group1 = GroupFixture.createGroup(user1, "group1_" + i);
-            groupRepository.save(group1);
-            Team team1 = createTeam("team1_" + i, group1.getId(), user1);
-            teamRepository.save(team1);
+            User u = GroupFixture.createLeader("user_" + i);
+            userRepository.save(u);
+            Group g = GroupFixture.createGroup(u, "group_" + i);
+            groupRepository.save(g);
+            Team team = createTeam("team" + i, g.getId(), u);
+            teamRepository.save(team);
 
-            User user2 = GroupFixture.createLeader("user2_" + i);
-            userRepository.save(user2);
-            Group group2 = GroupFixture.createGroup(user2, "group2_" + i);
-            groupRepository.save(group2);
-            Team team2 = createTeam("team2_" + i, group2.getId(), user2);
-            teamRepository.save(team2);
-
-            CompetitionRequest request = new CompetitionRequest(team1.getId(), team2.getId(), LocalDateTime.now());
+            CompetitionRequest request = new CompetitionRequest(team.getId(), myTeam.getId(), LocalDateTime.now());
             competitionRequestRepository.save(request);
         }
 
@@ -79,8 +88,8 @@ class CompetitionRequestQueryServiceTest {
 
 
         // when
-        CompetitionRequestPageResponse firstPage = competitionRequestReader.getRequests(0);
-        CompetitionRequestPageResponse secondPage = competitionRequestReader.getRequests(1);
+        CompetitionRequestPageResponse firstPage = competitionRequestReader.getRequests(myTeam.getId(), 0);
+        CompetitionRequestPageResponse secondPage = competitionRequestReader.getRequests(myTeam.getId(), 1);
 
         // then
         assertThat(firstPage.totalCount()).isEqualTo(25);
@@ -94,7 +103,7 @@ class CompetitionRequestQueryServiceTest {
     @DisplayName("대항전 요청 목록 조회 - 요청이 없음")
     void getRequests_withNoRequests() {
         // when
-        CompetitionRequestPageResponse result = competitionRequestReader.getRequests(0);
+        CompetitionRequestPageResponse result = competitionRequestReader.getRequests(myTeam.getId(), 0);
 
         // then
         assertThat(result.totalCount()).isEqualTo(0);

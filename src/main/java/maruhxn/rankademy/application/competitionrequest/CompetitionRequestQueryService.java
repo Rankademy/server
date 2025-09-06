@@ -15,8 +15,8 @@ public class CompetitionRequestQueryService implements CompetitionRequestReader 
     private final CompetitionRequestQueryRepository competitionRequestQueryRepository;
 
     @Override
-    public CompetitionRequestPageResponse getRequests(int page) {
-        return competitionRequestQueryRepository.findAll(page);
+    public CompetitionRequestPageResponse getRequests(Long teamId, int page) {
+        return competitionRequestQueryRepository.findAll(teamId, page);
     }
 
 }

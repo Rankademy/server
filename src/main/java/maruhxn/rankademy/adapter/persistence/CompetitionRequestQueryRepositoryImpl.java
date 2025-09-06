@@ -19,7 +19,7 @@ public class CompetitionRequestQueryRepositoryImpl implements CompetitionRequest
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public CompetitionRequestPageResponse findAll(int page) {
+    public CompetitionRequestPageResponse findAll(Long myTeamId, int page) {
         QTeam fromTeam = QTeam.team;
 
         List<CompetitionRequestPageResponse.CompetitionRequestResponse> result = queryFactory
@@ -32,6 +32,7 @@ public class CompetitionRequestQueryRepositoryImpl implements CompetitionRequest
                 ))
                 .from(competitionRequest)
                 .join(fromTeam).on(competitionRequest.fromTeamId.eq(fromTeam.id))
+                .where(competitionRequest.toTeamId.eq(myTeamId))
                 .orderBy(competitionRequest.id.desc())
                 .offset(page * 20L)
                 .limit(20)

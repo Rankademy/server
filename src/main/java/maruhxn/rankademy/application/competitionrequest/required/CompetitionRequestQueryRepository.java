@@ -4,6 +4,6 @@ import maruhxn.rankademy.application.competitionrequest.required.dto.Competition
 
 public interface CompetitionRequestQueryRepository {
 
-    CompetitionRequestPageResponse findAll(int page);
+    CompetitionRequestPageResponse findAll(Long teamId, int page);
 
 }
