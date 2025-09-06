@@ -6,6 +6,8 @@ import maruhxn.rankademy.application.competition.provided.dto.CompetitionResultR
 
 public interface CompetitionReader {
 
+    Boolean checkIsMyCompetition(Long userId, Long competitionId);
+
     CompetitionDetailResponse getDetail(Long id); // 대항전 상세 정보 조회
 
     CompetitionResultResponse getResult(Long id); // 대항전 결과 조회

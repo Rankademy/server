@@ -330,4 +330,81 @@ class CompetitionReaderTest {
         assertThat(result2.totalCount()).isEqualTo(2);
         assertThat(result2.competitions()).hasSize(0);
     }
+
+    @Test
+    @DisplayName("내가 속한 대항전인지 확인 - 내가 팀1에 속해있을 경우")
+    void checkIsMyCompetition_UserInTeam1() {
+        // given
+        Team team1 = createTeam("leader1", group1.getId());
+        Team team2 = createTeam("leader2", group2.getId());
+        Competition competition = Competition.createAfterAccept(team1.getId(), team2.getId());
+        competitionRepository.save(competition);
+
+        User userInTeam1 = team1.getTeamMembers().stream().findAny().get().getUser();
+
+        em.flush();
+        em.clear();
+
+        // when
+        Boolean isMyCompetition = reader.checkIsMyCompetition(userInTeam1.getId(), competition.getId());
+
+        // then
+        assertThat(isMyCompetition).isTrue();
+    }
+
+    @Test
+    @DisplayName("내가 속한 대항전인지 확인 - 내가 팀2에 속해있을 경우")
+    void checkIsMyCompetition_UserInTeam2() {
+        // given
+        Team team1 = createTeam("leader1", group1.getId());
+        Team team2 = createTeam("leader2", group2.getId());
+        Competition competition = Competition.createAfterAccept(team1.getId(), team2.getId());
+        competitionRepository.save(competition);
+
+        User userInTeam2 = team2.getTeamMembers().stream().findAny().get().getUser();
+
+        em.flush();
+        em.clear();
+
+        // when
+        Boolean isMyCompetition = reader.checkIsMyCompetition(userInTeam2.getId(), competition.getId());
+
+        // then
+        assertThat(isMyCompetition).isTrue();
+    }
+
+    @Test
+    @DisplayName("내가 속한 대항전인지 확인 - 내가 어느 팀에도 속해있지 않을 경우")
+    void checkIsMyCompetition_UserNotInAnyTeam() {
+        // given
+        Team team1 = createTeam("leader1", group1.getId());
+        Team team2 = createTeam("leader2", group2.getId());
+        Competition competition = Competition.createAfterAccept(team1.getId(), team2.getId());
+        competitionRepository.save(competition);
+
+        User otherUser = GroupFixture.createLeader("other-user");
+        userRepository.save(otherUser);
+
+        em.flush();
+        em.clear();
+
+        // when
+        Boolean isMyCompetition = reader.checkIsMyCompetition(otherUser.getId(), competition.getId());
+
+        // then
+        assertThat(isMyCompetition).isFalse();
+    }
+
+    @Test
+    @DisplayName("내가 속한 대항전인지 확인 - 대항전 정보 없음")
+    void checkIsMyCompetition_CompetitionNotFound() {
+        // given
+        Long competitionId = 999L;
+        Long userId = 1L;
+
+        // when & then
+        assertThatThrownBy(() -> reader.checkIsMyCompetition(userId, competitionId))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("대항전 정보를 찾을 수 없습니다. competitionId: " + competitionId);
+    }
 }
