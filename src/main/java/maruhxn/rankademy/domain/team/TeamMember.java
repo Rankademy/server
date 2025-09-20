@@ -15,11 +15,11 @@ import maruhxn.rankademy.domain.user.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TeamMember extends AbstractEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -28,7 +28,6 @@ public class TeamMember extends AbstractEntity {
     private LolPosition position;
 
     public TeamMember(User user, LolPosition position) {
-        this.team = team;
         this.user = user;
         this.position = position;
     }
