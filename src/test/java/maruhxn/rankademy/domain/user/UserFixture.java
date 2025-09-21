@@ -53,6 +53,10 @@ public class UserFixture {
         return request -> createSummonerInfo(request, tierInfo);
     }
 
+    public static SummonerInfoConnector createSummonerInfoConnector(String puuid, TierInfo tierInfo) {
+        return request -> createSummonerInfo(request, puuid, tierInfo);
+    }
+
     public static SummonerInfo createSummonerInfo(RiotAuthRequest request) {
         return new SummonerInfo(
                 UUID.randomUUID().toString(),
@@ -82,6 +86,19 @@ public class UserFixture {
     public static SummonerInfo createSummonerInfo(RiotAuthRequest request, TierInfo tierInfo) {
         return new SummonerInfo(
                 UUID.randomUUID().toString(),
+                request.summonerName(),
+                request.summonerTag(),
+                12345,
+                tierInfo,
+                100,
+                100,
+                LocalDateTime.now()
+        );
+    }
+
+    public static SummonerInfo createSummonerInfo(RiotAuthRequest request, String puuid, TierInfo tierInfo) {
+        return new SummonerInfo(
+                puuid,
                 request.summonerName(),
                 request.summonerTag(),
                 12345,

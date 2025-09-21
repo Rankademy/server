@@ -5,11 +5,11 @@ import maruhxn.rankademy.application.user.provided.UserAuthorizer;
 import maruhxn.rankademy.application.user.provided.UserReader;
 import maruhxn.rankademy.application.user.required.UnivMailCertifier;
 import maruhxn.rankademy.application.user.required.UserRepository;
+import maruhxn.rankademy.domain.shared.DomainEventPublisher;
 import maruhxn.rankademy.domain.shared.event.RiotAuthEvent;
 import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -23,7 +23,7 @@ public class UserAuthService implements UserAuthorizer {
     private final UserRepository userRepository;
     private final UnivMailCertifier univMailCertifier;
     private final SummonerInfoConnector summonerInfoConnector;
-    private final ApplicationEventPublisher publisher;
+    private final DomainEventPublisher publisher;
 
     @Override
     public void sendUnivCertifyMail(Long userId) {
@@ -61,7 +61,7 @@ public class UserAuthService implements UserAuthorizer {
     public User completeRiotAuthentication(Long userId, RiotAuthRequest riotAuthRequest) {
         User user = userReader.get(userId);
         user.connectSummonerInfo(summonerInfoConnector, riotAuthRequest);
-        publisher.publishEvent(new RiotAuthEvent(userId));
+        publisher.publish(new RiotAuthEvent(userId));
         return userRepository.save(user);
     }
 

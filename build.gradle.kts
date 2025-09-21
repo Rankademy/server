@@ -1,3 +1,5 @@
+val querydslVersion = "5.1.0"
+
 plugins {
     java
     id("org.springframework.boot") version "3.5.3"
@@ -36,8 +38,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
     // querydsl
-    implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
-    annotationProcessor("com.querydsl:querydsl-apt:5.0.0:jakarta")
+    implementation("com.querydsl:querydsl-jpa:${querydslVersion}:jakarta")
+    annotationProcessor("com.querydsl:querydsl-apt:${querydslVersion}:jakarta")
     annotationProcessor("jakarta.annotation:jakarta.annotation-api")
     annotationProcessor("jakarta.persistence:jakarta.persistence-api")
 
