@@ -11,6 +11,7 @@ import maruhxn.rankademy.domain.shared.event.CompetitionResultSubmitEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
 @Service
@@ -31,8 +32,8 @@ public class CompetitionResultService implements CompetitionResultManager {
     @Override
     public void opposeResult(Long competitionId, OpposeResultRequest request) {
         Competition competition = getCompetition(competitionId);
-
-        competition.oppose(request);
+        LocalDateTime now = LocalDateTime.now();
+        competition.oppose(request, now);
     }
 
     private Competition getCompetition(Long competitionId) {

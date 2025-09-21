@@ -10,6 +10,7 @@ import maruhxn.rankademy.domain.competition.dto.SubmitCompetitionResultRequest;
 import maruhxn.rankademy.domain.shared.AbstractEntity;
 import org.springframework.util.Assert;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,8 +85,10 @@ public class Competition extends AbstractEntity {
         return finalWinnerTeamId.equals(team1Id) ? team1Id : team2Id;
     }
 
-    public void oppose(OpposeResultRequest request) {
+    public void oppose(OpposeResultRequest request, LocalDateTime now) {
         Assert.state(this.status == CompetitionStatus.COMPLETED, "등록 완료된 경기 결과에 대해서만 이의 신청이 가능합니다.");
+        Duration diff = Duration.between(this.submittedAt, now).abs();
+        Assert.state(diff.compareTo(Duration.ofDays(7)) < 0, "제출일로부터 7일이 지난 건에 대해서는 이의 신청이 불가합니다.");
         this.status = CompetitionStatus.OPPOSED;
         this.opposedReason = request.reason();
     }

@@ -5,6 +5,7 @@ import maruhxn.rankademy.domain.competition.dto.SubmitCompetitionResultRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static maruhxn.rankademy.domain.competition.CompetitionFixture.createSubmitCompetitionResultRequest;
@@ -162,7 +163,7 @@ class CompetitionTest {
         OpposeResultRequest opposeResultRequest = new OpposeResultRequest("OCR 결과 잘못됨");
 
         // when
-        competition.oppose(opposeResultRequest);
+        competition.oppose(opposeResultRequest, competition.getSubmittedAt());
 
         // then
         assertThat(competition.getStatus()).isEqualTo(CompetitionStatus.OPPOSED);
@@ -177,7 +178,36 @@ class CompetitionTest {
         OpposeResultRequest opposeResultRequest = new OpposeResultRequest("OCR 결과 잘못됨");
 
         // when
-        assertThatThrownBy(() -> competition.oppose(opposeResultRequest))
+        assertThatThrownBy(() -> competition.oppose(opposeResultRequest, LocalDateTime.now()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("등록된지 7일이 지난 경기 결과에 대해서는 이의 신청할 수 없다")
+    void opposeFail_over7days() {
+        Competition competition = CompetitionFixture.createCompetition();
+        Long team1Id = competition.getTeam1Id();
+        Long team2Id = competition.getTeam2Id();
+
+        List<SubmitCompetitionResultRequest.SetResultDto> setResults = List.of(
+                new SubmitCompetitionResultRequest.SetResultDto(1, team2Id, "key1")
+        );
+
+        SubmitCompetitionResultRequest request = new SubmitCompetitionResultRequest(
+                team1Id,
+                team2Id,
+                1,
+                setResults,
+                "Team 2 won",
+                team2Id
+        );
+
+        competition.submitSetResult(request);
+
+        OpposeResultRequest opposeResultRequest = new OpposeResultRequest("OCR 결과 잘못됨");
+
+        // when
+        assertThatThrownBy(() -> competition.oppose(opposeResultRequest, competition.getSubmittedAt().plusDays(7)))
                 .isInstanceOf(IllegalStateException.class);
     }
 }
