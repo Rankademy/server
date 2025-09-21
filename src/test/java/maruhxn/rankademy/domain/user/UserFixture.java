@@ -152,4 +152,12 @@ public class UserFixture {
     public static UserTitleProvider createTitleProvider() {
         return userId -> List.of("DUMMY");
     }
+
+    public static User createAuthorizedMember(String email, String username) {
+        User member = createUser(email, username);
+        member.enrollUnivInfo(createEnrollUnivRequest("서울과학기술대학교", username + "@seoultech.ac.kr"));
+        member.completeUnivAuthentication();
+        member.connectSummonerInfo(createSummonerInfoConnector(username + "-puuid"), createRiotAuthRequest(username, "KR1"));
+        return member;
+    }
 }
