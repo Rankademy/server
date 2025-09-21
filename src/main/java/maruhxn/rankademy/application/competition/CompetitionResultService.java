@@ -7,11 +7,11 @@ import maruhxn.rankademy.domain.competition.Competition;
 import maruhxn.rankademy.domain.competition.dto.OpposeResultRequest;
 import maruhxn.rankademy.domain.competition.dto.SubmitCompetitionResultRequest;
 import maruhxn.rankademy.domain.shared.DomainEventPublisher;
+import maruhxn.rankademy.domain.shared.TimeProvider;
 import maruhxn.rankademy.domain.shared.event.CompetitionResultSubmitEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
 @Service
@@ -21,19 +21,20 @@ public class CompetitionResultService implements CompetitionResultManager {
 
     private final CompetitionRepository competitionRepository;
     private final DomainEventPublisher publisher;
+    private final TimeProvider timeProvider;
 
     @Override
     public void submitResult(Long actingUserId, Long competitionId, SubmitCompetitionResultRequest request) {
         Competition competition = getCompetition(competitionId);
-        competition.submitSetResult(request);
+        competition.submitSetResult(request, timeProvider.getCurrentTime());
         publisher.publish(new CompetitionResultSubmitEvent(competitionId, actingUserId));
     }
 
     @Override
     public void opposeResult(Long competitionId, OpposeResultRequest request) {
         Competition competition = getCompetition(competitionId);
-        LocalDateTime now = LocalDateTime.now();
-        competition.oppose(request, now);
+
+        competition.oppose(request, timeProvider.getCurrentTime());
     }
 
     private Competition getCompetition(Long competitionId) {

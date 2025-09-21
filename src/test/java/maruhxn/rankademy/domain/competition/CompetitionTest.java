@@ -2,6 +2,7 @@ package maruhxn.rankademy.domain.competition;
 
 import maruhxn.rankademy.domain.competition.dto.OpposeResultRequest;
 import maruhxn.rankademy.domain.competition.dto.SubmitCompetitionResultRequest;
+import maruhxn.rankademy.domain.shared.TimeProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +15,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("도메인 - Competition")
 class CompetitionTest {
+
+    TimeProvider timeProvider = new TimeProvider();
 
     @Test
     @DisplayName("대항전 생성 시, 상태가 SCHEDULED이고 팀 정보가 올바르게 등록된다")
@@ -54,7 +57,7 @@ class CompetitionTest {
         );
 
         // when
-        competition.submitSetResult(request);
+        competition.submitSetResult(request, timeProvider.getCurrentTime());
 
         // then
         assertThat(competition.getStatus()).isEqualTo(CompetitionStatus.COMPLETED);
@@ -80,7 +83,7 @@ class CompetitionTest {
         );
 
         // when & then
-        assertThatThrownBy(() -> competition.submitSetResult(request))
+        assertThatThrownBy(() -> competition.submitSetResult(request, timeProvider.getCurrentTime()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("세트의 팀 구성이 대항전과 다릅니다.");
     }
@@ -99,11 +102,11 @@ class CompetitionTest {
                 1,
                 team1Id
         );
-
-        competition.submitSetResult(request); // First submission
+        LocalDateTime submittedAt = timeProvider.getCurrentTime();
+        competition.submitSetResult(request, submittedAt); // First submission
 
         // when & then
-        assertThatThrownBy(() -> competition.submitSetResult(request))
+        assertThatThrownBy(() -> competition.submitSetResult(request, timeProvider.getCurrentTime()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("이미 진행된 대항전입니다.");
     }
@@ -129,7 +132,7 @@ class CompetitionTest {
                 team2Id
         );
 
-        competition.submitSetResult(request);
+        competition.submitSetResult(request, timeProvider.getCurrentTime());
 
         // when
         Long finalWinnerId = competition.getFinalWinnerId();
@@ -158,7 +161,7 @@ class CompetitionTest {
                 team2Id
         );
 
-        competition.submitSetResult(request);
+        competition.submitSetResult(request, timeProvider.getCurrentTime());
 
         OpposeResultRequest opposeResultRequest = new OpposeResultRequest("OCR 결과 잘못됨");
 
@@ -202,7 +205,7 @@ class CompetitionTest {
                 team2Id
         );
 
-        competition.submitSetResult(request);
+        competition.submitSetResult(request, timeProvider.getCurrentTime());
 
         OpposeResultRequest opposeResultRequest = new OpposeResultRequest("OCR 결과 잘못됨");
 

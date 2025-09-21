@@ -18,6 +18,7 @@ import maruhxn.rankademy.domain.competition.dto.OpposeResultRequest;
 import maruhxn.rankademy.domain.competition.dto.SubmitCompetitionResultRequest;
 import maruhxn.rankademy.domain.group.Group;
 import maruhxn.rankademy.domain.group.GroupFixture;
+import maruhxn.rankademy.domain.shared.TimeProvider;
 import maruhxn.rankademy.domain.team.Team;
 import maruhxn.rankademy.domain.team.TeamMember;
 import maruhxn.rankademy.domain.team.dto.TeamCreateRequest;
@@ -74,6 +75,9 @@ class CompetitionApiTest {
 
     @Autowired
     CompetitionRepository competitionRepository;
+
+    @Autowired
+    TimeProvider timeProvider;
 
     private User myTeamLeader, otherTeamLeader, otherUser;
     private Group group;
@@ -169,7 +173,7 @@ class CompetitionApiTest {
         // given
         SubmitCompetitionResultRequest request = new SubmitCompetitionResultRequest(
                 myTeam.getId(), otherTeam.getId(), 1, List.of(new SubmitCompetitionResultRequest.SetResultDto(1, myTeam.getId(), "k")), "m", myTeam.getId());
-        competition.submitSetResult(request);
+        competition.submitSetResult(request, timeProvider.getCurrentTime());
         competitionRepository.save(competition);
         em.flush();
         em.clear();
@@ -245,8 +249,17 @@ class CompetitionApiTest {
     void opposeCompetitionResult_success() throws Exception {
         // given
         // First, submit a result
-        competition.submitSetResult(new SubmitCompetitionResultRequest(
-                myTeam.getId(), otherTeam.getId(), 1, List.of(new SubmitCompetitionResultRequest.SetResultDto(1, myTeam.getId(), "k")), "m", myTeam.getId()));
+        competition.submitSetResult(
+                new SubmitCompetitionResultRequest(
+                        myTeam.getId(),
+                        otherTeam.getId(),
+                        1,
+                        List.of(new SubmitCompetitionResultRequest.SetResultDto(1, myTeam.getId(), "k")),
+                        "m",
+                        myTeam.getId()
+                ),
+                timeProvider.getCurrentTime()
+        );
         competitionRepository.save(competition);
         em.flush();
         em.clear();

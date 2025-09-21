@@ -14,6 +14,7 @@ import maruhxn.rankademy.domain.competition.CompetitionStatus;
 import maruhxn.rankademy.domain.competition.dto.SubmitCompetitionResultRequest;
 import maruhxn.rankademy.domain.group.Group;
 import maruhxn.rankademy.domain.group.GroupFixture;
+import maruhxn.rankademy.domain.shared.TimeProvider;
 import maruhxn.rankademy.domain.team.Team;
 import maruhxn.rankademy.domain.team.TeamFixture;
 import maruhxn.rankademy.domain.team.TeamMember;
@@ -56,6 +57,9 @@ class CompetitionReaderTest {
 
     @Autowired
     EntityManager em;
+
+    @Autowired
+    TimeProvider timeProvider;
 
     private User groupLeader1;
     private Group group1;
@@ -181,7 +185,7 @@ class CompetitionReaderTest {
                 team1.getId()
         );
         competitionRepository.save(competition);
-        competition.submitSetResult(request);
+        competition.submitSetResult(request, timeProvider.getCurrentTime());
         competitionRepository.save(competition);
         em.flush();
         em.clear();
@@ -224,7 +228,7 @@ class CompetitionReaderTest {
                 "Team 1 won",
                 team1.getId()
         );
-        competition1.submitSetResult(request);
+        competition1.submitSetResult(request, timeProvider.getCurrentTime());
         competitionRepository.save(competition1);
 
         Competition competition2 = Competition.createAfterAccept(team3.getId(), team4.getId());
@@ -301,7 +305,7 @@ class CompetitionReaderTest {
                 "Team 1 won",
                 team1.getId()
         );
-        competition1.submitSetResult(request);
+        competition1.submitSetResult(request, timeProvider.getCurrentTime());
         competitionRepository.save(competition1);
 
         Competition competition2 = Competition.createAfterAccept(team1.getId(), team3.getId());

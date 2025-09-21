@@ -46,6 +46,8 @@ public class Competition extends AbstractEntity {
 
     private LocalDateTime submittedAt;
 
+    private LocalDateTime expiredAt;
+
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SetResult> setResults = new ArrayList<>();
 
@@ -56,20 +58,22 @@ public class Competition extends AbstractEntity {
         this.team2Id = requireNonNull(team2Id);
         this.status = CompetitionStatus.SCHEDULED;
         this.scheduledAt = LocalDateTime.now();
+        this.expiredAt = LocalDateTime.now().plusDays(7);
     }
 
     public static Competition createAfterAccept(Long team1Id, Long team2Id) {
         return new Competition(team1Id, team2Id);
     }
 
-    public void submitSetResult(SubmitCompetitionResultRequest request) {
+    public void submitSetResult(SubmitCompetitionResultRequest request, LocalDateTime submittedAt) {
+        Assert.state(submittedAt.isBefore(this.expiredAt), "일주일이 지난 대항전에 대해서는 경기 결과를 등록할 수 없습니다.");
         Assert.isTrue(validateTeams(request), "세트의 팀 구성이 대항전과 다릅니다.");
         Assert.state(this.status == CompetitionStatus.SCHEDULED, "이미 진행된 대항전입니다.");
         this.totalSets = request.totalSets();
         this.finalWinnerTeamId = request.finalWinnerId();
         this.memo = request.memo();
         this.status = CompetitionStatus.COMPLETED;
-        this.submittedAt = LocalDateTime.now();
+        this.submittedAt = submittedAt;
 
         request.setResults().stream()
                 .map(dto -> SetResult.of(this, dto))
