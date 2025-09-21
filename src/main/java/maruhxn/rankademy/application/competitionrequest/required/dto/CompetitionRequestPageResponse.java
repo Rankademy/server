@@ -5,7 +5,7 @@ import java.util.List;
 
 public record CompetitionRequestPageResponse(
         Long totalCount,
-        List<CompetitionRequestResponse> teams
+        List<CompetitionRequestResponse> competitionRequests
 ) {
 
     public record CompetitionRequestResponse(

@@ -70,7 +70,7 @@ class CompetitionRequestQueryServiceTest {
     void getRequests_withPaging() {
         // given
 
-        // Create 25 requests
+        // Create 25 competitionRequests
         for (int i = 0; i < 25; i++) {
             User u = GroupFixture.createLeader("user_" + i);
             userRepository.save(u);
@@ -93,10 +93,10 @@ class CompetitionRequestQueryServiceTest {
 
         // then
         assertThat(firstPage.totalCount()).isEqualTo(25);
-        assertThat(firstPage.teams()).hasSize(20);
+        assertThat(firstPage.competitionRequests()).hasSize(20);
 
         assertThat(secondPage.totalCount()).isEqualTo(25);
-        assertThat(secondPage.teams()).hasSize(5);
+        assertThat(secondPage.competitionRequests()).hasSize(5);
     }
 
     @Test
@@ -107,7 +107,7 @@ class CompetitionRequestQueryServiceTest {
 
         // then
         assertThat(result.totalCount()).isEqualTo(0);
-        assertThat(result.teams()).isEmpty();
+        assertThat(result.competitionRequests()).isEmpty();
     }
 
     private Team createTeam(String name, Long groupId, User representative) {

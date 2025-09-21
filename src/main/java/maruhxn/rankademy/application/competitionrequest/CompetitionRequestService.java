@@ -36,7 +36,8 @@ public class CompetitionRequestService implements CompetitionRequestManager {
 
         LocalDateTime now = LocalDateTime.now();
         publisher.publish(new SendCompetitionRequestEvent(from.getId(), to.getId(), actingUserId, now));
-        return sender.sendRequest(from, to, actingUserId, now);
+        CompetitionRequest competitionRequest = sender.sendRequest(from, to, actingUserId, now);
+        return competitionRequestRepository.save(competitionRequest);
     }
 
     @Override
