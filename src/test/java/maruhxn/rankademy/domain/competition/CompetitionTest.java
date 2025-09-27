@@ -53,7 +53,9 @@ class CompetitionTest {
                 3,
                 setResults,
                 "Team 1 won",
-                team1Id
+                team1Id,
+                1L,
+                2L
         );
 
         // when
@@ -79,7 +81,9 @@ class CompetitionTest {
                 team1Id,
                 999L,
                 1,
-                team1Id
+                team1Id,
+                1L,
+                2L
         );
 
         // when & then
@@ -100,7 +104,9 @@ class CompetitionTest {
                 team1Id,
                 team2Id,
                 1,
-                team1Id
+                team1Id,
+                1L,
+                2L
         );
         LocalDateTime submittedAt = timeProvider.getCurrentTime();
         competition.submitSetResult(request, submittedAt); // First submission
@@ -129,7 +135,9 @@ class CompetitionTest {
                 1,
                 setResults,
                 "Team 2 won",
-                team2Id
+                team2Id,
+                2L,
+                1L
         );
 
         competition.submitSetResult(request, timeProvider.getCurrentTime());
@@ -158,7 +166,9 @@ class CompetitionTest {
                 1,
                 setResults,
                 "Team 2 won",
-                team2Id
+                team2Id,
+                2L,
+                1L
         );
 
         competition.submitSetResult(request, timeProvider.getCurrentTime());
@@ -202,7 +212,9 @@ class CompetitionTest {
                 1,
                 setResults,
                 "Team 2 won",
-                team2Id
+                team2Id,
+                2L,
+                1L
         );
 
         competition.submitSetResult(request, timeProvider.getCurrentTime());

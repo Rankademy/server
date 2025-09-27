@@ -11,13 +11,16 @@ public record SubmitCompetitionResultRequest(
         int totalSets,
         List<SetResultDto> setResults,
         String memo,
-        Long finalWinnerId
+        Long finalWinnerId,
+        Long finalWinnerGroupId,
+        Long finalLoserGroupId
 ) {
 
     public SubmitCompetitionResultRequest {
         Assert.isTrue(setResults != null && !setResults.isEmpty(), "세트 정보는 비어있을 수 없습니다.");
         Assert.isTrue(totalSets == setResults.size(), "진행한 세트 수와 경기 데이터 수가 다릅니다.");
         Assert.isTrue(setCount(setResults) == totalSets, "세트 번호 중복입니다.");
+        Assert.isTrue(!finalWinnerGroupId.equals(finalLoserGroupId), "승자 그룹과 패배자 그룹은 서로 같을 수 없습니다.");
     }
 
     private int setCount(List<SetResultDto> setResults) {

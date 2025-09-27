@@ -1,7 +1,7 @@
 package maruhxn.rankademy.adapter.persistence;
 
 import jakarta.persistence.EntityManager;
-import maruhxn.rankademy.adapter.webapi.dto.UnivRankingResponse;
+import maruhxn.rankademy.adapter.persistence.ranking.OnCampusRankingRepository;
 import maruhxn.rankademy.adapter.webapi.dto.UnivStudentRankingResponse;
 import maruhxn.rankademy.adapter.webapi.ranking.dto.UnivStudentRankingFilter;
 import maruhxn.rankademy.domain.match.service.MostChampionCalculator;
@@ -32,10 +32,10 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Transactional
-class UnivRankingRepositoryTest {
+class OnCampusRankingRepositoryTest {
 
     @Autowired
-    UnivRankingRepository univRankingRepository;
+    OnCampusRankingRepository onCampusRankingRepository;
 
     @Autowired
     EntityManager em;
@@ -90,31 +90,13 @@ class UnivRankingRepositoryTest {
     }
 
     @Test
-    @DisplayName("getUnivRanking 메서드는 대학교 랭킹 목록을 올바르게 반환한다")
-    void getUnivRanking() {
-        // when
-        List<UnivRankingResponse> univRanking = univRankingRepository.getUnivRanking(0);
-
-        // then
-        UnivRankingResponse seoultech = univRanking.stream().filter(u -> u.univName().equals("서울과학기술대학교")).findFirst().get();
-        assertThat(seoultech.totalUserCnt()).isEqualTo(2);
-        assertThat(seoultech.winCount()).isEqualTo(200);
-        assertThat(seoultech.rankerDto().username()).isEqualTo("user2");
-
-        UnivRankingResponse korea = univRanking.stream().filter(u -> u.univName().equals("고려대학교")).findFirst().get();
-        assertThat(korea.totalUserCnt()).isEqualTo(1);
-        assertThat(korea.winCount()).isEqualTo(100);
-        assertThat(korea.rankerDto().username()).isEqualTo("user3");
-    }
-
-    @Test
     @DisplayName("getUnivStudentRanking 메서드는 특정 대학교의 학생 랭킹을 올바르게 반환한다")
     void getUnivStudentRanking() {
         // given
         UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter(null, null, null);
 
         // when
-        List<UnivStudentRankingResponse> snutUnivStudentRanking = univRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
+        List<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
 
         // then
         assertThat(snutUnivStudentRanking).hasSize(2);
@@ -125,7 +107,7 @@ class UnivRankingRepositoryTest {
         assertThat(snutUnivStudentRanking.get(1).tierInfo().getTier()).isEqualTo(GOLD);
         assertThat(snutUnivStudentRanking.get(1).topMosts()).containsExactly("champ1", "champ2", "champ3");
 
-        List<UnivStudentRankingResponse> koreaUnivStudentRanking = univRankingRepository.getUnivStudentRanking("고려대학교", 0, univStudentRankingFilter);
+        List<UnivStudentRankingResponse> koreaUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("고려대학교", 0, univStudentRankingFilter);
         assertThat(koreaUnivStudentRanking).hasSize(1);
         assertThat(koreaUnivStudentRanking.get(0).summonerName()).isEqualTo("summoner3");
         assertThat(koreaUnivStudentRanking.get(0).tierInfo().getTier()).isEqualTo(BRONZE);
@@ -134,13 +116,13 @@ class UnivRankingRepositoryTest {
     }
 
     @Test
-    @DisplayName("getUnivStudentRanking 메서드는 major 필터를 사용하여 특정 대학교의 학생 랭킹을 올바르게 반환한다")
+    @DisplayName("getUnivStudentRanking 메서드는 major 필터를 사용하여 특정 대학교의 학생   랭킹을 올바르게 반환한다")
     void getUnivStudentRankingWithMajorFilter() {
         // given
         UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter("컴퓨터공학과", null, null);
 
         // when
-        List<UnivStudentRankingResponse> snutUnivStudentRanking = univRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
+        List<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
 
         // then
         assertThat(snutUnivStudentRanking).hasSize(1);
@@ -154,7 +136,7 @@ class UnivRankingRepositoryTest {
         UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter(null, 2020, null);
 
         // when
-        List<UnivStudentRankingResponse> snutUnivStudentRanking = univRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
+        List<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
 
         // then
         assertThat(snutUnivStudentRanking).hasSize(1);
@@ -168,7 +150,7 @@ class UnivRankingRepositoryTest {
         UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter(null, null, LolPosition.TOP);
 
         // when
-        List<UnivStudentRankingResponse> snutUnivStudentRanking = univRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
+        List<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
 
         // then
         assertThat(snutUnivStudentRanking).hasSize(1);
@@ -182,7 +164,7 @@ class UnivRankingRepositoryTest {
         UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter("전기정보공학과", 2020, LolPosition.MID);
 
         // when
-        List<UnivStudentRankingResponse> snutUnivStudentRanking = univRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
+        List<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
 
         // then
         assertThat(snutUnivStudentRanking).hasSize(1);
@@ -196,7 +178,7 @@ class UnivRankingRepositoryTest {
         UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter("기계공학과", null, null);
 
         // when
-        List<UnivStudentRankingResponse> snutUnivStudentRanking = univRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
+        List<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
 
         // then
         assertThat(snutUnivStudentRanking).isEmpty();

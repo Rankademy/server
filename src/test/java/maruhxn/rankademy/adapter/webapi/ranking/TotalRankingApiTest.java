@@ -1,4 +1,4 @@
-package maruhxn.rankademy.adapter.webapi;
+package maruhxn.rankademy.adapter.webapi.ranking;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -6,13 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import maruhxn.rankademy.RankademyTestConfiguration;
 import maruhxn.rankademy.adapter.webapi.dto.UnivRankingResponse;
-import maruhxn.rankademy.adapter.webapi.dto.UnivStudentRankingResponse;
+import maruhxn.rankademy.application.group.required.GroupRepository;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.match.service.MostChampionCalculator;
 import maruhxn.rankademy.domain.user.ChampionPlayRecord;
 import maruhxn.rankademy.domain.user.TierInfo;
 import maruhxn.rankademy.domain.user.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -40,9 +41,9 @@ import static org.mockito.Mockito.when;
 @AutoConfigureMockMvc
 @Transactional
 @Import(RankademyTestConfiguration.class)
-class RankingApiTest {
+class TotalRankingApiTest {
 
-    static final String BASE_URL = "/api/v1/rankings/univ";
+    static final String BASE_URL = "/api/v1/rankings";
 
     @Autowired
     MockMvcTester mvcTester;
@@ -52,6 +53,9 @@ class RankingApiTest {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    GroupRepository groupRepository;
 
     @Autowired
     EntityManager em;
@@ -103,8 +107,9 @@ class RankingApiTest {
     }
 
     @Test
+    @DisplayName("대학 랭킹 조회")
     void getUnivRanking() throws UnsupportedEncodingException, JsonProcessingException {
-        MvcTestResult result = mvcTester.get().uri(BASE_URL)
+        MvcTestResult result = mvcTester.get().uri(BASE_URL + "/univ")
                 .exchange();
         assertThat(result).hasStatusOk();
 
@@ -125,20 +130,4 @@ class RankingApiTest {
         );
     }
 
-    @Test
-    void getUnivStudentRanking() throws UnsupportedEncodingException, JsonProcessingException {
-        MvcTestResult result = mvcTester.get().uri(BASE_URL + "/서울과학기술대학교")
-                .exchange();
-        assertThat(result).hasStatusOk();
-
-        List<UnivStudentRankingResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
-        });
-
-        assertThat(response).hasSize(2);
-        assertThat(response.get(0).summonerName()).isEqualTo("summoner2");
-        assertThat(response.get(0).tierInfo().getTier()).isEqualTo(EMERALD);
-        assertThat(response.get(0).topMosts()).containsExactly("champ4", "champ5", "champ6");
-        assertThat(response.get(1).summonerName()).isEqualTo("summoner1");
-        assertThat(response.get(1).tierInfo().getTier()).isEqualTo(GOLD);
-    }
 }

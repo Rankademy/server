@@ -56,31 +56,6 @@ class GroupApiTest {
     EntityManager em;
 
     @Test
-    @WithAnonymousUser
-    @DisplayName("그룹 랭킹 조회")
-    void getGroupRankingList() throws Exception {
-        for (int i = 0; i < 30; i++) {
-            User leader = GroupFixture.createLeader("leader" + i);
-            userRepository.save(leader);
-
-            Group group = GroupFixture.createGroup(leader, "group" + i);
-            groupRepository.save(group);
-        }
-
-        MvcTestResult result = mvcTester.get().uri(BASE_URL)
-                .param("page", "1")
-                .param("keyword", "")
-                .param("sortKey", GroupSortKey.TIER.name())
-                .exchange();
-
-        assertThat(result).hasStatusOk();
-
-        List<GroupResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
-        });
-        assertThat(response).hasSize(10);
-    }
-
-    @Test
     @DisplayName("내 그룹 목록 조회 - 성공")
     void getMyGroups() throws Exception {
         User member = GroupFixture.createMember();

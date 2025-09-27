@@ -182,7 +182,9 @@ class CompetitionReaderTest {
                         new SubmitCompetitionResultRequest.SetResultDto(3, team1.getId(), "image3")
                 ),
                 "Team 1 won",
-                team1.getId()
+                team1.getId(),
+                team1.getGroupId(),
+                team2.getGroupId()
         );
         competitionRepository.save(competition);
         competition.submitSetResult(request, timeProvider.getCurrentTime());
@@ -226,7 +228,9 @@ class CompetitionReaderTest {
                         new SubmitCompetitionResultRequest.SetResultDto(3, team1.getId(), "image3")
                 ),
                 "Team 1 won",
-                team1.getId()
+                team1.getId(),
+                team1.getGroupId(),
+                team2.getGroupId()
         );
         competition1.submitSetResult(request, timeProvider.getCurrentTime());
         competitionRepository.save(competition1);
@@ -303,7 +307,9 @@ class CompetitionReaderTest {
                         new SubmitCompetitionResultRequest.SetResultDto(3, team1.getId(), "image3")
                 ),
                 "Team 1 won",
-                team1.getId()
+                team1.getId(),
+                team1.getGroupId(),
+                team2.getGroupId()
         );
         competition1.submitSetResult(request, timeProvider.getCurrentTime());
         competitionRepository.save(competition1);

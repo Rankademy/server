@@ -15,7 +15,9 @@ public class CompetitionFixture {
             Long team1Id,
             Long team2Id,
             int totalSets,
-            Long finalWinnerId
+            Long finalWinnerId,
+            Long finalWinnerGroupId,
+            Long finalLoserGroupId
     ) {
         Long loserId = finalWinnerId == team1Id ? team2Id : team1Id;
 
@@ -31,7 +33,9 @@ public class CompetitionFixture {
                 totalSets,
                 setResults,
                 String.format("Win Team Id: %d", finalWinnerId),
-                team1Id
+                team1Id,
+                finalWinnerGroupId,
+                finalLoserGroupId
         );
     }
 }
