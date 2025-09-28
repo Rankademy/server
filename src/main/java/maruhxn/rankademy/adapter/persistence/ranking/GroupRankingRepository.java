@@ -3,6 +3,7 @@ package maruhxn.rankademy.adapter.persistence.ranking;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -39,14 +40,14 @@ public class GroupRankingRepository {
 
         // ✅ 승리 수: SUM(CASE ...)를 템플릿으로 고정 (Hibernate 6 타입추론 우회)
         NumberExpression<Long> winCount =
-                com.querydsl.core.types.dsl.Expressions.numberTemplate(
+                Expressions.numberTemplate(
                         Long.class,
                         "coalesce(sum(case when {0} = {1} then 1 else 0 end), 0)",
                         competition.finalWinnerGroupId, group.id);
 
         // ✅ 총 대항전 수: LEFT JOIN에 이미 참가 조건이 걸려 있으므로 COUNT(id)면 충분
         NumberExpression<Long> totalCount =
-                com.querydsl.core.types.dsl.Expressions.numberTemplate(
+                Expressions.numberTemplate(
                         Long.class,
                         "coalesce(count({0}), 0)",
                         competition.id);

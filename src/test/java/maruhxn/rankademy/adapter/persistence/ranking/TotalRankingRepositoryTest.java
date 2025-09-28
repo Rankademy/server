@@ -3,6 +3,11 @@ package maruhxn.rankademy.adapter.persistence.ranking;
 import jakarta.persistence.EntityManager;
 import maruhxn.rankademy.adapter.webapi.dto.TotalUserRankingResponse;
 import maruhxn.rankademy.adapter.webapi.dto.UnivRankingResponse;
+import maruhxn.rankademy.application.competition.required.CompetitionRepository;
+import maruhxn.rankademy.application.group.required.GroupRepository;
+import maruhxn.rankademy.domain.competition.Competition;
+import maruhxn.rankademy.domain.competition.dto.SubmitCompetitionResultRequest;
+import maruhxn.rankademy.domain.group.Group;
 import maruhxn.rankademy.domain.match.service.MostChampionCalculator;
 import maruhxn.rankademy.domain.user.*;
 import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
@@ -16,8 +21,10 @@ import org.springframework.data.web.PagedModel;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import static maruhxn.rankademy.domain.group.GroupFixture.createGroup;
 import static maruhxn.rankademy.domain.user.Rank.I;
 import static maruhxn.rankademy.domain.user.Rank.II;
 import static maruhxn.rankademy.domain.user.Tier.*;
@@ -37,13 +44,21 @@ class TotalRankingRepositoryTest {
     @Autowired
     EntityManager em;
 
+    @Autowired
+    CompetitionRepository competitionRepository;
+
+    @Autowired
+    GroupRepository groupRepository;
+
     @MockitoBean
     MostChampionCalculator mostChampionCalculator;
+
+    User user1, user2, user3;
 
     @BeforeEach
     void setUp() {
         // given
-        User user1 = createUser("user1@test.com", "user1");
+        user1 = createUser("user1@test.com", "user1");
         user1.enrollUnivInfo(new EnrollUnivRequest("서울과학기술대학교", "user1@seoultech.ac.kr", true, 2021, "컴퓨터공학과"));
         user1.updateProfile(new ProfileUpdateRequest("user1", null, LolPosition.TOP, LolPosition.JG));
         user1.connectSummonerInfo(createSummonerInfoConnector(new TierInfo(GOLD, II, 50)), createRiotAuthRequest("summoner1", "KR1"));
@@ -56,7 +71,7 @@ class TotalRankingRepositoryTest {
         user1.completeUnivAuthentication();
         em.persist(user1);
 
-        User user2 = createUser("user2@test.com", "user2");
+        user2 = createUser("user2@test.com", "user2");
         user2.enrollUnivInfo(new EnrollUnivRequest("서울과학기술대학교", "user2@seoultech.ac.kr", true, 2020, "전기정보공학과"));
         user2.updateProfile(new ProfileUpdateRequest("user2", null, LolPosition.MID, LolPosition.SUP));
         user2.connectSummonerInfo(createSummonerInfoConnector(new TierInfo(EMERALD, I, 20)), createRiotAuthRequest("summoner2", "KR1"));
@@ -69,7 +84,7 @@ class TotalRankingRepositoryTest {
         user2.completeUnivAuthentication();
         em.persist(user2);
 
-        User user3 = createUser("user3@test.com", "user3");
+        user3 = createUser("user3@test.com", "user3");
         user3.enrollUnivInfo(new EnrollUnivRequest("고려대학교", "user3@korea.ac.kr", true, 2022, "경영학과"));
         user3.updateProfile(new ProfileUpdateRequest("user3", null, LolPosition.JG, LolPosition.MID));
         user3.connectSummonerInfo(createSummonerInfoConnector(new TierInfo(BRONZE, I, 50)), createRiotAuthRequest("summoner3", "KR1"));
@@ -87,21 +102,72 @@ class TotalRankingRepositoryTest {
     }
 
     @Test
-    @DisplayName("getUnivRanking 메서드는 대학교 랭킹 목록을 올바르게 반환한다")
-    void getUnivRanking() {
+    @DisplayName("getUnivRanking: 대항전 승리 수 기준 내림차순 정렬 및 DISTINCT 집계가 정확하다")
+    void getUnivRanking_orderByWinCount_andDistinct() {
+        // given
+        // 같은 대학(서울과기대)에 그룹 2개, 고려대에 그룹 1개
+        Group st1 = groupRepository.save(createGroup(user1, "st1"));
+        Group st2 = groupRepository.save(createGroup(user2, "st2"));
+        Group ku = groupRepository.save(createGroup(user3, "ku"));
+
+        // 경기 구성
+        createCompletedCompetition(st1.getId(), st2.getId());
+        createCompletedCompetition(st1.getId(), ku.getId());
+        createCompletedCompetition(ku.getId(), st2.getId());
+
+        em.flush();
+        em.clear();
+
         // when
-        List<UnivRankingResponse> univRanking = totalRankingRepository.getUnivRanking(0, null);
+        List<UnivRankingResponse> rows = totalRankingRepository.getUnivRanking(0, null);
+
+        // then: 서울과기대가 승리 2로 1위, 고려대가 승리 1로 2위
+        assertThat(rows).hasSize(2);
+        UnivRankingResponse seoultech = rows.get(0);
+        UnivRankingResponse korea = rows.get(1);
+
+        assertThat(seoultech.univName()).isEqualTo("서울과학기술대학교");
+        assertThat(korea.univName()).isEqualTo("고려대학교");
+
+        // DISTINCT 검증: intra-univ 경기(stA–stB)는 총 1건으로 집계되어야 함
+        assertThat(seoultech.competitionTotalCnt()).isEqualTo(3L); // (1),(2),(3) 모두 서울과기대 소속 그룹이 참여
+        assertThat(seoultech.competitionWinCnt()).isEqualTo(2L);   // stA가 2승
+
+        assertThat(korea.competitionTotalCnt()).isEqualTo(2L);     // (2),(3)
+        assertThat(korea.competitionWinCnt()).isEqualTo(1L);       // ku가 1승
+
+        // 활성 유저 수 & 랭커 확인
+        assertThat(seoultech.totalUserCnt()).isEqualTo(2L);        // user1, user2
+        assertThat(seoultech.rankerDto().summonerName()).isEqualTo("user2"); // EMERALD > GOLD
+        assertThat(korea.totalUserCnt()).isEqualTo(1L);            // user3
+        assertThat(korea.rankerDto().summonerName()).isEqualTo("user3");
+    }
+
+    @Test
+    @DisplayName("getUnivRanking: 대학명 키워드로 필터링된다")
+    void getUnivRanking_filterByUnivNameKey() {
+        // when
+        List<UnivRankingResponse> rows = totalRankingRepository.getUnivRanking(0, "서울과");
 
         // then
-        UnivRankingResponse seoultech = univRanking.stream().filter(u -> u.univName().equals("서울과학기술대학교")).findFirst().get();
-        assertThat(seoultech.totalUserCnt()).isEqualTo(2);
-        assertThat(seoultech.winCount()).isEqualTo(200);
-        assertThat(seoultech.rankerDto().username()).isEqualTo("user2");
+        assertThat(rows).hasSize(1);
+        assertThat(rows.get(0).univName()).isEqualTo("서울과학기술대학교");
+    }
 
-        UnivRankingResponse korea = univRanking.stream().filter(u -> u.univName().equals("고려대학교")).findFirst().get();
-        assertThat(korea.totalUserCnt()).isEqualTo(1);
-        assertThat(korea.winCount()).isEqualTo(100);
-        assertThat(korea.rankerDto().username()).isEqualTo("user3");
+    private Competition createCompletedCompetition(Long winnerGroupId, Long loserGroupId) {
+        Competition competition = Competition.createAfterAccept(1L, 2L);
+        SubmitCompetitionResultRequest request = new SubmitCompetitionResultRequest(
+                1L,
+                2L,
+                1,
+                List.of(new SubmitCompetitionResultRequest.SetResultDto(1, 1L, "image1")),
+                "Team 1 won",
+                1L,
+                winnerGroupId,
+                loserGroupId
+        );
+        competition.submitSetResult(request, LocalDateTime.now());
+        return competitionRepository.save(competition);
     }
 
     @Test
