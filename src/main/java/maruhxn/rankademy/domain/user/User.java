@@ -124,14 +124,17 @@ public class User extends AbstractEntity {
     }
 
     public boolean isAuthorized() {
+        checkAuthorized();
+        return authStatus == UserAuthStatus.AUTHORIZED;
+    }
+
+    private void checkAuthorized() {
         if ((univInfo == null || !univInfo.isUnivVerified()) ||
                 summonerInfo == null) {
             authStatus = UserAuthStatus.UNAUTHORIZED;
-            return false;
+            return;
         }
-
         authStatus = UserAuthStatus.AUTHORIZED;
-        return true;
     }
 
     public void enrollUnivInfo(EnrollUnivRequest enrollUnivRequest) {
@@ -154,6 +157,7 @@ public class User extends AbstractEntity {
         Assert.state(this.univInfo != null, "학교 정보를 등록해주세요.");
         Assert.state(!this.univInfo.isUnivVerified(), "이미 학교 인증이 완료되었습니다.");
         this.univInfo = this.univInfo.authenticate();
+        checkAuthorized();
     }
 
     public void removeUnivInfo() {
@@ -163,6 +167,7 @@ public class User extends AbstractEntity {
     public void connectSummonerInfo(SummonerInfoConnector summonerInfoConnector, RiotAuthRequest riotAuthRequest) {
         Assert.state(this.summonerInfo == null, "이미 라이엇 계정이 연동되었습니다.");
         this.summonerInfo = summonerInfoConnector.connect(riotAuthRequest);
+        checkAuthorized();
     }
 
     public void removeRiotAuthentication() {
