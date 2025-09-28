@@ -1,7 +1,6 @@
 package maruhxn.rankademy.adapter.webapi.ranking;
 
 import lombok.RequiredArgsConstructor;
-import maruhxn.rankademy.adapter.persistence.ranking.GroupRankingRepository;
 import maruhxn.rankademy.adapter.persistence.ranking.OnCampusRankingRepository;
 import maruhxn.rankademy.adapter.webapi.dto.UnivStudentRankingResponse;
 import maruhxn.rankademy.adapter.webapi.ranking.dto.GroupRankingFilter;
@@ -19,7 +18,6 @@ import java.util.List;
 public class OnCampusRankingApi {
 
     private final OnCampusRankingRepository onCampusRankingRepository;
-    private final GroupRankingRepository groupRankingRepository;
 
     @GetMapping
     public List<UnivStudentRankingResponse> getUnivStudentRanking(
@@ -44,6 +42,6 @@ public class OnCampusRankingApi {
             @RequestParam(value = "mainPosition", required = false) LolPosition mainPosition
     ) {
         GroupRankingFilter groupRankingFilter = new GroupRankingFilter(groupNameKey, major, admissionYear, mainPosition);
-        return groupRankingRepository.getGroupRanking(univName, page, sortKey, groupRankingFilter);
+        return onCampusRankingRepository.getGroupRanking(univName, page, sortKey, groupRankingFilter);
     }
 }

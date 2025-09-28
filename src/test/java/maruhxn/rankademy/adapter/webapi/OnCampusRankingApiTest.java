@@ -146,7 +146,6 @@ class OnCampusRankingApiTest {
         assertThat(response).hasSize(2);
         assertThat(response.get(0).summonerName()).isEqualTo("summoner2");
         assertThat(response.get(0).tierInfo().getTier()).isEqualTo(EMERALD);
-        assertThat(response.get(0).topMosts()).containsExactly("champ4", "champ5", "champ6");
         assertThat(response.get(1).summonerName()).isEqualTo("summoner1");
         assertThat(response.get(1).tierInfo().getTier()).isEqualTo(GOLD);
     }

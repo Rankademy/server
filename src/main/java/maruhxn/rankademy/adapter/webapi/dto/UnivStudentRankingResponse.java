@@ -3,8 +3,6 @@ package maruhxn.rankademy.adapter.webapi.dto;
 import maruhxn.rankademy.domain.user.LolPosition;
 import maruhxn.rankademy.domain.user.TierInfo;
 
-import java.util.List;
-
 public record UnivStudentRankingResponse(
         Long userId,
         String puuid,
@@ -13,7 +11,8 @@ public record UnivStudentRankingResponse(
         int summonerIcon,
         TierInfo tierInfo,
         double winRate,
-        List<String> topMosts,
+        int winCount,
+        int lossCount,
         LolPosition mainPosition,
         LolPosition subPosition,
         int admissionYear,
