@@ -41,6 +41,8 @@ public class CompetitionRequestQueryRepositoryImpl implements CompetitionRequest
         Long count = queryFactory
                 .select(competitionRequest.count())
                 .from(competitionRequest)
+                .join(fromTeam).on(competitionRequest.fromTeamId.eq(fromTeam.id))
+                .where(competitionRequest.toTeamId.eq(myTeamId))
                 .fetchOne();
 
         return new CompetitionRequestPageResponse(count, result);
