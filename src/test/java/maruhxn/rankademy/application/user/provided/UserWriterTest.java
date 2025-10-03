@@ -72,7 +72,7 @@ class UserWriterTest {
     }
 
     @Test
-    @DisplayName("중복된 아이디(username)로 가입 시 예외가 발생한다.")
+    @DisplayName("중복된 아이디(summonerName)로 가입 시 예외가 발생한다.")
     void register_OrSetPassword_FailWithDuplicateUsername() {
         // given
         User user = registerOrSetPasswordUser();

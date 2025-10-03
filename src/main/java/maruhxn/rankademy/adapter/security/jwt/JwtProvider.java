@@ -85,7 +85,7 @@ public class JwtProvider {
         return Jwts.builder()
                 .subject(rankademyUser.getEmail())
                 .claim("id", rankademyUser.getId())
-                .claim("username", rankademyUser.getNickname())
+                .claim("summonerName", rankademyUser.getNickname())
                 .claim("isAuthorized", rankademyUser.userInfo().isAuthorized())
                 .claim("role", authorities.get(0).getAuthority())
 //                .claim("provider", rankademyUser.getProvider())
@@ -133,7 +133,7 @@ public class JwtProvider {
     }
 
     public String getUsername(String token) {
-        return getPayload(token).get("username", String.class);
+        return getPayload(token).get("summonerName", String.class);
     }
 
 //    public String getProvider(String token) {

@@ -6,7 +6,7 @@ import jakarta.persistence.EntityManager;
 import maruhxn.rankademy.RankademyTestConfiguration;
 import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.adapter.security.model.UserInfo;
-import maruhxn.rankademy.adapter.webapi.dto.ProfileResponse;
+import maruhxn.rankademy.application.user.dto.ProfileResponse;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.user.LolPosition;
 import maruhxn.rankademy.domain.user.User;
@@ -51,36 +51,18 @@ class ProfileApiTest {
 
     @Test
     void getProfile() throws UnsupportedEncodingException, JsonProcessingException {
-        User user = registerUser();
-        RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
-
-        MvcTestResult result = mvcTester.get().uri(BASE_URL)
-                .with(user(mockUser))
-                .exchange();
-
-        assertThat(result).hasStatusOk();
-
-        var response = objectMapper.readValue(result.getResponse().getContentAsString(), ProfileResponse.class);
-
-        assertAll(
-                () -> assertThat(response.id()).isEqualTo(user.getId()),
-                () -> assertThat(response.username()).isEqualTo(user.getUsername()),
-                () -> assertThat(response.univInfo()).isNull(),
-                () -> assertThat(response.mainPosition()).isNull(),
-                () -> assertThat(response.summonerInfo()).isNull()
-        );
-    }
-
-    @Test
-    void getProfile_VERIFIED() throws UnsupportedEncodingException, JsonProcessingException {
         User user = createUser();
         user.enrollUnivInfo(createEnrollUnivRequest());
-        user = userRepository.save(user);
+        user.completeUnivAuthentication();
+        user.connectSummonerInfo(createSummonerInfoConnector(), createRiotAuthRequest());
+        userRepository.save(user);
+
         em.flush();
         em.clear();
 
         RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
 
+        // 학교 인증 및 라이엇 인증 완료 후
         MvcTestResult result = mvcTester.get().uri(BASE_URL)
                 .with(user(mockUser))
                 .exchange();
@@ -92,43 +74,13 @@ class ProfileApiTest {
         User target = userRepository.findById(user.getId()).orElseThrow();
         assertAll(
                 () -> assertThat(response.id()).isEqualTo(target.getId()),
-                () -> assertThat(response.username()).isEqualTo(target.getUsername()),
-                () -> assertThat(response.univInfo()).isNotNull(),
+                () -> assertThat(response.summonerInfo().summonerName()).isEqualTo(target.getSummonerInfo().getSummonerName()),
                 () -> assertThat(response.univInfo().univName()).isEqualTo(target.getUnivInfo().getUnivName()),
-                () -> assertThat(response.univInfo().univMail()).isEqualTo(target.getUnivInfo().getUnivMail().address()),
-                () -> assertThat(response.univInfo().univVerified()).isEqualTo(false),
+                () -> assertThat(response.univInfo().univVerified()).isEqualTo(true),
+                () -> assertThat(response.univInfo().admissionYear()).isEqualTo(target.getUnivInfo().getAdmissionYear()),
                 () -> assertThat(response.univInfo().major()).isEqualTo(target.getUnivInfo().getMajor()),
-                () -> assertThat(response.mainPosition()).isNull(),
-                () -> assertThat(response.summonerInfo()).isNull()
-        );
-
-        user.completeUnivAuthentication();
-        user.connectSummonerInfo(createSummonerInfoConnector(), createRiotAuthRequest());
-        userRepository.save(user);
-        em.flush();
-        em.clear();
-
-        // 학교 인증 및 라이엇 인증 완료 후
-        MvcTestResult result2 = mvcTester.get().uri(BASE_URL)
-                .with(user(mockUser))
-                .exchange();
-
-        assertThat(result2).hasStatusOk();
-
-        var response2 = objectMapper.readValue(result2.getResponse().getContentAsString(), ProfileResponse.class);
-
-        User target2 = userRepository.findById(user.getId()).orElseThrow();
-        assertAll(
-                () -> assertThat(response2.id()).isEqualTo(target2.getId()),
-                () -> assertThat(response2.username()).isEqualTo(target2.getUsername()),
-                () -> assertThat(response2.univInfo()).isNotNull(),
-                () -> assertThat(response2.univInfo().univName()).isEqualTo(target.getUnivInfo().getUnivName()),
-                () -> assertThat(response2.univInfo().univMail()).isEqualTo(target.getUnivInfo().getUnivMail().address()),
-                () -> assertThat(response2.univInfo().univVerified()).isEqualTo(true),
-                () -> assertThat(response2.univInfo().major()).isEqualTo(target.getUnivInfo().getMajor()),
-                () -> assertThat(response2.summonerInfo()).isNotNull(),
-                () -> assertThat(response2.summonerInfo().summonerName()).isEqualTo(target2.getSummonerInfo().getSummonerName()),
-                () -> assertThat(response2.summonerInfo().summonerTag()).isEqualTo(target2.getSummonerInfo().getSummonerTag())
+                () -> assertThat(response.mostChampionIds()).isEmpty(),
+                () -> assertThat(response.winRate()).isEqualTo(target.getSummonerInfo().getWinRate())
         );
     }
 
@@ -138,7 +90,7 @@ class ProfileApiTest {
         RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
 
         var request = new ProfileUpdateRequest(
-                "new-username",
+                "new-summonerName",
                 "it's about",
                 LolPosition.TOP,
                 LolPosition.JG

@@ -3,11 +3,10 @@ package maruhxn.rankademy.adapter.webapi;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.security.model.RankademyUser;
-import maruhxn.rankademy.adapter.webapi.dto.ProfileResponse;
+import maruhxn.rankademy.application.user.dto.ProfileResponse;
 import maruhxn.rankademy.application.user.provided.UserAuthorizer;
 import maruhxn.rankademy.application.user.provided.UserReader;
 import maruhxn.rankademy.application.user.provided.UserWriter;
-import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
@@ -28,8 +27,7 @@ public class ProfileApi {
     public ProfileResponse getProfile(
             @AuthenticationPrincipal RankademyUser rankademyUser
     ) {
-        User user = userReader.get(rankademyUser.getId());
-        return ProfileResponse.from(user);
+        return userReader.getProfile(rankademyUser.getId());
     }
 
     @PatchMapping

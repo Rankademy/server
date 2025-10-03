@@ -1,7 +1,9 @@
 package maruhxn.rankademy.application.user;
 
 import lombok.RequiredArgsConstructor;
+import maruhxn.rankademy.application.user.dto.ProfileResponse;
 import maruhxn.rankademy.application.user.provided.UserReader;
+import maruhxn.rankademy.application.user.required.UserQueryRepository;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.user.Email;
 import maruhxn.rankademy.domain.user.OAuth2Provider;
@@ -18,10 +20,17 @@ import java.util.Optional;
 public class UserQueryService implements UserReader {
 
     private final UserRepository userRepository;
+    private final UserQueryRepository userQueryRepository;
 
     @Override
     public User get(Long userId) {
         return userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("회원을 찾을 수 없습니다. id: " + userId));
+    }
+
+    @Override
+    public ProfileResponse getProfile(Long userId) {
+        return userQueryRepository.getProfile(userId)
                 .orElseThrow(() -> new NoSuchElementException("회원을 찾을 수 없습니다. id: " + userId));
     }
 
