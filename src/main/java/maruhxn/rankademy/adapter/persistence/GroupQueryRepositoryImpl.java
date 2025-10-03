@@ -121,6 +121,8 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                         Projections.constructor(
                                 RecruitmentPostDetailResponse.class,
                                 groupRecruitmentPost.id,
+                                group.id,
+                                group.name,
                                 groupRecruitmentPost.title,
                                 groupRecruitmentPost.content,
                                 groupRecruitmentPost.requirements,
