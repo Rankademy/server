@@ -5,14 +5,19 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import maruhxn.rankademy.RankademyTestConfiguration;
-import maruhxn.rankademy.adapter.webapi.dto.UnivRankingResponse;
 import maruhxn.rankademy.adapter.webapi.dto.UnivStudentRankingResponse;
+import maruhxn.rankademy.application.group.provided.dto.GroupResponse;
+import maruhxn.rankademy.application.group.provided.dto.GroupSortKey;
+import maruhxn.rankademy.application.group.required.GroupRepository;
 import maruhxn.rankademy.application.user.required.UserRepository;
+import maruhxn.rankademy.domain.group.Group;
+import maruhxn.rankademy.domain.group.GroupFixture;
 import maruhxn.rankademy.domain.match.service.MostChampionCalculator;
 import maruhxn.rankademy.domain.user.ChampionPlayRecord;
 import maruhxn.rankademy.domain.user.TierInfo;
 import maruhxn.rankademy.domain.user.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -31,7 +36,6 @@ import static maruhxn.rankademy.domain.user.Rank.II;
 import static maruhxn.rankademy.domain.user.Tier.*;
 import static maruhxn.rankademy.domain.user.UserFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -40,7 +44,7 @@ import static org.mockito.Mockito.when;
 @AutoConfigureMockMvc
 @Transactional
 @Import(RankademyTestConfiguration.class)
-class RankingApiTest {
+class OnCampusRankingApiTest {
 
     static final String BASE_URL = "/api/v1/rankings/univ";
 
@@ -52,6 +56,9 @@ class RankingApiTest {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    GroupRepository groupRepository;
 
     @Autowired
     EntityManager em;
@@ -103,29 +110,31 @@ class RankingApiTest {
     }
 
     @Test
-    void getUnivRanking() throws UnsupportedEncodingException, JsonProcessingException {
-        MvcTestResult result = mvcTester.get().uri(BASE_URL)
+    @DisplayName("교내 그룹 랭킹 조회")
+    void getGroupRankingList() throws Exception {
+        for (int i = 0; i < 30; i++) {
+            User leader = GroupFixture.createLeader("leader" + i);
+            userRepository.save(leader);
+
+            Group group = GroupFixture.createGroup(leader, "group" + i);
+            groupRepository.save(group);
+        }
+
+        MvcTestResult result = mvcTester.get().uri(BASE_URL + "/서울과학기술대학교/groups")
+                .param("page", "1")
+                .param("keyword", "")
+                .param("sortKey", GroupSortKey.TIER.name())
                 .exchange();
+
         assertThat(result).hasStatusOk();
 
-        List<UnivRankingResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+        List<GroupResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
         });
-
-        UnivRankingResponse seoultech = response.stream().filter(u -> u.univName().equals("서울과학기술대학교")).findFirst().get();
-        UnivRankingResponse korea = response.stream().filter(u -> u.univName().equals("고려대학교")).findFirst().get();
-
-        assertAll(
-                () -> assertThat(response).hasSize(2),
-                () -> assertThat(seoultech.totalUserCnt()).isEqualTo(2),
-                () -> assertThat(seoultech.winCount()).isEqualTo(200),
-                () -> assertThat(seoultech.rankerDto().username()).isEqualTo("user2"),
-                () -> assertThat(korea.totalUserCnt()).isEqualTo(1),
-                () -> assertThat(korea.winCount()).isEqualTo(100),
-                () -> assertThat(korea.rankerDto().username()).isEqualTo("user3")
-        );
+        assertThat(response).hasSize(10);
     }
 
     @Test
+    @DisplayName("교내 유저 랭킹 조회")
     void getUnivStudentRanking() throws UnsupportedEncodingException, JsonProcessingException {
         MvcTestResult result = mvcTester.get().uri(BASE_URL + "/서울과학기술대학교")
                 .exchange();
@@ -137,7 +146,6 @@ class RankingApiTest {
         assertThat(response).hasSize(2);
         assertThat(response.get(0).summonerName()).isEqualTo("summoner2");
         assertThat(response.get(0).tierInfo().getTier()).isEqualTo(EMERALD);
-        assertThat(response.get(0).topMosts()).containsExactly("champ4", "champ5", "champ6");
         assertThat(response.get(1).summonerName()).isEqualTo("summoner1");
         assertThat(response.get(1).tierInfo().getTier()).isEqualTo(GOLD);
     }

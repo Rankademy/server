@@ -11,8 +11,6 @@ public interface GroupReader {
 
     List<MyGroupResponse> getMyGroupList(Long userId);
 
-    List<GroupResponse> getRankingList(int page, String keyword, GroupSortKey sortKey);
-
     GroupDetailResponse getDetail(Long userId, Long groupId);
 
     List<RecruitmentPostResponse> getRecruitmentPostList(int page);

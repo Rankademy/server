@@ -1,6 +1,5 @@
 package maruhxn.rankademy.adapter.persistence;
 
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
@@ -46,52 +45,6 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                 .join(groupMember.group, group)
                 .where(groupMember.user.id.eq(userId))
                 .fetch();
-    }
-
-    @Override
-    public List<GroupResponse> getRankingList(int page, String keyword, GroupSortKey sortKey) {
-        QGroupMember leaderMember = new QGroupMember("leaderMember");
-        QUser leaderUser = new QUser("leaderUser");
-
-        return queryFactory
-                .select(
-                        Projections.constructor(
-                                GroupResponse.class,
-                                group.id,
-                                group.name,
-                                group.logoImage,
-                                group.capacity,
-                                group.members.size(),
-                                Expressions.constant(0),
-                                Expressions.constant(0),
-                                summonerInfo.tierInfo.mappedTier.avg(),
-                                Projections.constructor(
-                                        LeaderDto.class,
-                                        leaderUser.id,
-                                        leaderUser.summonerInfo.summonerName,
-                                        leaderUser.summonerInfo.summonerIconNum
-                                )
-                        )
-                )
-                .from(group)
-                .join(group.members, groupMember)
-                .join(groupMember.user, user)
-                .join(user.summonerInfo, summonerInfo)
-                .join(leaderMember).on(leaderMember.group.id.eq(group.id).and(leaderMember.role.eq(GroupRole.LEADER)))
-                .join(leaderMember.user, leaderUser)
-                .where(keyword != null ? group.name.like("%" + keyword + "%") : null)
-                .groupBy(group.id, group.name, group.logoImage, group.capacity, leaderUser.id, leaderUser.summonerInfo.summonerIconNum)
-                .orderBy(this.getOrderSpecifier(sortKey), group.createdAt.asc())
-                .offset(page * 20L)
-                .limit(20)
-                .fetch();
-    }
-
-    private OrderSpecifier<?> getOrderSpecifier(GroupSortKey sortKey) {
-        return switch (sortKey) {
-            case TIER -> summonerInfo.tierInfo.mappedTier.avg().desc();
-            case WIN_COUNT -> summonerInfo.winCount.sum().desc(); // TODO: 대항전 승리 순으로 변경 필요
-        };
     }
 
     @Override

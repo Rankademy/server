@@ -7,8 +7,6 @@ import java.util.Optional;
 
 public interface GroupQueryRepository {
 
-    List<GroupResponse> getRankingList(int page, String keyword, GroupSortKey sortKey);
-
     Optional<GroupDetailResponse> getGroupDetails(Long userId, Long groupId);
 
     List<RecruitmentPostResponse> getRecruitmentPostList(int page);

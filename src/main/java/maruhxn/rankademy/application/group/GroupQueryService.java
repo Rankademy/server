@@ -30,11 +30,6 @@ public class GroupQueryService implements GroupReader {
     }
 
     @Override
-    public List<GroupResponse> getRankingList(int page, String keyword, GroupSortKey sortKey) {
-        return groupQueryRepository.getRankingList(page, keyword, sortKey);
-    }
-
-    @Override
     public GroupDetailResponse getDetail(Long userId, Long groupId) {
         return groupQueryRepository.getGroupDetails(userId, groupId)
                 .orElseThrow(() -> new NoSuchElementException("그룹 정보가 존재하지 않습니다. id: " + groupId));

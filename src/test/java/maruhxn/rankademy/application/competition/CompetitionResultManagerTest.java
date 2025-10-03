@@ -110,7 +110,9 @@ class CompetitionResultManagerTest {
                 team1.getId(),
                 team2.getId(),
                 3,
-                team1.getId()
+                team1.getId(),
+                team1.getGroupId(),
+                team2.getGroupId()
         );
 
         // when
@@ -134,7 +136,9 @@ class CompetitionResultManagerTest {
                 team1.getId(),
                 team2.getId(),
                 1,
-                team1.getId()
+                team1.getId(),
+                team1.getGroupId(),
+                team2.getGroupId()
         );
 
         // when & then
@@ -152,7 +156,9 @@ class CompetitionResultManagerTest {
                 team1.getId(),
                 team2.getId(),
                 3,
-                team1.getId()
+                team1.getId(),
+                team1.getGroupId(),
+                team2.getGroupId()
         );
         competitionResultManager.submitResult(actingUserId, competition.getId(), submitRequest);
         em.flush();

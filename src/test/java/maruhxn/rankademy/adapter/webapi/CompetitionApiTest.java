@@ -80,7 +80,7 @@ class CompetitionApiTest {
     TimeProvider timeProvider;
 
     private User myTeamLeader, otherTeamLeader, otherUser;
-    private Group group;
+    private Group group1, group2;
     private Team myTeam, otherTeam;
     private Competition competition;
 
@@ -93,12 +93,14 @@ class CompetitionApiTest {
         otherUser = GroupFixture.createMember("otherUser@test.com", "otherUser");
         userRepository.save(otherUser);
 
-        group = createGroup(myTeamLeader, "test group");
-        groupRepository.save(group);
+        group1 = createGroup(myTeamLeader, "test group1");
+        groupRepository.save(group1);
+        group2 = createGroup(otherTeamLeader, "test group2");
+        groupRepository.save(group2);
 
-        myTeam = makeTeam("myTeam", myTeamLeader);
+        myTeam = makeTeam("myTeam", myTeamLeader, group1.getId());
         teamRepository.save(myTeam);
-        otherTeam = makeTeam("otherTeam", otherTeamLeader);
+        otherTeam = makeTeam("otherTeam", otherTeamLeader, group2.getId());
         teamRepository.save(otherTeam);
         competition = Competition.createAfterAccept(myTeam.getId(), otherTeam.getId());
         competitionRepository.save(competition);
@@ -139,7 +141,7 @@ class CompetitionApiTest {
     @DisplayName("그룹 대결 목록 조회 - 성공")
     void getGroupCompetitions_success() throws Exception {
         // when
-        var result = mvcTester.get().uri(BASE_URL + "/groups/" + group.getId() + "?page=0")
+        var result = mvcTester.get().uri(BASE_URL + "/groups/" + group1.getId() + "?page=0")
                 .with(user(RankademyUser.from(UserInfo.from(myTeamLeader))))
                 .exchange();
 
@@ -172,7 +174,15 @@ class CompetitionApiTest {
     void getCompetitionResult_success() throws Exception {
         // given
         SubmitCompetitionResultRequest request = new SubmitCompetitionResultRequest(
-                myTeam.getId(), otherTeam.getId(), 1, List.of(new SubmitCompetitionResultRequest.SetResultDto(1, myTeam.getId(), "k")), "m", myTeam.getId());
+                myTeam.getId(),
+                otherTeam.getId(),
+                1,
+                List.of(new SubmitCompetitionResultRequest.SetResultDto(1, myTeam.getId(), "k")),
+                "m",
+                myTeam.getId(),
+                myTeam.getGroupId(),
+                otherTeam.getGroupId()
+        );
         competition.submitSetResult(request, timeProvider.getCurrentTime());
         competitionRepository.save(competition);
         em.flush();
@@ -206,7 +216,9 @@ class CompetitionApiTest {
                 1, // totalSets
                 setResults,
                 "GG",
-                myTeam.getId()
+                myTeam.getId(),
+                myTeam.getGroupId(),
+                otherTeam.getGroupId()
         );
 
         // when
@@ -231,7 +243,15 @@ class CompetitionApiTest {
     void submitCompetitionResult_forbidden() throws Exception {
         // given
         SubmitCompetitionResultRequest request = new SubmitCompetitionResultRequest(
-                myTeam.getId(), otherTeam.getId(), 1, List.of(new SubmitCompetitionResultRequest.SetResultDto(1, myTeam.getId(), "k")), "m", myTeam.getId());
+                myTeam.getId(),
+                otherTeam.getId(),
+                1,
+                List.of(new SubmitCompetitionResultRequest.SetResultDto(1, myTeam.getId(), "k")),
+                "m",
+                myTeam.getId(),
+                myTeam.getGroupId(),
+                otherTeam.getGroupId()
+        );
 
         // when
         var result = mvcTester.post().uri(BASE_URL + "/" + competition.getId() + "/results")
@@ -256,7 +276,9 @@ class CompetitionApiTest {
                         1,
                         List.of(new SubmitCompetitionResultRequest.SetResultDto(1, myTeam.getId(), "k")),
                         "m",
-                        myTeam.getId()
+                        myTeam.getId(),
+                        myTeam.getGroupId(),
+                        otherTeam.getGroupId()
                 ),
                 timeProvider.getCurrentTime()
         );
@@ -298,7 +320,7 @@ class CompetitionApiTest {
     }
 
 
-    private Team makeTeam(String name, User leader) {
+    private Team makeTeam(String name, User leader, Long groupId) {
         Set<TeamMember> members = new HashSet<>();
         members.add(new TeamMember(leader, LolPosition.TOP));
         for (int i = 0; i < 4; i++) {
@@ -307,7 +329,7 @@ class CompetitionApiTest {
             members.add(new TeamMember(member, LolPosition.values()[(i + 1) % 5]));
         }
         TeamCreateRequest request = new TeamCreateRequest(
-                group.getId(),
+                groupId,
                 name,
                 "intro of " + name,
                 leader.getId(),

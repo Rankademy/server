@@ -5,7 +5,10 @@ import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.application.group.provided.GroupReader;
 import maruhxn.rankademy.application.group.provided.GroupWriter;
-import maruhxn.rankademy.application.group.provided.dto.*;
+import maruhxn.rankademy.application.group.provided.dto.GroupDetailResponse;
+import maruhxn.rankademy.application.group.provided.dto.GroupMemberResponse;
+import maruhxn.rankademy.application.group.provided.dto.MyGroupResponse;
+import maruhxn.rankademy.application.group.provided.dto.RecentCompetitionResponse;
 import maruhxn.rankademy.domain.group.Group;
 import maruhxn.rankademy.domain.group.dto.GroupCreateRequest;
 import maruhxn.rankademy.domain.group.dto.GroupUpdateRequest;
@@ -23,15 +26,6 @@ public class GroupApi {
 
     private final GroupReader groupReader;
     private final GroupWriter groupWriter;
-
-    @GetMapping
-    public List<GroupResponse> getGroupRankingList(
-            @RequestParam("page") int page,
-            @RequestParam("keyword") String keyword,
-            @RequestParam("sortKey") GroupSortKey sortKey
-    ) {
-        return groupReader.getRankingList(page, keyword, sortKey);
-    }
 
     @GetMapping("/my")
     @PreAuthorize("principal.userInfo().authorized")

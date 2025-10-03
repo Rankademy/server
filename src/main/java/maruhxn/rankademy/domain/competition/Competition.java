@@ -41,6 +41,10 @@ public class Competition extends AbstractEntity {
 
     private Long finalWinnerTeamId;
 
+    private Long finalWinnerGroupId;
+
+    private Long finalLoserGroupId;
+
     @Column(nullable = false)
     private LocalDateTime scheduledAt;
 
@@ -71,6 +75,8 @@ public class Competition extends AbstractEntity {
         Assert.state(this.status == CompetitionStatus.SCHEDULED, "이미 진행된 대항전입니다.");
         this.totalSets = request.totalSets();
         this.finalWinnerTeamId = request.finalWinnerId();
+        this.finalWinnerGroupId = request.finalWinnerGroupId();
+        this.finalLoserGroupId = request.finalLoserGroupId();
         this.memo = request.memo();
         this.status = CompetitionStatus.COMPLETED;
         this.submittedAt = submittedAt;
