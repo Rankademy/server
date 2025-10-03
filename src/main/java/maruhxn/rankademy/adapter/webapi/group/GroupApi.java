@@ -1,4 +1,4 @@
-package maruhxn.rankademy.adapter.webapi;
+package maruhxn.rankademy.adapter.webapi.group;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -77,24 +77,6 @@ public class GroupApi {
             @RequestBody @Valid GroupUpdateRequest request
     ) {
         groupWriter.update(groupId, request);
-    }
-
-    @PostMapping("/{groupId}/recruitment")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("@groupLeaderChecker.isGroupLeader(principal.userInfo(), #groupId)")
-    public void startRecruitment(
-            @PathVariable("groupId") Long groupId
-    ) {
-        groupWriter.startRecruitment(groupId);
-    }
-
-    @DeleteMapping("/{groupId}/recruitment")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@groupLeaderChecker.isGroupLeader(principal.userInfo(), #groupId)")
-    public void closeRecruitment(
-            @PathVariable("groupId") Long groupId
-    ) {
-        groupWriter.closeRecruitment(groupId);
     }
 
     @DeleteMapping("/{groupId}")

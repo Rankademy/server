@@ -1,4 +1,4 @@
-package maruhxn.rankademy.adapter.webapi;
+package maruhxn.rankademy.adapter.webapi.group;
 
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.security.model.RankademyUser;
