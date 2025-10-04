@@ -3,7 +3,7 @@ package maruhxn.rankademy.adapter.webapi;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.security.model.RankademyUser;
-import maruhxn.rankademy.application.user.dto.ProfileResponse;
+import maruhxn.rankademy.application.user.dto.MyProfileResponse;
 import maruhxn.rankademy.application.user.provided.UserAuthorizer;
 import maruhxn.rankademy.application.user.provided.UserReader;
 import maruhxn.rankademy.application.user.provided.UserWriter;
@@ -24,10 +24,10 @@ public class ProfileApi {
     private final UserAuthorizer userAuthorizer;
 
     @GetMapping
-    public ProfileResponse getProfile(
+    public MyProfileResponse getMyProfile(
             @AuthenticationPrincipal RankademyUser rankademyUser
     ) {
-        return userReader.getProfile(rankademyUser.getId());
+        return userReader.getMyProfile(rankademyUser.getId());
     }
 
     @PatchMapping

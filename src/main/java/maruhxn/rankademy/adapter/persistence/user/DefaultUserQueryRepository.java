@@ -3,6 +3,7 @@ package maruhxn.rankademy.adapter.persistence.user;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import maruhxn.rankademy.application.user.dto.MyProfileResponse;
 import maruhxn.rankademy.application.user.dto.ProfileResponse;
 import maruhxn.rankademy.application.user.required.UserQueryRepository;
 import maruhxn.rankademy.domain.user.LolPosition;
@@ -33,7 +34,10 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
                                 ProfileResponse.SummonerInfoResponse.class,
                                 summonerInfo.summonerName,
                                 summonerInfo.summonerTag,
-                                summonerInfo.summonerIconNum
+                                summonerInfo.summonerIconNum,
+                                summonerInfo.tierInfo,
+                                summonerInfo.winCount,
+                                summonerInfo.lossCount
                         ),
                         Projections.constructor(
                                 ProfileResponse.UnivInfoResponse.class,
@@ -74,11 +78,63 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
                 base.description(),
                 mostChampions,
                 base.mainPosition(),
-                base.subPosition(),
-                base.tierInfo(),
-                base.winCount(),
-                base.lossCount(),
-                base.winRate()
+                base.subPosition()
+        ));
+    }
+
+    @Override
+    public Optional<MyProfileResponse> getMyProfile(Long userId) {
+        MyProfileBase base = queryFactory
+                .select(Projections.constructor(
+                        MyProfileBase.class,
+                        user.id,
+                        user.username,
+                        Projections.constructor(
+                                MyProfileResponse.SummonerInfoResponse.class,
+                                summonerInfo.puuid,
+                                summonerInfo.summonerName,
+                                summonerInfo.summonerTag,
+                                summonerInfo.summonerIconNum,
+                                summonerInfo.tierInfo,
+                                summonerInfo.winCount,
+                                summonerInfo.lossCount
+                        ),
+                        Projections.constructor(
+                                MyProfileResponse.UnivInfoResponse.class,
+                                user.univInfo.univName,
+                                user.univInfo.univMail.address,
+                                user.univInfo.univVerified,
+                                user.univInfo.major,
+                                user.univInfo.admissionYear
+                        ),
+                        user.description,
+                        user.mainPosition,
+                        user.subPosition,
+                        summonerInfo.id
+                ))
+                .from(user)
+                .leftJoin(summonerInfo).on(user.summonerInfo.id.eq(summonerInfo.id))
+                .where(user.id.eq(userId))
+                .fetchOne();
+
+        if(base == null) return Optional.empty();
+
+        List<String> mostChampions = queryFactory
+                .select(championPlayRecord.championId)
+                .from(summonerInfo)
+                .join(summonerInfo.mostChampions, championPlayRecord)
+                .where(summonerInfo.id.eq(base.summonerInfoId))
+                .fetch();
+
+        return Optional.of(new MyProfileResponse(
+                base.id(),
+                base.username(),
+                base.summonerInfo(),
+                base.univInfo(),
+                base.description(),
+                mostChampions,
+                base.mainPosition(),
+                base.subPosition()
         ));
     }
 
@@ -95,9 +151,17 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
             Integer lossCount,
             Long summonerInfoId
     ) {
-        double winRate() {
-            int total = Math.max(1, winCount + lossCount); // 0-division 방지 (정책 맞게 조절)
-            return (double) winCount / total * 100.0;
-        }
+    }
+
+    public record MyProfileBase(
+            Long id,
+            String username,
+            MyProfileResponse.SummonerInfoResponse summonerInfo,
+            MyProfileResponse.UnivInfoResponse univInfo,
+            String description,
+            LolPosition mainPosition,
+            LolPosition subPosition,
+            Long summonerInfoId
+    ) {
     }
 }
