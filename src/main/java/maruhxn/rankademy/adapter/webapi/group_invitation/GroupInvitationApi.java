@@ -6,6 +6,7 @@ import maruhxn.rankademy.application.group_invitation.dto.GroupInvitationPageRes
 import maruhxn.rankademy.application.group_invitation.provided.GroupInvitationManager;
 import maruhxn.rankademy.application.group_invitation.provided.GroupInvitationReader;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,14 +19,15 @@ public class GroupInvitationApi {
 
     @GetMapping
     public GroupInvitationPageResponse getInvitations(
-            @PathVariable("groupId") Long groupId,
+            @AuthenticationPrincipal RankademyUser user,
             @RequestParam("page") int page
     ) {
-        return groupInvitationReader.getInvitations(groupId, page);
+        return groupInvitationReader.getInvitations(user.getId(), page);
     }
 
     @PostMapping("/send")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("@groupLeaderChecker.isGroupLeader(principal.userInfo(), #groupId)")
     public void sendCompetitionRequest(
             @PathVariable("groupId") Long groupId,
             @RequestParam("userId") Long invitedUserId
@@ -35,6 +37,7 @@ public class GroupInvitationApi {
 
     @PatchMapping("/accept/{invitationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@groupInviteeChecker.isInvitee(principal.userInfo(), #invitationId)")
     public void acceptInvitation(
             @AuthenticationPrincipal RankademyUser user,
             @PathVariable Long invitationId
@@ -44,6 +47,7 @@ public class GroupInvitationApi {
 
     @PatchMapping("/reject/{invitationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@groupInviteeChecker.isInvitee(principal.userInfo(), #invitationId)")
     public void rejectInvitation(
             @AuthenticationPrincipal RankademyUser user,
             @PathVariable Long invitationId

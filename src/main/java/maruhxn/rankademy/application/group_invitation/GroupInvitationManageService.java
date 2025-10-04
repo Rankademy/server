@@ -2,15 +2,20 @@ package maruhxn.rankademy.application.group_invitation;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import maruhxn.rankademy.application.group.provided.GroupReader;
 import maruhxn.rankademy.application.group_invitation.provided.GroupInvitationManager;
+import maruhxn.rankademy.application.group_invitation.provided.GroupInvitationReader;
 import maruhxn.rankademy.application.group_invitation.required.GroupInvitationRepository;
+import maruhxn.rankademy.application.user.provided.UserReader;
+import maruhxn.rankademy.domain.group.Group;
+import maruhxn.rankademy.domain.group.GroupRole;
 import maruhxn.rankademy.domain.group_invitation.GroupInvitation;
 import maruhxn.rankademy.domain.shared.DomainEventPublisher;
 import maruhxn.rankademy.domain.shared.event.GroupInviteEvent;
+import maruhxn.rankademy.domain.user.User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
 
 @Service
 @Transactional
@@ -18,6 +23,9 @@ import java.util.NoSuchElementException;
 public class GroupInvitationManageService implements GroupInvitationManager {
 
     private final GroupInvitationRepository groupInvitationRepository;
+    private final GroupInvitationReader groupInvitationReader;
+    private final UserReader userReader;
+    private final GroupReader groupReader;
     private final DomainEventPublisher publisher;
 
     @Override
@@ -32,24 +40,19 @@ public class GroupInvitationManageService implements GroupInvitationManager {
 
     @Override
     public void acceptInvitation(Long actingUserId, Long invitationId) {
-        GroupInvitation invitation = groupInvitationRepository.findById(invitationId)
-                .orElseThrow(() -> new NoSuchElementException("그룹 초대 정보를 찾을 수 없습니다. invitationId: " + invitationId));
+        GroupInvitation invitation = groupInvitationReader.get(invitationId);
 
-        if(!invitation.getUserId().equals(actingUserId)) {
-            throw new IllegalStateException("초대 대상이 아닙니다. invitationId: " + invitationId);
-        }
+        Group group = groupReader.get(invitation.getGroupId());
+        User user = userReader.get(invitation.getUserId());
+
+        group.addMember(user, GroupRole.MEMBER);
 
         invitation.accept();
     }
 
     @Override
     public void rejectInvitation(Long actingUserId, Long invitationId) {
-        GroupInvitation invitation = groupInvitationRepository.findById(invitationId)
-                .orElseThrow(() -> new NoSuchElementException("그룹 초대 정보를 찾을 수 없습니다. invitationId: " + invitationId));
-
-        if(!invitation.getUserId().equals(actingUserId)) {
-            throw new IllegalStateException("초대 대상이 아닙니다. invitationId: " + invitationId);
-        }
+        GroupInvitation invitation = groupInvitationReader.get(invitationId);
 
         invitation.reject();
     }
