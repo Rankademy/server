@@ -101,4 +101,18 @@ public class Team extends AbstractEntity {
     public void deactivate() {
         this.isActive = false;
     }
+
+    public void withdraw(Long userId) {
+        TeamMember leavingMember = teamMembers.stream()
+                .filter(tm -> tm.getUser().getId().equals(userId))
+                .findAny()
+                .orElseThrow(() -> new IllegalStateException("팀 멤버를 찾을 수 없습니다. userId: " + userId));
+
+        // 연관관계 정리 및 멤버 제거
+        leavingMember.setTeam(null);
+        teamMembers.remove(leavingMember);
+
+        // 팀 비활성화
+        deactivate();
+    }
 }
