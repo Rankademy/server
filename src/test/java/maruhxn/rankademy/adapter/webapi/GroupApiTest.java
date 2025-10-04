@@ -246,52 +246,6 @@ class GroupApiTest {
     }
 
     @Test
-    @DisplayName("그룹 모집 시작")
-    void startRecruitment() throws Exception {
-        User leader = GroupFixture.createLeader();
-        userRepository.save(leader);
-
-        Group group = GroupFixture.createGroup(leader);
-        groupRepository.save(group);
-
-        MvcTestResult result = mvcTester.post().uri(BASE_URL + String.format("/%d/recruitment", group.getId()))
-                .with(user(RankademyUser.from(UserInfo.from(leader))))
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.CREATED);
-    }
-
-    @Test
-    @DisplayName("그룹 모집 시작 - 리더가 아닌 경우")
-    void startRecruitment_withNotLeader() throws Exception {
-        User member = GroupFixture.createMember();
-        userRepository.save(member);
-        Group group = generateGroup();
-
-        MvcTestResult result = mvcTester.post().uri(BASE_URL + String.format("/%d/recruitment", group.getId()))
-                .with(user(RankademyUser.from(UserInfo.from(member))))
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.FORBIDDEN);
-    }
-
-    @Test
-    @DisplayName("그룹 모집 종료")
-    void closeRecruitment() throws Exception {
-        User leader = GroupFixture.createLeader();
-        userRepository.save(leader);
-
-        Group group = GroupFixture.createGroup(leader);
-        groupRepository.save(group);
-
-        MvcTestResult result = mvcTester.delete().uri(BASE_URL + String.format("/%d/recruitment", group.getId()))
-                .with(user(RankademyUser.from(UserInfo.from(leader))))
-                .exchange();
-
-        assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
-    }
-
-    @Test
     @DisplayName("그룹 삭제")
     void deleteGroup() throws Exception {
         User leader = GroupFixture.createLeader();

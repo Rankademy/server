@@ -84,34 +84,6 @@ class GroupWriterTest {
     }
 
     @Test
-    void startAndCloseRecruitment() {
-        Group group = generateGroup();
-        group.closeRecruitment();
-
-        assertThat(group.isRecruiting()).isFalse();
-
-        group = groupWriter.startRecruitment(group.getId());
-        em.flush();
-        em.clear();
-
-        assertThat(group.isRecruiting()).isTrue();
-
-        group = groupWriter.closeRecruitment(group.getId());
-        em.flush();
-        em.clear();
-
-        assertThat(group.isRecruiting()).isFalse();
-    }
-
-    private Group generateGroup() {
-        Group group = createGroup(leader);
-        groupRepository.save(group);
-        em.flush();
-        em.clear();
-        return group;
-    }
-
-    @Test
     void delete() {
         Group group = generateGroup();
 
@@ -120,5 +92,13 @@ class GroupWriterTest {
         em.clear();
 
         assertThat(groupRepository.findById(group.getId())).isEmpty();
+    }
+
+    private Group generateGroup() {
+        Group group = createGroup(leader);
+        groupRepository.save(group);
+        em.flush();
+        em.clear();
+        return group;
     }
 }

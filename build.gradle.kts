@@ -72,6 +72,10 @@ dependencies {
     // webflux
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 
+    // File Upload
+    implementation(platform("software.amazon.awssdk:bom:2.25.30"))
+    implementation("software.amazon.awssdk:s3")
+
     mockitoAgent("org.mockito:mockito-core:5.18.0") { isTransitive = false }
 }
 
