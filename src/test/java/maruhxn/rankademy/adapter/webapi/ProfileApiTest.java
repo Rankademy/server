@@ -6,7 +6,7 @@ import jakarta.persistence.EntityManager;
 import maruhxn.rankademy.RankademyTestConfiguration;
 import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.adapter.security.model.UserInfo;
-import maruhxn.rankademy.application.user.dto.ProfileResponse;
+import maruhxn.rankademy.application.user.dto.MyProfileResponse;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.user.LolPosition;
 import maruhxn.rankademy.domain.user.User;
@@ -50,7 +50,7 @@ class ProfileApiTest {
     EntityManager em;
 
     @Test
-    void getProfile() throws UnsupportedEncodingException, JsonProcessingException {
+    void getMyProfile() throws UnsupportedEncodingException, JsonProcessingException {
         User user = createUser();
         user.enrollUnivInfo(createEnrollUnivRequest());
         user.completeUnivAuthentication();
@@ -69,7 +69,7 @@ class ProfileApiTest {
 
         assertThat(result).hasStatusOk();
 
-        var response = objectMapper.readValue(result.getResponse().getContentAsString(), ProfileResponse.class);
+        var response = objectMapper.readValue(result.getResponse().getContentAsString(), MyProfileResponse.class);
 
         User target = userRepository.findById(user.getId()).orElseThrow();
         assertAll(
@@ -80,7 +80,7 @@ class ProfileApiTest {
                 () -> assertThat(response.univInfo().admissionYear()).isEqualTo(target.getUnivInfo().getAdmissionYear()),
                 () -> assertThat(response.univInfo().major()).isEqualTo(target.getUnivInfo().getMajor()),
                 () -> assertThat(response.mostChampionIds()).isEmpty(),
-                () -> assertThat(response.winRate()).isEqualTo(target.getSummonerInfo().getWinRate())
+                () -> assertThat(response.summonerInfo().winRate()).isEqualTo(target.getSummonerInfo().getWinRate())
         );
     }
 

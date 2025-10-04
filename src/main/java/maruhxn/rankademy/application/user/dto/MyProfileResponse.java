@@ -1,14 +1,13 @@
 package maruhxn.rankademy.application.user.dto;
 
-import lombok.Builder;
 import maruhxn.rankademy.domain.user.LolPosition;
 import maruhxn.rankademy.domain.user.TierInfo;
 
 import java.util.List;
 
-@Builder
-public record ProfileResponse(
+public record MyProfileResponse(
         Long id,
+        String username,
         SummonerInfoResponse summonerInfo,
         UnivInfoResponse univInfo,
         String description,
@@ -16,10 +15,18 @@ public record ProfileResponse(
         LolPosition mainPosition,
         LolPosition subPosition
 ) {
-    public record UnivInfoResponse(String univName, boolean univVerified, String major, int admissionYear) {
+
+    public record UnivInfoResponse(
+            String univName,
+            String univMail,
+            boolean univVerified,
+            String major,
+            int admissionYear
+    ) {
     }
 
     public record SummonerInfoResponse(
+            String puuid,
             String summonerName,
             String summonerTag,
             int summonerIconNum,
@@ -28,15 +35,16 @@ public record ProfileResponse(
             int lossCount,
             double winRate
     ) {
-        public SummonerInfoResponse(String summonerName, String summonerTag, int summonerIconNum, TierInfo tierInfo, int winCount, int lossCount) {
+        public SummonerInfoResponse(String puuid, String summonerName, String summonerTag, int summonerIconNum, TierInfo tierInfo, int winCount, int lossCount) {
             this(
-                    summonerName,
-                    summonerTag,
-                    summonerIconNum,
-                    tierInfo,
-                    winCount,
-                    lossCount,
-                    (double) winCount / Math.max(1, winCount + lossCount) * 100.0
+                puuid,
+                summonerName,
+                summonerTag,
+                summonerIconNum,
+                tierInfo,
+                winCount,
+                lossCount,
+                (double) winCount / Math.max(1, winCount + lossCount) * 100.0
             );
         }
     }

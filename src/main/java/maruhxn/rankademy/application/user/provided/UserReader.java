@@ -1,5 +1,6 @@
 package maruhxn.rankademy.application.user.provided;
 
+import maruhxn.rankademy.application.user.dto.MyProfileResponse;
 import maruhxn.rankademy.application.user.dto.ProfileResponse;
 import maruhxn.rankademy.domain.user.OAuth2Provider;
 import maruhxn.rankademy.domain.user.User;
@@ -11,6 +12,8 @@ public interface UserReader {
     User get(Long userId);
 
     ProfileResponse getProfile(Long userId);
+
+    MyProfileResponse getMyProfile(Long userId);
 
     Optional<User> findByEmail(String email);
 
