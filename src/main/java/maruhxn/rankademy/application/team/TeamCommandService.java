@@ -4,11 +4,14 @@ import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.application.team.provided.TeamWriter;
 import maruhxn.rankademy.application.team.required.TeamRepository;
 import maruhxn.rankademy.domain.shared.DomainEventPublisher;
+import maruhxn.rankademy.domain.shared.event.TeamCreatedEvent;
 import maruhxn.rankademy.domain.shared.event.TeamDeactivatedEvent;
 import maruhxn.rankademy.domain.team.Team;
 import maruhxn.rankademy.domain.team.dto.TeamCreateRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -20,7 +23,10 @@ public class TeamCommandService implements TeamWriter {
 
     @Override
     public Team create(TeamCreateRequest request) {
-        return teamRepository.save(Team.create(request));
+        Team team = Team.create(request);
+        Team saved = teamRepository.save(team);
+        publisher.publish(new TeamCreatedEvent(team.getId(), LocalDateTime.now()));
+        return saved;
     }
 
     @Override
@@ -31,6 +37,6 @@ public class TeamCommandService implements TeamWriter {
 
         team.withdraw(userId);
 
-        publisher.publish(new TeamDeactivatedEvent(team.getId(), java.time.LocalDateTime.now()));
+        publisher.publish(new TeamDeactivatedEvent(team.getId(), LocalDateTime.now()));
     }
 }

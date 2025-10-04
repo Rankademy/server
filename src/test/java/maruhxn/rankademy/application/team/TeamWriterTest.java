@@ -18,11 +18,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.transaction.TestTransaction;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -94,36 +95,89 @@ class TeamWriterTest {
             members.add(new TeamMember(memberUser, LolPosition.values()[i + 1]));
         }
 
-        TeamCreateRequest request = TeamFixture.createTeamCreateRequest(representative.getId(), members);
+        TeamCreateRequest baseRequest = TeamFixture.createTeamCreateRequest(representative.getId(), members);
+        TeamCreateRequest request = new TeamCreateRequest(
+                baseRequest.groupId(),
+                "team-withdraw-" + UUID.randomUUID(),
+                baseRequest.intro(),
+                baseRequest.representativeId(),
+                baseRequest.members()
+        );
         Team team = teamWriter.create(request);
+        String creationMessage = "팀 %s이 생성되었습니다.".formatted(team.getName());
+        String deactivationMessage = "팀 %s이 비활성화되었습니다.".formatted(team.getName());
+        Long teamId = team.getId();
 
-        // when: 멤버 1명이 탈퇴 실행 (서비스 트랜잭션 커밋 후 이벤트 처리)
-        teamWriter.withdraw(leavingUser.getId(), team.getId());
-
-        // 도메인 이벤트(afterCommit)를 실행시키기 위해 테스트 트랜잭션 먼저 커밋
+        // 팀 생성 트랜잭션 커밋 후 이벤트 발행
         TestTransaction.flagForCommit();
         TestTransaction.end();
 
-        // 검증을 위한 새 트랜잭션 시작
+        // 다음 시나리오를 위한 새 트랜잭션 시작
+        TestTransaction.start();
+
+        // when: 멤버 1명이 탈퇴 실행 (서비스 트랜잭션 커밋 후 이벤트 처리)
+        teamWriter.withdraw(leavingUser.getId(), teamId);
+
+        // 탈퇴 처리 트랜잭션 커밋하여 비활성화 이벤트 발행
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+
+        // 검증용 새 트랜잭션 시작
         TestTransaction.start();
 
         // then: 팀은 비활성화되고, 멤버 수는 4명으로 감소하며, 탈퇴자는 제외된다
-        Team found = teamRepository.findByIdWithTeamMember(team.getId()).orElseThrow();
+        Team found = teamRepository.findByIdWithTeamMember(teamId).orElseThrow();
         assertThat(found.isActive()).isFalse();
         assertThat(found.getTeamMembers()).hasSize(4)
                 .extracting(tm -> tm.getUser().getId()).doesNotContain(leavingUser.getId());
 
-        // 남아있는 멤버 전원에게 알림 1건씩 생성되었는지 확인
+        // 남아있는 멤버 전원에게 알림 2건씩 생성되었는지 확인 (생성 및 비활성화)
         found.getTeamMembers().forEach(tm -> {
             var page = notificationQueryService.getNotifications(tm.getUser().getId(), 0);
-            assertThat(page.totalCount()).isEqualTo(1);
-            assertThat(page.notifications()).hasSize(1);
-            assertThat(page.notifications().getFirst().message()).contains("비활성화");
+            assertThat(page.totalCount()).isEqualTo(2);
+            assertThat(page.notifications()).hasSize(2);
+            assertThat(page.notifications().getFirst().message()).isEqualTo(deactivationMessage);
+            assertThat(page.notifications().getLast().message()).isEqualTo(creationMessage);
         });
 
-        // 탈퇴자에게는 알림이 없어야 한다
+        // 탈퇴자는 비활성화 알림을 받지 않지만 생성 알림은 유지된다
         var leavingPage = notificationQueryService.getNotifications(leavingUser.getId(), 0);
-        assertThat(leavingPage.totalCount()).isEqualTo(0);
-        assertThat(leavingPage.notifications()).isEmpty();
+        assertThat(leavingPage.totalCount()).isEqualTo(1);
+        assertThat(leavingPage.notifications()).hasSize(1);
+        assertThat(leavingPage.notifications().getFirst().message()).isEqualTo(creationMessage);
+
+        TestTransaction.flagForRollback();
+        TestTransaction.end();
+
+        cleanupPersistedState(teamId, members, Set.of(creationMessage, deactivationMessage));
+    }
+
+    private void cleanupPersistedState(Long teamId, Set<TeamMember> members, Set<String> notificationMessages) {
+        TestTransaction.start();
+
+        notificationMessages.forEach(message ->
+                em.createQuery("delete from Notification n where n.message = :message")
+                        .setParameter("message", message)
+                        .executeUpdate()
+        );
+
+        Team persistedTeam = em.find(Team.class, teamId);
+        if (persistedTeam != null) {
+            em.remove(persistedTeam);
+        }
+
+        Set<Long> userIds = members.stream()
+                .map(member -> member.getUser().getId())
+                .collect(Collectors.toSet());
+
+        userIds.forEach(userId -> {
+            User persistedUser = em.find(User.class, userId);
+            if (persistedUser != null) {
+                em.remove(persistedUser);
+            }
+        });
+
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
     }
 }
