@@ -76,6 +76,9 @@ dependencies {
     implementation(platform("software.amazon.awssdk:bom:2.25.30"))
     implementation("software.amazon.awssdk:s3")
 
+    // logging
+    implementation("com.kdgregory.logging:logback-aws-appenders:2.4.1")
+
     mockitoAgent("org.mockito:mockito-core:5.18.0") { isTransitive = false }
 }
 
