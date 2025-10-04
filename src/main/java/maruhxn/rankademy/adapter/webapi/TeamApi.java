@@ -1,12 +1,14 @@
 package maruhxn.rankademy.adapter.webapi;
 
 import lombok.RequiredArgsConstructor;
+import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.application.team.provided.TeamReader;
 import maruhxn.rankademy.application.team.provided.TeamWriter;
 import maruhxn.rankademy.application.team.provided.dto.TeamDetailResponse;
 import maruhxn.rankademy.application.team.provided.dto.TeamPageResponse;
 import maruhxn.rankademy.domain.team.dto.TeamCreateRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -33,4 +35,12 @@ public class TeamApi {
         return teamReader.getTeamDetails(teamId);
     }
 
+    @DeleteMapping("/{teamId}/withdraw")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void withdrawTeam(
+            @AuthenticationPrincipal RankademyUser user,
+            @PathVariable("teamId") Long teamId
+    ) {
+        teamWriter.withdraw(user.getId(), teamId);
+    }
 }
