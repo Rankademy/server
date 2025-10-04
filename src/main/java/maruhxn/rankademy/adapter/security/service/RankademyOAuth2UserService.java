@@ -49,7 +49,7 @@ public class RankademyOAuth2UserService implements OAuth2UserService<OAuth2UserR
                                 .orElseGet(() -> userWriter.oauth2Register(
                                         new UserOAuth2CreateRequest(
                                                 oAuth2ProviderUser.getEmail(),
-                                                oAuth2ProviderUser.getUsername(),
+                                                oAuth2ProviderUser.getUsername() + "_" + oAuth2ProviderUser.getProvider(),
                                                 oAuth2ProviderUser.getProvider(),
                                                 oAuth2ProviderUser.getProviderId()
                                         )
