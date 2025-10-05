@@ -3,7 +3,6 @@ package maruhxn.rankademy;
 import maruhxn.rankademy.application.match.RiotAuthEventHandler;
 import maruhxn.rankademy.application.user.required.EmailSender;
 import maruhxn.rankademy.application.user.required.UnivMailCertifier;
-import maruhxn.rankademy.domain.user.PasswordEncoder;
 import maruhxn.rankademy.domain.user.UserFixture;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -15,11 +14,6 @@ public class RankademyTestConfiguration {
     @Bean
     public EmailSender emailSender() {
         return (email, subject, body) -> System.out.println("Sending email: " + email);
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return UserFixture.createPasswordEncoder();
     }
 
     @Bean

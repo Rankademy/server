@@ -48,6 +48,7 @@ public class JwtProvider {
         return UserInfo.builder()
                 .id(this.getId(accessToken))
                 .username(this.getUsername(accessToken))
+                .email(this.getEmail(accessToken))
                 .isAuthorized(this.getIsAuthorized(accessToken))
                 .role(this.getRole(accessToken))
 //                .provider(this.getProvider(accessToken))

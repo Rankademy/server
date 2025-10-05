@@ -31,7 +31,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 @Import(RankademyTestConfiguration.class)
 class UserApiTest {
 
-    private static final String BASE_URL = "/api/users";
+    private static final String BASE_URL = "/api/v1/users";
 
     @Autowired
     MockMvcTester mvcTester;

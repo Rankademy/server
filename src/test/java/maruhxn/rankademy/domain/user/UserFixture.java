@@ -1,8 +1,9 @@
 package maruhxn.rankademy.domain.user;
 
+import maruhxn.rankademy.domain.user.Email;
 import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
-import maruhxn.rankademy.domain.user.dto.UserRegisterRequest;
+import maruhxn.rankademy.domain.user.dto.UserOAuth2CreateRequest;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
 import maruhxn.rankademy.domain.user.service.UserTitleProvider;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -11,32 +12,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static maruhxn.rankademy.domain.user.OAuth2Provider.GOOGLE;
+
 public class UserFixture {
 
-    public static UserRegisterRequest createUserRegisterRequest(String email, String username) {
-        return new UserRegisterRequest(email, username, "verysecret");
+    public static UserOAuth2CreateRequest createUserOAuth2CreateRequest(String email, String username) {
+        return new UserOAuth2CreateRequest(email, username, GOOGLE, UUID.randomUUID().toString());
     }
 
-    public static UserRegisterRequest createUserRegisterRequest(String email) {
-        return new UserRegisterRequest(email, "maruhxn", "verysecret");
+    public static UserOAuth2CreateRequest createUserOAuth2CreateRequest(String email) {
+        return createUserOAuth2CreateRequest(email, "maruhxn");
     }
 
-    public static UserRegisterRequest createUserRegisterRequest() {
-        return createUserRegisterRequest("maruhxn@rankademy.app");
-    }
-
-    public static PasswordEncoder createPasswordEncoder() {
-        return new PasswordEncoder() {
-            @Override
-            public String encode(String password) {
-                return password.toUpperCase();
-            }
-
-            @Override
-            public boolean matches(String password, String passwordHash) {
-                return encode(password).equals(passwordHash);
-            }
-        };
+    public static UserOAuth2CreateRequest createUserOAuth2CreateRequest() {
+        return createUserOAuth2CreateRequest("maruhxn@rankademy.app");
     }
 
     public static SummonerInfoConnector createSummonerInfoConnector() {
@@ -110,19 +99,19 @@ public class UserFixture {
     }
 
     public static User createUser() {
-        return User.register(createUserRegisterRequest(), createPasswordEncoder());
+        return new User("maruhxn", new Email("maruhxn@rankademy.app"));
     }
 
     public static User createUser(String email) {
-        return User.register(createUserRegisterRequest(email), createPasswordEncoder());
+        return new User("maruhxn", new Email(email));
     }
 
     public static User createUser(String email, String username) {
-        return User.register(createUserRegisterRequest(email, username), createPasswordEncoder());
+        return new User(username, new Email(email));
     }
 
     public static User createUser(Long id) {
-        User user = User.register(createUserRegisterRequest(), createPasswordEncoder());
+        User user = createUser();
         ReflectionTestUtils.setField(user, "id", id);
         return user;
     }

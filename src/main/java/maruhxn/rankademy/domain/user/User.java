@@ -35,8 +35,6 @@ public class User extends AbstractEntity {
     @NaturalId
     private Email email;
 
-    private String passwordHash;
-
     @Enumerated(EnumType.STRING)
     private UserAuthStatus authStatus;
 
@@ -87,23 +85,6 @@ public class User extends AbstractEntity {
         this.role = Role.ROLE_USER;
     }
 
-    public User(String username, Email email, String passwordHash) {
-        this.username = username;
-        this.email = email;
-        this.passwordHash = passwordHash;
-        this.joinedAt = LocalDateTime.now();
-        this.authStatus = UserAuthStatus.UNAUTHORIZED;
-        this.role = Role.ROLE_USER;
-    }
-
-    public static User register(UserRegisterRequest registerRequest, PasswordEncoder passwordEncoder) {
-        return new User(
-                requireNonNull(registerRequest.username()),
-                new Email(registerRequest.email()),
-                requireNonNull(passwordEncoder.encode(registerRequest.password()))
-        );
-    }
-
     public static User oauth2Register(UserOAuth2CreateRequest userOAuth2CreateRequest) {
         User user = new User(
                 requireNonNull(userOAuth2CreateRequest.username()),
@@ -113,14 +94,6 @@ public class User extends AbstractEntity {
         user.addOAuthAccount(userOAuth2CreateRequest.provider(), userOAuth2CreateRequest.providerId());
 
         return user;
-    }
-
-    public boolean verifyPassword(String password, PasswordEncoder passwordEncoder) {
-        return passwordEncoder.matches(password, this.passwordHash);
-    }
-
-    public void changePassword(String password, PasswordEncoder passwordEncoder) {
-        this.passwordHash = passwordEncoder.encode(requireNonNull(password));
     }
 
     public boolean isAuthorized() {
@@ -202,13 +175,5 @@ public class User extends AbstractEntity {
 
     public void addOAuthAccount(OAuth2Provider provider, String oauthId) {
         this.oauthAccounts.add(new OAuthAccount(provider, oauthId));
-    }
-
-    public boolean hasPassword() {
-        return passwordHash != null && !passwordHash.isBlank();
-    }
-
-    public boolean isRegisteredViaOAuthOnly() {
-        return !hasPassword() && !oauthAccounts.isEmpty();
     }
 }

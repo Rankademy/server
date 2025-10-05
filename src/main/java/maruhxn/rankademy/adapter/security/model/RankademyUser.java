@@ -30,7 +30,7 @@ public record RankademyUser(
 
     @Override
     public String getPassword() {
-        return userInfo.password();
+        return "";
     }
 
     @Override

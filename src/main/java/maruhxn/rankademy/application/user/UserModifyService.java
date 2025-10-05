@@ -6,18 +6,13 @@ import maruhxn.rankademy.application.user.provided.UserWriter;
 import maruhxn.rankademy.application.user.required.EmailSender;
 import maruhxn.rankademy.application.user.required.UnivMailValidator;
 import maruhxn.rankademy.application.user.required.UserRepository;
-import maruhxn.rankademy.domain.user.Email;
-import maruhxn.rankademy.domain.user.PasswordEncoder;
 import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
 import maruhxn.rankademy.domain.user.dto.UserOAuth2CreateRequest;
-import maruhxn.rankademy.domain.user.dto.UserRegisterRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -27,29 +22,8 @@ public class UserModifyService implements UserWriter {
 
     private final UserReader userReader;
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final EmailSender emailSender;
     private final UnivMailValidator univMailValidator;
-
-    @Override
-    public User registerOrSetPassword(UserRegisterRequest registerRequest) {
-        Optional<User> optionalUser = userRepository.findByEmail(new Email(registerRequest.email()));
-
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            if (user.isRegisteredViaOAuthOnly()) {
-                // 비밀번호 설정만 진행 (소셜 가입자 → 이메일 로그인 확장)
-                user.changePassword(registerRequest.password(), passwordEncoder);
-                return userRepository.save(user);
-            }
-        }
-
-        this.checkDuplicateUsername(registerRequest.username());
-        User user = User.register(registerRequest, passwordEncoder);
-        this.sendWelcomeEmail(user);
-
-        return userRepository.save(user);
-    }
 
     private void sendWelcomeEmail(User user) {
         emailSender.send(
@@ -109,4 +83,3 @@ public class UserModifyService implements UserWriter {
     }
 
 }
-

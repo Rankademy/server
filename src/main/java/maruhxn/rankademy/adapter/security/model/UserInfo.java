@@ -8,7 +8,6 @@ public record UserInfo(
         Long id,
         String username,
         String email,
-        String password,
         boolean isAuthorized,
         String role
 ) {
@@ -17,7 +16,6 @@ public record UserInfo(
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail().address())
-                .password(user.getPasswordHash())
                 .isAuthorized(user.isAuthorized())
                 .role(user.getRole().name())
                 .build();

@@ -13,43 +13,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class UserTest {
 
     User user;
-    PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
-        this.passwordEncoder = createPasswordEncoder();
-        user = User.register(
-                createUserRegisterRequest(),
-                passwordEncoder
-        );
-    }
-
-    @Test
-    @DisplayName("정상적으로 회원가입을 한다")
-    void registerUser() {
-        assertThat(user.getAuthStatus()).isEqualTo(UserAuthStatus.UNAUTHORIZED);
-    }
-
-    @Test
-    @DisplayName("유효하지 않은 이메일 형식으로 회원가입 시 예외가 발생한다")
-    void registerFailByInvalidEmail() {
-        assertThatThrownBy(() ->
-                User.register(createUserRegisterRequest("invalid email"), passwordEncoder)
-        ).isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    @DisplayName("비밀번호를 올바르게 검증한다")
-    void verifyPassword() {
-        assertThat(user.verifyPassword("verysecret", passwordEncoder)).isTrue();
-        assertThat(user.verifyPassword("hello", passwordEncoder)).isFalse();
-    }
-
-    @Test
-    @DisplayName("비밀번호를 변경한다")
-    void changePassword() {
-        user.changePassword("verysecret2", passwordEncoder);
-        assertThat(user.verifyPassword("verysecret2", passwordEncoder)).isTrue();
+        user = createUser();
     }
 
     @Test

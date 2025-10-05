@@ -4,7 +4,6 @@ import jakarta.persistence.EntityManager;
 import maruhxn.rankademy.RankademyTestConfiguration;
 import maruhxn.rankademy.application.user.required.UnivMailCertifier;
 import maruhxn.rankademy.application.user.required.UserRepository;
-import maruhxn.rankademy.domain.user.PasswordEncoder;
 import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
@@ -41,9 +40,6 @@ class UserAuthorizerTest {
 
     @MockitoBean
     SummonerInfoConnector summonerInfoConnector;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Test
     void sendUnivCertifyMail() {
@@ -122,8 +118,7 @@ class UserAuthorizerTest {
     }
 
     private User registerUser() {
-        var initialRequest = createUserRegisterRequest();
-        User user = userRepository.save(User.register(initialRequest, passwordEncoder));
+        User user = userRepository.save(createUser());
         em.flush();
         em.clear();
         return user;
