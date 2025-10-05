@@ -16,9 +16,10 @@ public record GroupDetailResponse(
         Long memberCnt,
         LeaderDto leader,
         LocalDateTime createdAt,
-        boolean isJoined
+        boolean isJoined,
+        boolean isLeader
 ) {
-    public GroupDetailResponse(Long groupId, String name, String about, String logoImageUrl, Double mappedTier, RecordInfoDto competitionInfo, Long capacity, Long memberCnt, LeaderDto leader, LocalDateTime createdAt, boolean isJoined) {
+    public GroupDetailResponse(Long groupId, String name, String about, String logoImageUrl, Double mappedTier, RecordInfoDto competitionInfo, Long capacity, Long memberCnt, LeaderDto leader, LocalDateTime createdAt, boolean isJoined, boolean isLeader) {
         this(
                 groupId,
                 name,
@@ -30,7 +31,8 @@ public record GroupDetailResponse(
                 memberCnt,
                 leader,
                 createdAt,
-                isJoined
+                isJoined,
+                isLeader
         );
     }
 }

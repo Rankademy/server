@@ -163,6 +163,8 @@ class GroupApiTest {
 
         GroupDetailResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), GroupDetailResponse.class);
         assertThat(response.groupId()).isEqualTo(group.getId());
+        assertThat(response.isJoined()).isFalse();
+        assertThat(response.isLeader()).isFalse();
 
     }
 

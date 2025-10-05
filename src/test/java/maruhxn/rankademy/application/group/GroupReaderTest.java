@@ -110,6 +110,7 @@ class GroupReaderTest {
         assertThat(groupDetail.logoImageUrl()).isEqualTo("logo.jpg");
         assertThat(groupDetail.leader().username()).isEqualTo(leader.getSummonerInfo().getSummonerName());
         assertThat(groupDetail.isJoined()).isTrue();
+        assertThat(groupDetail.isLeader()).isTrue();
     }
 
     @Test
@@ -125,6 +126,7 @@ class GroupReaderTest {
         assertThat(groupDetail.logoImageUrl()).isEqualTo("logo.jpg");
         assertThat(groupDetail.leader().username()).isEqualTo(leader.getSummonerInfo().getSummonerName());
         assertThat(groupDetail.isJoined()).isFalse();
+        assertThat(groupDetail.isLeader()).isFalse();
     }
 
     @Test

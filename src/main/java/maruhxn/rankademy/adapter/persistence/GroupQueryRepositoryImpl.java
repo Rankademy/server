@@ -1,7 +1,7 @@
 package maruhxn.rankademy.adapter.persistence;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +13,7 @@ import maruhxn.rankademy.domain.user.QUser;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static maruhxn.rankademy.domain.group.QGroup.group;
@@ -52,33 +53,23 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
         QGroupMember leaderMember = new QGroupMember("leaderMember");
         QUser leaderUser = new QUser("leaderUser");
 
-        return Optional.ofNullable(queryFactory
+        var avgMappedTierExpr = summonerInfo.tierInfo.mappedTier.avg();
+        var capacityExpr = group.capacity.longValue();
+        var memberCountExpr = group.members.size().longValue();
+
+        Tuple head = queryFactory
                 .select(
-                        Projections.constructor(
-                                GroupDetailResponse.class,
-                                group.id,
-                                group.name,
-                                group.about,
-                                group.logoImage,
-                                summonerInfo.tierInfo.mappedTier.avg(),
-                                Expressions.nullExpression(RecordInfoDto.class),
-                                group.capacity.longValue(),
-                                group.members.size().longValue(),
-                                Projections.constructor(
-                                        LeaderDto.class,
-                                        leaderUser.id,
-                                        leaderUser.summonerInfo.summonerName,
-                                        leaderUser.summonerInfo.summonerIconNum
-                                ),
-                                group.createdAt,
-                                userId == null
-                                        ? Expressions.constant(false)
-                                        : JPAExpressions.selectOne()
-                                        .from(groupMember)
-                                        .where(groupMember.group.id.eq(groupId)
-                                                .and(groupMember.user.id.eq(userId)))
-                                        .exists()
-                        )
+                        group.id,
+                        group.name,
+                        group.about,
+                        group.logoImage,
+                        avgMappedTierExpr,
+                        capacityExpr,
+                        memberCountExpr,
+                        leaderUser.id,
+                        leaderUser.summonerInfo.summonerName,
+                        leaderUser.summonerInfo.summonerIconNum,
+                        group.createdAt
                 )
                 .from(group)
                 .join(group.members, groupMember)
@@ -87,8 +78,61 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                 .join(leaderMember).on(leaderMember.group.id.eq(group.id).and(leaderMember.role.eq(GroupRole.LEADER)))
                 .join(leaderMember.user, leaderUser)
                 .where(group.id.eq(groupId))
-                .groupBy(group.id, group.name, group.about, group.logoImage, group.capacity, group.createdAt, leaderUser.id, leaderUser.summonerInfo.summonerIconNum)
-                .fetchOne());
+                .groupBy(
+                        group.id,
+                        group.name,
+                        group.about,
+                        group.logoImage,
+                        group.capacity,
+                        leaderUser.id,
+                        leaderUser.summonerInfo.summonerName,
+                        leaderUser.summonerInfo.summonerIconNum,
+                        group.createdAt
+                )
+                .fetchOne();
+
+        if (head == null) {
+            return Optional.empty();
+        }
+
+        boolean isJoined = false;
+        boolean isLeader = false;
+
+        if (userId != null) {
+            isJoined = queryFactory
+                    .selectOne()
+                    .from(groupMember)
+                    .where(groupMember.group.id.eq(groupId)
+                            .and(groupMember.user.id.eq(userId)))
+                    .fetchFirst() != null;
+
+            Long leaderId = head.get(leaderUser.id);
+            isLeader = Objects.equals(leaderId, userId);
+        }
+
+        Double avgMappedTier = head.get(avgMappedTierExpr);
+        Long capacity = head.get(capacityExpr);
+        Long memberCount = head.get(memberCountExpr);
+        LeaderDto leaderDto = new LeaderDto(
+                head.get(leaderUser.id),
+                head.get(leaderUser.summonerInfo.summonerName),
+                head.get(leaderUser.summonerInfo.summonerIconNum)
+        );
+
+        return Optional.of(new GroupDetailResponse(
+                head.get(group.id),
+                head.get(group.name),
+                head.get(group.about),
+                head.get(group.logoImage),
+                avgMappedTier != null ? avgMappedTier : 0.0,
+                null,
+                capacity != null ? capacity : 0L,
+                memberCount != null ? memberCount : 0L,
+                leaderDto,
+                head.get(group.createdAt),
+                isJoined,
+                isLeader
+        ));
     }
 
     @Override
@@ -191,4 +235,3 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                 .fetch();
     }
 }
-
