@@ -74,7 +74,7 @@ class TeamCreatedListenerTest {
             members.add(new TeamMember(member, positions.get(i)));
         }
 
-        TeamCreateRequest baseRequest = TeamFixture.createTeamCreateRequest(representative.getId(), members);
+        TeamCreateRequest baseRequest = TeamFixture.createTeamCreateRequest(representative.getId(), TeamFixture.toSlots(members));
         TeamCreateRequest request = new TeamCreateRequest(
                 baseRequest.groupId(),
                 "team-" + suffix,

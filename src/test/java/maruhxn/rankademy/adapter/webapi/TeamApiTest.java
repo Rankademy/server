@@ -132,7 +132,7 @@ class TeamApiTest {
         }
 
         User leader = memberList.get(0);
-        TeamCreateRequest request = TeamFixture.createTeamCreateRequest(leader.getId(), teamMembers, group.getId());
+        TeamCreateRequest request = TeamFixture.createTeamCreateRequest(leader.getId(), TeamFixture.toSlots(teamMembers), group.getId());
 
         // when
         MvcTestResult result = mvcTester.post().uri(BASE_URL)
@@ -154,7 +154,7 @@ class TeamApiTest {
                 .map(member -> new TeamMember(member, LolPosition.TOP))
                 .collect(Collectors.toSet());
 
-        TeamCreateRequest request = TeamFixture.createTeamCreateRequest(groupLeader.getId(), teamMembers, group.getId());
+        TeamCreateRequest request = TeamFixture.createTeamCreateRequest(groupLeader.getId(), TeamFixture.toSlots(teamMembers), group.getId());
 
         // when
         MvcTestResult result = mvcTester.post().uri(BASE_URL)
@@ -228,10 +228,10 @@ class TeamApiTest {
                 name,
                 "test intro",
                 leader.getId(),
-                teamMembers
+                TeamFixture.toSlots(teamMembers)
         );
 
-        Team team = Team.create(request);
+        Team team = Team.create(request, teamMembers);
         return teamRepository.save(team);
     }
 

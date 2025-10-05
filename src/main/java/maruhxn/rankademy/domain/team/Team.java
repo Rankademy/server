@@ -70,13 +70,13 @@ public class Team extends AbstractEntity {
     }
 
     // === 도메인 메서드 ===
-    public static Team create(TeamCreateRequest createRequest) {
+    public static Team create(TeamCreateRequest createRequest, Set<TeamMember> teamMembers) {
         Team team = new Team(
                 createRequest.groupId(),
                 createRequest.name(),
                 createRequest.intro(),
                 createRequest.representativeId());
-        team.setTeamMembers(createRequest.members());
+        team.setTeamMembers(teamMembers);
         return team;
     }
 

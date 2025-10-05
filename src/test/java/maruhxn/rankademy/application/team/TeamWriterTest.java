@@ -62,7 +62,7 @@ class TeamWriterTest {
             userRepository.save(memberUser);
             members.add(new TeamMember(memberUser, LolPosition.values()[i + 1]));
         }
-        TeamCreateRequest teamCreateRequest = TeamFixture.createTeamCreateRequest(representative.getId(), members);
+        TeamCreateRequest teamCreateRequest = TeamFixture.createTeamCreateRequest(representative.getId(), TeamFixture.toSlots(members));
 
         // when
         Team team = teamWriter.create(teamCreateRequest);
@@ -95,7 +95,7 @@ class TeamWriterTest {
             members.add(new TeamMember(memberUser, LolPosition.values()[i + 1]));
         }
 
-        TeamCreateRequest baseRequest = TeamFixture.createTeamCreateRequest(representative.getId(), members);
+        TeamCreateRequest baseRequest = TeamFixture.createTeamCreateRequest(representative.getId(), TeamFixture.toSlots(members));
         TeamCreateRequest request = new TeamCreateRequest(
                 baseRequest.groupId(),
                 "team-withdraw-" + UUID.randomUUID(),

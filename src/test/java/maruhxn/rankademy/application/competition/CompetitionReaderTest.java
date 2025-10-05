@@ -121,7 +121,7 @@ class CompetitionReaderTest {
             members.add(new TeamMember(memberUser, LolPosition.values()[j + 1]));
         }
 
-        Team team = Team.create(TeamFixture.createTeamCreateRequest(representative.getId(), members, groupId));
+        Team team = Team.create(TeamFixture.createTeamCreateRequest(representative.getId(), TeamFixture.toSlots(members), groupId), members);
         return teamRepository.save(team);
     }
 

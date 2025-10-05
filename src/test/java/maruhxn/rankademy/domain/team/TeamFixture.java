@@ -49,27 +49,36 @@ public class TeamFixture {
         return members;
     }
 
-    public static TeamCreateRequest createTeamCreateRequest(Long representativeId, Set<TeamMember> members) {
-        return new TeamCreateRequest(1L, "test team", "test intro", representativeId, members);
+    public static TeamCreateRequest createTeamCreateRequest(Long representativeId, Set<TeamCreateRequest.TeamMemberSlot> memberSlots) {
+        return new TeamCreateRequest(1L, "test team", "test intro", representativeId, memberSlots);
     }
 
-    public static TeamCreateRequest createTeamCreateRequest(Long representativeId, Set<TeamMember> members, Long groupId) {
+    public static TeamCreateRequest createTeamCreateRequest(Long representativeId, Set<TeamCreateRequest.TeamMemberSlot> memberSlots, Long groupId) {
         return new TeamCreateRequest(
                 groupId,
                 UUID.randomUUID().toString(),
                 "test intro",
                 representativeId,
-                members
+                memberSlots
         );
     }
 
     public static Team createTeamWithReflection(User representative) {
         Set<TeamMember> members = createTeamMembersWithReflection(representative);
-        return Team.create(createTeamCreateRequest(representative.getId(), members));
+        return Team.create(createTeamCreateRequest(representative.getId(), toSlots(members)), members);
     }
 
     public static Team createTeamWithReflection(User representative, Long groupId) {
         Set<TeamMember> members = createTeamMembersWithReflection(representative);
-        return Team.create(createTeamCreateRequest(representative.getId(), members, groupId));
+        return Team.create(createTeamCreateRequest(representative.getId(), toSlots(members), groupId), members);
+    }
+
+    public static Set<TeamCreateRequest.TeamMemberSlot> toSlots(Set<TeamMember> members) {
+        return members.stream()
+                .map(member -> new TeamCreateRequest.TeamMemberSlot(
+                        member.getUser().getId(),
+                        member.getPosition()
+                ))
+                .collect(Collectors.toSet());
     }
 }

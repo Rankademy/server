@@ -17,6 +17,7 @@ import maruhxn.rankademy.domain.competitionrequest.CompetitionRequestStatus;
 import maruhxn.rankademy.domain.group.Group;
 import maruhxn.rankademy.domain.group.GroupFixture;
 import maruhxn.rankademy.domain.team.Team;
+import maruhxn.rankademy.domain.team.TeamFixture;
 import maruhxn.rankademy.domain.team.TeamMember;
 import maruhxn.rankademy.domain.team.dto.TeamCreateRequest;
 import maruhxn.rankademy.domain.user.LolPosition;
@@ -254,8 +255,8 @@ class CompetitionRequestApiTest {
                 name,
                 "intro of " + name,
                 leader.getId(),
-                members
+                TeamFixture.toSlots(members)
         );
-        return Team.create(request);
+        return Team.create(request, members);
     }
 }

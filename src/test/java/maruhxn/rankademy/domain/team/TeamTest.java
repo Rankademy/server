@@ -23,7 +23,7 @@ class TeamTest {
         Set<TeamMember> members = TeamFixture.createTeamMembersWithReflection(representative);
 
         // when
-        Team team = Team.create(TeamFixture.createTeamCreateRequest(representative.getId(), members));
+        Team team = Team.create(TeamFixture.createTeamCreateRequest(representative.getId(), TeamFixture.toSlots(members)), members);
 
         // then
         assertThat(team).isNotNull();
@@ -44,7 +44,7 @@ class TeamTest {
 
         // when & then
         assertThatThrownBy(() ->
-                Team.create(TeamFixture.createTeamCreateRequest(representative.getId(), members)))
+                Team.create(TeamFixture.createTeamCreateRequest(representative.getId(), TeamFixture.toSlots(members)), members))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("팀원 5명의 정보를 모두 입력해주세요");
     }
@@ -65,7 +65,7 @@ class TeamTest {
 
         // when & then
         assertThatThrownBy(() ->
-                Team.create(TeamFixture.createTeamCreateRequest(representative.getId(), members)))
+                Team.create(TeamFixture.createTeamCreateRequest(representative.getId(), TeamFixture.toSlots(members)), members))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("라인은 중복될 수 없습니다");
     }
@@ -80,7 +80,7 @@ class TeamTest {
 
         // when & then
         assertThatThrownBy(() ->
-                Team.create(new TeamCreateRequest(1L, "test team", "test intro", otherPersonId, members)))
+                Team.create(new TeamCreateRequest(1L, "test team", "test intro", otherPersonId, TeamFixture.toSlots(members)), members))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("대표자는 팀 멤버에 속해있어야 합니다");
     }
@@ -97,7 +97,7 @@ class TeamTest {
         members.add(TeamFixture.createTeamMember(4L, new TierInfo(Tier.GOLD, Rank.IV, 0), LolPosition.ADC));
         members.add(TeamFixture.createTeamMember(5L, new TierInfo(Tier.PLATINUM, Rank.IV, 0), LolPosition.SUP));
 
-        Team team = Team.create(TeamFixture.createTeamCreateRequest(representative.getUser().getId(), members));
+        Team team = Team.create(TeamFixture.createTeamCreateRequest(representative.getUser().getId(), TeamFixture.toSlots(members)), members);
 
         // when
         TierInfo avgTier = team.averageTierInfo();

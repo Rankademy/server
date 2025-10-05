@@ -31,8 +31,11 @@ public class TeamApi {
     }
 
     @GetMapping("/{teamId}")
-    public TeamDetailResponse getTeamDetail(@PathVariable("teamId") Long teamId) {
-        return teamReader.getTeamDetails(teamId);
+    public TeamDetailResponse getTeamDetail(
+            @AuthenticationPrincipal RankademyUser user,
+            @PathVariable("teamId") Long teamId
+    ) {
+        return teamReader.getTeamDetails(user.getId(), teamId);
     }
 
     @DeleteMapping("/{teamId}/withdraw")

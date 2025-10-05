@@ -78,7 +78,7 @@ class TeamReaderTest {
                 members.add(new TeamMember(memberUser, LolPosition.values()[j + 1]));
             }
 
-            Team team = Team.create(TeamFixture.createTeamCreateRequest(representative.getId(), members, group.getId()));
+            Team team = Team.create(TeamFixture.createTeamCreateRequest(representative.getId(), TeamFixture.toSlots(members), group.getId()), members);
             teamRepository.save(team);
         }
 
@@ -124,14 +124,14 @@ class TeamReaderTest {
             members.add(new TeamMember(memberUser, LolPosition.values()[j + 1]));
         }
 
-        Team team = Team.create(TeamFixture.createTeamCreateRequest(representative.getId(), members, group.getId()));
+        Team team = Team.create(TeamFixture.createTeamCreateRequest(representative.getId(), TeamFixture.toSlots(members), group.getId()), members);
         teamRepository.save(team);
 
         em.flush();
         em.clear();
 
         // when
-        TeamDetailResponse teamDetails = teamReader.getTeamDetails(team.getId());
+        TeamDetailResponse teamDetails = teamReader.getTeamDetails(user.getId(), team.getId());
 
         // then
         assertThat(teamDetails).isNotNull();
@@ -146,7 +146,7 @@ class TeamReaderTest {
     @DisplayName("팀 상세 조회 - 존재하지 않는 ID")
     void getTeamDetails_withNonExistentId() {
         // when / then
-        assertThatThrownBy(() -> teamReader.getTeamDetails(999L))
+        assertThatThrownBy(() -> teamReader.getTeamDetails(user.getId(), 999L))
                 .isInstanceOf(NoSuchElementException.class);
     }
 }
