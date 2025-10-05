@@ -24,6 +24,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven("https://repo.springdoc.org/snapshot")
 }
 
 val mockitoAgent: Configuration = configurations.create("mockitoAgent")
@@ -78,6 +79,9 @@ dependencies {
 
     // logging
     implementation("com.kdgregory.logging:logback-aws-appenders:2.4.1")
+
+    // api-docs
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
 
     mockitoAgent("org.mockito:mockito-core:5.18.0") { isTransitive = false }
 }
