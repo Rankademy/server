@@ -1,10 +1,12 @@
 package maruhxn.rankademy.application.team;
 
 import jakarta.persistence.EntityManager;
+import maruhxn.rankademy.application.competition.required.CompetitionRepository;
 import maruhxn.rankademy.application.notification.NotificationQueryService;
 import maruhxn.rankademy.application.team.provided.TeamWriter;
 import maruhxn.rankademy.application.team.required.TeamRepository;
 import maruhxn.rankademy.application.user.required.UserRepository;
+import maruhxn.rankademy.domain.competition.Competition;
 import maruhxn.rankademy.domain.group.GroupFixture;
 import maruhxn.rankademy.domain.team.Team;
 import maruhxn.rankademy.domain.team.TeamFixture;
@@ -26,6 +28,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Transactional
@@ -46,6 +49,9 @@ class TeamWriterTest {
 
     @Autowired
     NotificationQueryService notificationQueryService;
+
+    @Autowired
+    CompetitionRepository competitionRepository;
 
     @Test
     @DisplayName("팀 생성 성공")
@@ -150,6 +156,42 @@ class TeamWriterTest {
         TestTransaction.end();
 
         cleanupPersistedState(teamId, members, Set.of(creationMessage, deactivationMessage));
+    }
+
+    @Test
+    @DisplayName("진행 중인 대항전이 있으면 팀 탈퇴에 실패한다")
+    void withdrawFail_WhenCompetitionOngoing() {
+        // given: 팀 생성 및 탈퇴 대상 지정
+        User representative = GroupFixture.createLeader("leader-123");
+        userRepository.save(representative);
+
+        Set<TeamMember> members = new HashSet<>();
+        members.add(new TeamMember(representative, LolPosition.TOP));
+
+        User leavingUser = null;
+        for (int i = 0; i < 4; i++) {
+            User memberUser = GroupFixture.createMember("member-wcf" + i + "@test.com", "member-wcf" + i);
+            userRepository.save(memberUser);
+            if (i == 0) {
+                leavingUser = memberUser;
+            }
+            members.add(new TeamMember(memberUser, LolPosition.values()[i + 1]));
+        }
+
+        TeamCreateRequest request = TeamFixture.createTeamCreateRequest(representative.getId(), TeamFixture.toSlots(members));
+        Team team = teamWriter.create(request);
+        Long teamId = team.getId();
+
+        competitionRepository.save(Competition.createAfterAccept(teamId, teamId + 1L));
+
+        // when / then
+        Long leavingUserId = leavingUser.getId();
+        assertThatThrownBy(() -> teamWriter.withdraw(leavingUserId, teamId))
+                .isInstanceOf(IllegalStateException.class);
+
+        Team found = teamRepository.findByIdWithTeamMember(teamId).orElseThrow();
+        assertThat(found.isActive()).isTrue();
+        assertThat(found.getTeamMembers()).hasSize(5);
     }
 
     private void cleanupPersistedState(Long teamId, Set<TeamMember> members, Set<String> notificationMessages) {

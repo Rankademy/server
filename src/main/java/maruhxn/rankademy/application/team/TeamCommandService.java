@@ -1,6 +1,7 @@
 package maruhxn.rankademy.application.team;
 
 import lombok.RequiredArgsConstructor;
+import maruhxn.rankademy.application.competition.required.CompetitionRepository;
 import maruhxn.rankademy.application.team.provided.TeamWriter;
 import maruhxn.rankademy.application.team.required.TeamRepository;
 import maruhxn.rankademy.application.user.required.UserRepository;
@@ -27,6 +28,7 @@ public class TeamCommandService implements TeamWriter {
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final DomainEventPublisher publisher;
+    private final CompetitionRepository competitionRepository;
 
     @Override
     public Team create(TeamCreateRequest request) {
@@ -41,6 +43,10 @@ public class TeamCommandService implements TeamWriter {
         // 팀과 유저 로드
         Team team = teamRepository.findByIdWithTeamMember(teamId)
                 .orElseThrow(() -> new java.util.NoSuchElementException("팀을 찾을 수 없습니다. id: " + teamId));
+
+        if (competitionRepository.existsByTeamId(teamId)) {
+            throw new IllegalStateException("현재 진행 중인 대항전 혹은 진행된 대항전이 있어 팀을 탈퇴할 수 없습니다.");
+        }
 
         team.withdraw(userId);
 
