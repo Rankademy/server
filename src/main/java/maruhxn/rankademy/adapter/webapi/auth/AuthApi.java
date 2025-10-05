@@ -4,17 +4,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.security.dto.TokenDto;
 import maruhxn.rankademy.adapter.security.jwt.JwtProvider;
 import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.adapter.security.model.UserInfo;
 import maruhxn.rankademy.application.user.provided.UserReader;
-import maruhxn.rankademy.application.user.provided.UserWriter;
 import maruhxn.rankademy.domain.user.User;
-import maruhxn.rankademy.domain.user.dto.UserRegisterRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import static maruhxn.rankademy.adapter.security.Constants.REFRESH_TOKEN_HEADER;
@@ -26,22 +22,7 @@ import static maruhxn.rankademy.adapter.security.Constants.REFRESH_TOKEN_HEADER;
 public class AuthApi {
 
     private final UserReader userReader;
-    private final UserWriter userWriter;
     private final JwtProvider jwtProvider;
-
-    @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(
-            summary = "회원 가입",
-            description = "신규 사용자 정보를 등록하고 사용자 ID를 반환합니다."
-    )
-    @ApiResponse(responseCode = "201", description = "회원 가입 성공")
-    public Long register(
-            @RequestBody @Valid UserRegisterRequest request
-    ) {
-        User user = userWriter.registerOrSetPassword(request);
-        return user.getId();
-    }
 
     @GetMapping("/refresh")
     @Operation(

@@ -3,14 +3,10 @@ package maruhxn.rankademy.adapter.security;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.security.filter.JwtExceptionFilter;
 import maruhxn.rankademy.adapter.security.filter.JwtVerificationFilter;
-import maruhxn.rankademy.adapter.security.filter.RestLoginFilter;
 import maruhxn.rankademy.adapter.security.handlers.*;
 import maruhxn.rankademy.adapter.security.service.RankademyOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -31,7 +27,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthenticationProvider restAuthenticationProvider;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final JwtVerificationFilter jwtVerificationFilter;
     private final JwtExceptionFilter jwtExceptionFilter;
@@ -43,10 +38,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        builder.authenticationProvider(restAuthenticationProvider);
-        AuthenticationManager authenticationManager = builder.build();
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -79,10 +70,8 @@ public class SecurityConfig {
                                 .logoutUrl("/api/v1/auth/logout")
                                 .logoutSuccessHandler(logoutSuccessHandler)
                 )
-                .addFilterBefore(restLoginFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtVerificationFilter, RestLoginFilter.class)
+                .addFilterBefore(jwtVerificationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtExceptionFilter, JwtVerificationFilter.class)
-                .authenticationManager(authenticationManager)
                 .exceptionHandling(eh ->
                         eh
                                 .authenticationEntryPoint(authenticationEntryPoint)
@@ -90,14 +79,6 @@ public class SecurityConfig {
                 );
 
         return http.build();
-    }
-
-    private RestLoginFilter restLoginFilter(AuthenticationManager authenticationManager) {
-        RestLoginFilter restLoginFilter = new RestLoginFilter();
-        restLoginFilter.setAuthenticationManager(authenticationManager);
-        restLoginFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
-        restLoginFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
-        return restLoginFilter;
     }
 
     @Bean

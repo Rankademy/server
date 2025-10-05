@@ -10,22 +10,11 @@ public class RankademyAuthenticationToken extends AbstractAuthenticationToken {
     private Object principal;
     private Object credentials;
 
-    public RankademyAuthenticationToken(Object principal, Object credentials) {
-        super(null);
-        this.principal = principal;
-        this.credentials = credentials;
-        setAuthenticated(false);
-    }
-
     public RankademyAuthenticationToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.principal = principal;
         this.credentials = credentials;
         setAuthenticated(true);
-    }
-
-    public static RankademyAuthenticationToken unauthenticated(Object principal, Object credentials) {
-        return new RankademyAuthenticationToken(principal, credentials);
     }
 
     public static RankademyAuthenticationToken authenticated(RankademyUser principal) {
