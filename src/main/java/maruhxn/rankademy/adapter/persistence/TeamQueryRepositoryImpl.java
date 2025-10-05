@@ -1,9 +1,8 @@
 package maruhxn.rankademy.adapter.persistence;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.application.team.provided.dto.TeamDetailResponse;
@@ -17,6 +16,7 @@ import maruhxn.rankademy.domain.user.QUser;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static maruhxn.rankademy.domain.group.QGroup.group;
@@ -70,36 +70,25 @@ public class TeamQueryRepositoryImpl implements TeamQueryRepository {
     }
 
     @Override
-    public Optional<TeamDetailResponse> getDetailById(Long teamId) {
-        // 별칭 준비
+    public Optional<TeamDetailResponse> getDetailById(Long userId, Long teamId) {
         QTeamMember tm = QTeamMember.teamMember;
         QUser u = QUser.user;
         QSummonerInfo si = QSummonerInfo.summonerInfo;
         QGroup g = QGroup.group;
         QTeam t = QTeam.team;
 
-        // 1) 팀 헤더 + 평균티어(수치) 서브쿼리
-        SubQueryExpression<Double> avgMappedTierSubq =
-                JPAExpressions
-                        .select(si.tierInfo.mappedTier.avg().coalesce(0.0))  // 멤버 0명일 때 가드
-                        .from(tm)
-                        .join(tm.user, u)
-                        .leftJoin(u.summonerInfo, si)
-                        .where(tm.team.id.eq(t.id));
-
-        TeamDetailResponse head = queryFactory
-                .select(Projections.constructor(
-                        TeamDetailResponse.class,
+        Tuple head = queryFactory
+                .select(
                         t.id,
                         t.name,
                         g.univName,
                         g.name,
+                        g.logoImage,
                         t.intro,
                         t.createdAt,
                         t.isActive,
-                        avgMappedTierSubq,
-                        Expressions.constant(List.of())
-                ))
+                        t.representativeId
+                )
                 .from(t)
                 .join(g).on(t.groupId.eq(g.id))
                 .where(t.id.eq(teamId))
@@ -127,17 +116,31 @@ public class TeamQueryRepositoryImpl implements TeamQueryRepository {
                 .orderBy(tm.position.asc(), u.id.asc())
                 .fetch();
 
-        // 3) 최종 합성 (avg는 생성자에서 Tier로 변환됨)
+        double avgMappedTier = members.stream()
+                .map(TeamDetailResponse.TeamMemberResponse::tierInfo)
+                .filter(Objects::nonNull)
+                .mapToInt(tierInfo -> tierInfo.getMappedTier())
+                .average()
+                .orElse(0.0);
+
+        Long representativeId = head.get(t.representativeId);
+        boolean isTeamLeader = representativeId != null && representativeId.equals(userId);
+        boolean isMyTeam = isTeamLeader || members.stream()
+                .anyMatch(member -> Objects.equals(member.memberId(), userId));
+
         return Optional.of(new TeamDetailResponse(
-                head.teamId(),
-                head.teamName(),
-                head.univName(),
-                head.groupName(),
-                head.intro(),
-                head.createdAt(),
-                head.isActive(),
-                head.avgTierInfo(),
-                members
+                head.get(t.id),
+                head.get(t.name),
+                head.get(g.univName),
+                head.get(g.name),
+                head.get(g.logoImage),
+                head.get(t.intro),
+                head.get(t.createdAt),
+                Boolean.TRUE.equals(head.get(t.isActive)),
+                avgMappedTier,
+                members,
+                isTeamLeader,
+                isMyTeam
         ));
     }
 }

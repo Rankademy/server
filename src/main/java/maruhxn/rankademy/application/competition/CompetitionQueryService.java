@@ -57,9 +57,9 @@ public class CompetitionQueryService implements CompetitionReader {
     public CompetitionDetailResponse getDetail(Long id) {
         Competition competition = competitionRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("대항전 정보를 찾을 수 없습니다. competitionId: " + id));
-        TeamDetailResponse team1Detail = teamQueryRepository.getDetailById(competition.getTeam1Id())
+        TeamDetailResponse team1Detail = teamQueryRepository.getDetailById(null, competition.getTeam1Id())
                 .orElseThrow(() -> new NoSuchElementException("팀 정보를 찾을 수 없습니다. team1Id: " + competition.getTeam1Id()));
-        TeamDetailResponse team2Detail = teamQueryRepository.getDetailById(competition.getTeam2Id())
+        TeamDetailResponse team2Detail = teamQueryRepository.getDetailById(null, competition.getTeam2Id())
                 .orElseThrow(() -> new NoSuchElementException("팀 정보를 찾을 수 없습니다. team2Id: " + competition.getTeam2Id()));
 
         return new CompetitionDetailResponse(

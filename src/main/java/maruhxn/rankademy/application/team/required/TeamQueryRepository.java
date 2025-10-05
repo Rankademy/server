@@ -9,5 +9,5 @@ public interface TeamQueryRepository {
 
     TeamPageResponse findAll(int page);
 
-    Optional<TeamDetailResponse> getDetailById(Long teamId);
+    Optional<TeamDetailResponse> getDetailById(Long userId, Long teamId);
 }

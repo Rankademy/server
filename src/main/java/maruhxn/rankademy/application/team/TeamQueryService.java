@@ -32,8 +32,8 @@ public class TeamQueryService implements TeamReader {
     }
 
     @Override
-    public TeamDetailResponse getTeamDetails(Long teamId) {
-        return teamQueryRepository.getDetailById(teamId)
+    public TeamDetailResponse getTeamDetails(Long userId, Long teamId) {
+        return teamQueryRepository.getDetailById(userId, teamId)
                 .orElseThrow(() -> new NoSuchElementException("팀을 찾을 수 없습니다. id: " + teamId));
     }
 

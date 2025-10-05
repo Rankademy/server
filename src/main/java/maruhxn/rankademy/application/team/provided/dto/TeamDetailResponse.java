@@ -12,24 +12,30 @@ public record TeamDetailResponse(
         String teamName,
         String univName,
         String groupName,
+        String groupLogo,
         String intro,
         LocalDateTime createdAt,
         boolean isActive,
         TierInfo avgTierInfo,
-        List<TeamMemberResponse> teamMembers
+        List<TeamMemberResponse> teamMembers,
+        boolean isTeamLeader,
+        boolean isMyTeam
 ) {
 
-    public TeamDetailResponse(Long teamId, String teamName, String univName, String groupName, String intro, LocalDateTime createdAt, boolean isActive, Double avgMappedTier, List<TeamMemberResponse> teamMembers) {
+    public TeamDetailResponse(Long teamId, String teamName, String univName, String groupName, String groupLogo, String intro, LocalDateTime createdAt, boolean isActive, Double avgMappedTier, List<TeamMemberResponse> teamMembers, boolean isTeamLeader, boolean isMyTeam) {
         this(
                 teamId,
                 teamName,
                 univName,
                 groupName,
+                groupLogo,
                 intro,
                 createdAt,
                 isActive,
                 TierMapper.scoreToTier(avgMappedTier.intValue()),
-                teamMembers
+                teamMembers,
+                isTeamLeader,
+                isMyTeam
         );
     }
 

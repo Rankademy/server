@@ -10,5 +10,5 @@ public interface TeamReader {
 
     TeamPageResponse getTeamList(int page);
 
-    TeamDetailResponse getTeamDetails(Long teamId);
+    TeamDetailResponse getTeamDetails(Long userId, Long teamId);
 }
