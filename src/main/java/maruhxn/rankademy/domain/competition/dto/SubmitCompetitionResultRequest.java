@@ -1,19 +1,21 @@
 package maruhxn.rankademy.domain.competition.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Schema(description = "대항전 결과 제출 요청")
 public record SubmitCompetitionResultRequest(
-        Long team1Id,
-        Long team2Id,
-        int totalSets,
-        List<SetResultDto> setResults,
-        String memo,
-        Long finalWinnerId,
-        Long finalWinnerGroupId,
-        Long finalLoserGroupId
+        @Schema(description = "팀1 ID", example = "1") Long team1Id,
+        @Schema(description = "팀2 ID", example = "2") Long team2Id,
+        @Schema(description = "세트 수", example = "3") int totalSets,
+        @Schema(description = "세트별 결과 목록") List<SetResultDto> setResults,
+        @Schema(description = "비고 메모") String memo,
+        @Schema(description = "최종 승리 팀 ID", example = "1") Long finalWinnerId,
+        @Schema(description = "승리 그룹 ID", example = "10") Long finalWinnerGroupId,
+        @Schema(description = "패배 그룹 ID", example = "11") Long finalLoserGroupId
 ) {
 
     public SubmitCompetitionResultRequest {
@@ -29,10 +31,11 @@ public record SubmitCompetitionResultRequest(
                 .collect(Collectors.toSet()).size();
     }
 
+    @Schema(description = "세트 결과 입력")
     public record SetResultDto(
-            int setNumber,
-            Long winnerTeamId,
-            String resultImageKey
+            @Schema(description = "세트 번호", example = "1") int setNumber,
+            @Schema(description = "세트 승리 팀 ID", example = "1") Long winnerTeamId,
+            @Schema(description = "영상 또는 증빙 이미지 키") String resultImageKey
     ) {
 
     }

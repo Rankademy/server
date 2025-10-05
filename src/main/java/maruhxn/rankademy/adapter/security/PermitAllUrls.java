@@ -27,6 +27,9 @@ public enum PermitAllUrls {
     GROUP_RECRUITMENT_POST_LIST("/api/v1/groups/posts", GET),
     GROUP_RECRUITMENT_POST_DETAIL("/api/v1/groups/{groupId}/post", GET),
     GET_IMAGE("/api/v1/files**", GET),
+    SWAGGER_UI("/docs/swagger-ui.html", GET),
+    SWAGGER_UI_RESOURCES("/docs/swagger-ui/**", GET),
+    SWAGGER_API_DOCS("/docs/api-docs/**", GET),
     ;
 
     private final String url;
