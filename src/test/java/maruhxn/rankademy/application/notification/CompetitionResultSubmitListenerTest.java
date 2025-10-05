@@ -87,6 +87,9 @@ class CompetitionResultSubmitListenerTest {
         competitionResultSubmitListener.on(event);
 
         // then
+        verify(team1, times(1)).deactivate();
+        verify(team2, times(1)).deactivate();
+
         ArgumentCaptor<Notification> captor = ArgumentCaptor.forClass(Notification.class);
         verify(notificationRepository, times(2)).save(captor.capture());
 

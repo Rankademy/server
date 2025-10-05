@@ -36,6 +36,11 @@ public class CompetitionResultSubmitListener {
 
         Team team1 = getTeam(competition.getTeam1Id());
         Team team2 = getTeam(competition.getTeam2Id());
+
+        // 대항전 완료 이후 비활성화
+        team1.deactivate();
+        team2.deactivate();
+
         LocalDateTime now = LocalDateTime.now();
 
         String actingUserName = Stream.of(team1.getTeamMembers(), team2.getTeamMembers())

@@ -35,12 +35,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static maruhxn.rankademy.domain.group.GroupFixture.createGroup;
 import static maruhxn.rankademy.domain.group.GroupFixture.createMember;
@@ -87,21 +89,25 @@ class CompetitionApiTest {
 
     @BeforeEach
     void setUp() {
-        myTeamLeader = GroupFixture.createMember("myTeamLeader@test.com", "myTeamLeader");
+        String suffix = UUID.randomUUID().toString().substring(0, 4);
+        String otherSuffix = UUID.randomUUID().toString().substring(0, 4);
+        String extraSuffix = UUID.randomUUID().toString().substring(0, 4);
+
+        myTeamLeader = GroupFixture.createMember("leader-" + suffix + "@test.com", "leader-" + suffix);
         userRepository.save(myTeamLeader);
-        otherTeamLeader = GroupFixture.createMember("otherTeamLeader@test.com", "otherTeamLeader");
+        otherTeamLeader = GroupFixture.createMember("leader-" + otherSuffix + "@test.com", "leader-" + otherSuffix);
         userRepository.save(otherTeamLeader);
-        otherUser = GroupFixture.createMember("otherUser@test.com", "otherUser");
+        otherUser = GroupFixture.createMember("user-" + extraSuffix + "@test.com", "user-" + extraSuffix);
         userRepository.save(otherUser);
 
-        group1 = createGroup(myTeamLeader, "test group1");
+        group1 = createGroup(myTeamLeader, "test group1-" + suffix);
         groupRepository.save(group1);
-        group2 = createGroup(otherTeamLeader, "test group2");
+        group2 = createGroup(otherTeamLeader, "test group2-" + otherSuffix);
         groupRepository.save(group2);
 
-        myTeam = makeTeam("myTeam", myTeamLeader, group1.getId());
+        myTeam = makeTeam("myTeam-" + suffix, myTeamLeader, group1.getId());
         teamRepository.save(myTeam);
-        otherTeam = makeTeam("otherTeam", otherTeamLeader, group2.getId());
+        otherTeam = makeTeam("otherTeam-" + otherSuffix, otherTeamLeader, group2.getId());
         teamRepository.save(otherTeam);
         competition = Competition.createAfterAccept(myTeam.getId(), otherTeam.getId());
         competitionRepository.save(competition);
@@ -237,6 +243,19 @@ class CompetitionApiTest {
         assertThat(updatedCompetition.getSetResults().get(0).getSetNumber()).isEqualTo(1);
         assertThat(updatedCompetition.getSetResults().get(0).getWinnerTeamId()).isEqualTo(myTeam.getId());
         assertThat(updatedCompetition.getFinalWinnerTeamId()).isEqualTo(myTeam.getId());
+
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+
+        TestTransaction.start();
+
+        Team updatedMyTeam = teamRepository.findByIdWithTeamMember(myTeam.getId()).orElseThrow();
+        Team updatedOtherTeam = teamRepository.findByIdWithTeamMember(otherTeam.getId()).orElseThrow();
+        assertThat(updatedMyTeam.isActive()).isFalse();
+        assertThat(updatedOtherTeam.isActive()).isFalse();
+
+        TestTransaction.flagForRollback();
+        TestTransaction.end();
     }
 
     @Test
@@ -325,7 +344,7 @@ class CompetitionApiTest {
         Set<TeamMember> members = new HashSet<>();
         members.add(new TeamMember(leader, LolPosition.TOP));
         for (int i = 0; i < 4; i++) {
-            User member = createMember(name + "member" + i + "@test.com", name + "member" + i);
+            User member = createMember(name + "member" + i + "@test.com", UUID.randomUUID().toString().substring(0, 10));
             userRepository.save(member);
             members.add(new TeamMember(member, LolPosition.values()[(i + 1) % 5]));
         }

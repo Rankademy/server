@@ -13,6 +13,7 @@ import maruhxn.rankademy.domain.team.QTeam;
 import maruhxn.rankademy.domain.team.QTeamMember;
 import maruhxn.rankademy.domain.user.QSummonerInfo;
 import maruhxn.rankademy.domain.user.QUser;
+import maruhxn.rankademy.domain.user.TierInfo;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -119,7 +120,7 @@ public class TeamQueryRepositoryImpl implements TeamQueryRepository {
         double avgMappedTier = members.stream()
                 .map(TeamDetailResponse.TeamMemberResponse::tierInfo)
                 .filter(Objects::nonNull)
-                .mapToInt(tierInfo -> tierInfo.getMappedTier())
+                .mapToInt(TierInfo::getMappedTier)
                 .average()
                 .orElse(0.0);
 
