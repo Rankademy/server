@@ -1,9 +1,9 @@
 package maruhxn.rankademy.adapter.webapi.file;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.integration.file.FileProvider;
 import org.springframework.core.io.Resource;
@@ -17,7 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/v1/files")
 @RequiredArgsConstructor
-@Tag(name = "Files", description = "파일 업로드 및 조회 API")
+@Hidden
+//@Tag(name = "Files", description = "파일 업로드 및 조회 API")
 public class FileApi {
 
     private final FileProvider fileProvider;
@@ -25,6 +26,7 @@ public class FileApi {
     /**
      * 이미지 조회
      */
+    @Deprecated
     @GetMapping
     @Operation(
             summary = "이미지 조회",
@@ -46,6 +48,7 @@ public class FileApi {
     /**
      * 파일 업로드
      */
+    @Deprecated
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
@@ -65,6 +68,7 @@ public class FileApi {
     /**
      * 파일 삭제
      */
+    @Deprecated
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(

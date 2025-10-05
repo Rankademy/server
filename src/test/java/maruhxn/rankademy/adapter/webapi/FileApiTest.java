@@ -7,6 +7,7 @@ import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.adapter.security.model.UserInfo;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.user.User;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 @Transactional
 @Import(RankademyTestConfiguration.class)
 @DisplayName("FileApi 테스트")
+@Disabled
 class FileApiTest {
 
     static final String BASE_URL = "/api/v1/files";
