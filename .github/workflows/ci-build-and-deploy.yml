@@ -21,6 +21,16 @@ jobs:
           java-version: 21
           cache: gradle
 
+      - name: CI용 .env 생성
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
+        run: |
+          if [ -z "$ENV_FILE" ]; then
+            echo "CI_ENV_FILE secret is not set" >&2
+            exit 1
+          fi
+          printf '%s' "$ENV_FILE" > .env
+
       - name: gradlew 권한 부여
         run: chmod +x gradlew
 
@@ -60,7 +70,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: docker-compose.yml
+          source: env,docker-compose.yml
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.10
