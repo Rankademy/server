@@ -1,7 +1,6 @@
 services:
   app:
     image: "ghcr.io/rankademy/rankademy-server:${APP_VERSION}"
-    container_name: rankademy-app
     restart: always
     env_file:
       - .env
