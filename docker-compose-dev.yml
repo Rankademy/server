@@ -1,0 +1,18 @@
+services:
+  mysql:
+    image: 'mysql:latest'
+    environment:
+      - 'MYSQL_DATABASE=rankademy'
+      - 'MYSQL_PASSWORD=secret'
+      - 'MYSQL_ROOT_PASSWORD=verysecret'
+      - 'MYSQL_USER=maruhxn'
+    ports:
+      - '3306:3306'
+
+  mongodb:
+    image: 'mongo:latest'
+    environment:
+      - 'MONGO_INITDB_ROOT_USERNAME=maruhxn'
+      - 'MONGO_INITDB_ROOT_PASSWORD=verysecret'
+    ports:
+      - '27017:27017'
