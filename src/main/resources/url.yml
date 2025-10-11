@@ -1,0 +1,10 @@
+spring.config.activate.on-profile: local,dev,test
+
+client.url: http://localhost:3000
+server.url: http://localhost:8080
+
+---
+spring.config.activate.on-profile: prod
+
+client.url: http://localhost:3000
+server.url: https://rankademy.kr

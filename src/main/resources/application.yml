@@ -1,0 +1,15 @@
+spring.application.name: rankademy
+
+spring:
+  config:
+    import:
+      - db.yml
+      - jwt.yml
+      - oauth2.yml
+      - riot.yml
+      - file.yml
+      - url.yml
+      - storage.yml
+      - logging.yml
+      - docker.yml
+      - optional:file:.env[.properties]

@@ -37,5 +37,7 @@ out/
 .vscode/
 
 ### ADDITIONAL ###
-**/src/*/resources/*.yml
 **/src/main/generated/**
+**/src/*/resources/files/**
+/logs/**
+.env
