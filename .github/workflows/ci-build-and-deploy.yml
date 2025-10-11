@@ -2,12 +2,7 @@ name: ci-build-and-deploy
 
 on:
   pull_request:
-    branches: ["main", "dev"]
-    types:
-      - closed
-  push:
     branches: ["main"]
-  workflow_dispatch:
 
 jobs:
   test-and-build:
