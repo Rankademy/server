@@ -1,8 +1,9 @@
 name: ci-build-and-deploy
 
 on:
-  pull_request:
-    branches: ["main"]
+  push:
+    branches:
+      - main
 
 jobs:
   test-and-build:
@@ -55,14 +56,12 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 도커 이미지 배포 🐳
-        if: github.ref == 'refs/heads/main'
         run: ./publish_docker_with_args.sh ${{ steps.meta.outputs.version }}
 
   deploy:
     name: 배포
     needs: test-and-build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     steps:
       - name: 배포 파일 동기화
         uses: appleboy/scp-action@v0.1.7
