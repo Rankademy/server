@@ -1,18 +1,19 @@
-name: ci-build-and-deploy
+name: CI - Build & Publish
 
 on:
   push:
     branches:
       - main
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
-    continue-on-error: false
-    outputs:
-      version: ${{ steps.meta.outputs.version }}
     steps:
-      - name: release 리포지토리 체크아웃 🪜
+      - name: 리포지토리 체크아웃 🪜
         uses: actions/checkout@v4
 
       - name: JDK 21 셋업
@@ -27,7 +28,7 @@ jobs:
           ENV_FILE: ${{ secrets.ENV_FILE }}
         run: |
           if [ -z "$ENV_FILE" ]; then
-            echo "CI_ENV_FILE secret is not set" >&2
+            echo "ENV_FILE secret is not set" >&2
             exit 1
           fi
           printf '%s' "$ENV_FILE" > .env
@@ -56,34 +57,8 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN }}
 
       - name: 도커 이미지 배포 🐳
-        run: ./publish_docker_with_args.sh ${{ steps.meta.outputs.version }}
-
-  deploy:
-    name: 배포
-    needs: test-and-build
-    runs-on: ubuntu-latest
-    steps:
-      - name: 배포 파일 동기화
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: env,docker-compose.yml
-
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            set -euo pipefail
-            VERSION="${{ needs.test-and-build.outputs.version }}"
-            if [ -z "$VERSION" ]; then
-              echo "Image version was not provided" >&2
-              exit 1
-            fi
-            export APP_VERSION="$VERSION"
-            docker compose pull
-            docker compose up -d --remove-orphans
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          set -euo pipefail
+          ./publish_docker_with_args.sh "${VERSION}"
