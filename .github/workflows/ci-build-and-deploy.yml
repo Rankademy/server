@@ -2,12 +2,7 @@ name: ci-build-and-deploy
 
 on:
   pull_request:
-    branches: ["main", "dev"]
-    types:
-      - closed
-  push:
     branches: ["main"]
-  workflow_dispatch:
 
 jobs:
   test-and-build:
@@ -65,7 +60,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: .env,docker-compose.yml
+          source: docker-compose.yml
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.10

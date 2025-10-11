@@ -120,8 +120,6 @@ version = extra["versionCode"] as String
 
 val versionFilePath = "version.gradle"
 val versionKey = "versionCode"
-val envFilePath = ".env"
-val envVersionKey = "APP_VERSION"
 
 val semverRegex = Regex("""(\d+)\.(\d+)\.(\d+)""")
 val versionGradleRegex = Regex("""$versionKey\s*=\s*['"](\d+)\.(\d+)\.(\d+)['"]""")
@@ -144,35 +142,18 @@ fun writeVersionGradle(newVersion: String) {
     println("$versionKey updated to $newVersion")
 }
 
-// .env 파일을 열어 APP_VERSION=... 줄을 새 버전으로 교체
-fun updateEnvVersion(version: String) {
-    val env = rootProject.file(envFilePath)
-    if (!env.exists()) {
-        println(".env 파일이 없어 건너뜁니다: $envFilePath")
-        return
-    }
-    val updated = env.readLines().map { line ->
-        if (line.startsWith("$envVersionKey=")) {
-            if (semverRegex.containsMatchIn(line)) "$envVersionKey=$version" else line
-        } else line
-    }
-    env.writeText(updated.joinToString("\n"))
-    println("$envVersionKey updated to $version")
-}
-
 // 현재 버전을 읽고, 새 버전 문자열 검증 및 생성
 fun bumpVersion(transform: (major: Int, minor: Int, patch: Int) -> String) {
     val (major, minor, patch) = readCurrentVersion()
     val newVersion = transform(major, minor, patch)
     require(semverRegex.matches(newVersion)) { "잘못된 버전 형식: $newVersion (예: 1.2.3)" }
     writeVersionGradle(newVersion)
-    updateEnvVersion(newVersion)
 }
 
 // 패치 버전 올리기 task
 tasks.register("incrementPatchVersion") {
     group = "versioning"
-    description = "패치 버전을 +1 올리고 .env도 갱신합니다. (x.y.(z+1))"
+    description = "패치 버전을 +1 올립니다. (x.y.(z+1))"
     doLast {
         bumpVersion { major, minor, patch -> "$major.$minor.${patch + 1}" }
     }
@@ -181,7 +162,7 @@ tasks.register("incrementPatchVersion") {
 // 마이너 버전 올리기 task
 tasks.register("incrementMinorVersion") {
     group = "versioning"
-    description = "마이너 버전을 +1 올리고 패치를 0으로 초기화, .env도 갱신합니다. (x.(y+1).0)"
+    description = "마이너 버전을 +1 올리고 패치를 0으로 초기화합니다. (x.(y+1).0)"
     doLast {
         bumpVersion { major, minor, _ -> "$major.${minor + 1}.0" }
     }
