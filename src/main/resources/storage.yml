@@ -1,0 +1,22 @@
+aws:
+  credentials:
+    accessKey: ${AWS_ACCESS_KEY}
+    secretKey: ${AWS_SECRET_KEY}
+  presign:
+    ttl-seconds: 600
+
+---
+spring.config.activate.on-profile: local,dev,test
+
+aws:
+  storage:
+    region: ap-northeast-2
+    bucket: dev-rankademy
+
+---
+spring.config.activate.on-profile: prod
+
+aws:
+  storage:
+    region: ap-northeast-2
+    bucket: rankademy

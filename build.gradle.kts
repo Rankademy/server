@@ -4,11 +4,9 @@ plugins {
     java
     id("org.springframework.boot") version "3.5.3"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.github.spotbugs") version "6.1.11"
 }
 
 group = "maruhxn"
-version = "0.0.1-SNAPSHOT"
 
 java {
     toolchain {
@@ -89,10 +87,7 @@ dependencies {
 tasks.withType<Test> {
     useJUnitPlatform()
     jvmArgs("-javaagent:${mockitoAgent.asPath}")
-}
-
-spotbugs {
-    excludeFilter.set(file("${projectDir}/spotbugs-exclude-filter.xml"))
+    systemProperty("spring.profiles.active", "test")
 }
 
 // QueryDSL settings
@@ -116,4 +111,78 @@ tasks.register("cleanQuerydsl", Delete::class) {
 
 tasks.named("clean") {
     dependsOn("cleanQuerydsl")
+}
+
+// === 배포 스크립트 ===
+
+apply(from = "version.gradle")
+version = extra["versionCode"] as String
+
+val versionFilePath = "version.gradle"
+val versionKey = "versionCode"
+val envFilePath = ".env"
+val envVersionKey = "APP_VERSION"
+
+val semverRegex = Regex("""(\d+)\.(\d+)\.(\d+)""")
+val versionGradleRegex = Regex("""$versionKey\s*=\s*['"](\d+)\.(\d+)\.(\d+)['"]""")
+
+// version.gradle을 읽어 versionCode를 파싱하고 (major, minor, patch)로 반환
+fun readCurrentVersion(): Triple<Int, Int, Int> {
+    val content = file(versionFilePath).readText()
+    val match = versionGradleRegex.find(content)
+        ?: error("$versionFilePath 에서 $versionKey 를 못 찾았습니다. 형식: ext { $versionKey = '1.2.3' }")
+    val (maj, min, pat) = match.destructured
+    return Triple(maj.toInt(), min.toInt(), pat.toInt())
+}
+
+// version.gradle의 versionCode 값을 정규식 치환으로 새 버전으로 바꿈 + 동시에 project.version도 갱신
+fun writeVersionGradle(newVersion: String) {
+    val vf = file(versionFilePath)
+    val replaced = vf.readText().replace(versionGradleRegex, "$versionKey = '$newVersion'")
+    vf.writeText(replaced)
+    project.version = newVersion
+    println("$versionKey updated to $newVersion")
+}
+
+// .env 파일을 열어 APP_VERSION=... 줄을 새 버전으로 교체
+fun updateEnvVersion(version: String) {
+    val env = rootProject.file(envFilePath)
+    if (!env.exists()) {
+        println(".env 파일이 없어 건너뜁니다: $envFilePath")
+        return
+    }
+    val updated = env.readLines().map { line ->
+        if (line.startsWith("$envVersionKey=")) {
+            if (semverRegex.containsMatchIn(line)) "$envVersionKey=$version" else line
+        } else line
+    }
+    env.writeText(updated.joinToString("\n"))
+    println("$envVersionKey updated to $version")
+}
+
+// 현재 버전을 읽고, 새 버전 문자열 검증 및 생성
+fun bumpVersion(transform: (major: Int, minor: Int, patch: Int) -> String) {
+    val (major, minor, patch) = readCurrentVersion()
+    val newVersion = transform(major, minor, patch)
+    require(semverRegex.matches(newVersion)) { "잘못된 버전 형식: $newVersion (예: 1.2.3)" }
+    writeVersionGradle(newVersion)
+    updateEnvVersion(newVersion)
+}
+
+// 패치 버전 올리기 task
+tasks.register("incrementPatchVersion") {
+    group = "versioning"
+    description = "패치 버전을 +1 올리고 .env도 갱신합니다. (x.y.(z+1))"
+    doLast {
+        bumpVersion { major, minor, patch -> "$major.$minor.${patch + 1}" }
+    }
+}
+
+// 마이너 버전 올리기 task
+tasks.register("incrementMinorVersion") {
+    group = "versioning"
+    description = "마이너 버전을 +1 올리고 패치를 0으로 초기화, .env도 갱신합니다. (x.(y+1).0)"
+    doLast {
+        bumpVersion { major, minor, _ -> "$major.${minor + 1}.0" }
+    }
 }

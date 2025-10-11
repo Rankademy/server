@@ -1,0 +1,44 @@
+logging:
+  level:
+    root: INFO
+    maruhxn.rankademy: INFO
+    maruhxn.rankademy.adapter.webapi.filter.LoggingFilter: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} traceId=%X{traceId:-} - %msg%n"
+  register-shutdown-hook: false
+
+springdoc:
+  swagger-ui:
+    path: /docs/swagger-ui.html
+    display-operation-id: true
+    display-request-duration: true
+  api-docs:
+    path: /docs/api-docs
+
+---
+spring.config.activate.on-profile: local,dev,test
+
+logging:
+  file:
+    name: logs/rankademy.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} traceId=%X{traceId:-} - %msg%n"
+  logback:
+    rollingpolicy:
+      file-name-pattern: logs/rankademy.%d{yyyy-MM-dd}.%i.log
+      max-file-size: 50MB
+      max-history: 30
+      total-size-cap: 5GB
+      clean-history-on-start: false
+
+---
+spring.config.activate.on-profile: prod
+
+logging:
+  level:
+    org.springframework.web: WARN
+    org.hibernate.SQL: OFF
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} traceId=%X{traceId:-} - %msg%n"

@@ -47,30 +47,30 @@
     </springProfile>
 
     <springProfile name="prod">
-        <appender name="CLOUDWATCH" class="com.kdgregory.logging.logback.CloudWatchAppender">
-            <logGroup>${LOG_GROUP:-rankademy-api}</logGroup>
-            <logStream>${LOG_STREAM:-${HOSTNAME}}</logStream>
-            <region>${AWS_REGION:-ap-northeast-2}</region>
-            <retentionPeriod>${LOG_RETENTION_DAYS:-30}</retentionPeriod>
-            <batchDelay>5000</batchDelay>
-            <maxBatchSize>256</maxBatchSize>
-            <truncateOversizeMessages>true</truncateOversizeMessages>
-            <encoder>
-                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} traceId=%X{traceId:-} - %msg%n</pattern>
-            </encoder>
-        </appender>
+<!--        <appender name="CLOUDWATCH" class="com.kdgregory.logging.logback.CloudWatchAppender">-->
+<!--            <logGroup>${LOG_GROUP:-rankademy-api}</logGroup>-->
+<!--            <logStream>${LOG_STREAM:-${HOSTNAME}}</logStream>-->
+<!--            <region>${AWS_REGION:-ap-northeast-2}</region>-->
+<!--            <retentionPeriod>${LOG_RETENTION_DAYS:-30}</retentionPeriod>-->
+<!--            <batchDelay>5000</batchDelay>-->
+<!--            <maxBatchSize>256</maxBatchSize>-->
+<!--            <truncateOversizeMessages>true</truncateOversizeMessages>-->
+<!--            <encoder>-->
+<!--                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} traceId=%X{traceId:-} - %msg%n</pattern>-->
+<!--            </encoder>-->
+<!--        </appender>-->
 
-        <appender name="ASYNC_CLOUDWATCH" class="ch.qos.logback.classic.AsyncAppender">
-            <queueSize>4096</queueSize>
-            <discardingThreshold>0</discardingThreshold>
-            <appender-ref ref="CLOUDWATCH"/>
-        </appender>
+<!--        <appender name="ASYNC_CLOUDWATCH" class="ch.qos.logback.classic.AsyncAppender">-->
+<!--            <queueSize>4096</queueSize>-->
+<!--            <discardingThreshold>0</discardingThreshold>-->
+<!--            <appender-ref ref="CLOUDWATCH"/>-->
+<!--        </appender>-->
 
         <logger name="org.hibernate.SQL" level="OFF"/>
 
         <root level="INFO">
             <appender-ref ref="ASYNC_CONSOLE"/>
-            <appender-ref ref="ASYNC_CLOUDWATCH"/>
+<!--            <appender-ref ref="ASYNC_CLOUDWATCH"/>-->
         </root>
     </springProfile>
 </configuration>
