@@ -107,6 +107,7 @@ public class TeamQueryRepositoryImpl implements TeamQueryRepository {
                         si.summonerTag,
                         si.summonerIconNum,
                         u.univInfo.univName,
+                        u.univInfo.major,
                         u.univInfo.admissionYear,
                         si.tierInfo
                 ))

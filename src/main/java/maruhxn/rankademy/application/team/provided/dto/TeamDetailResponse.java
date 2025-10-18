@@ -49,7 +49,8 @@ public record TeamDetailResponse(
             @Schema(description = "소환사 태그", example = "KR1") String summonerTag,
             @Schema(description = "소환사 아이콘 번호", example = "1234") int summonerIcon,
             @Schema(description = "소속 대학교", example = "서울과학기술대학교") String univName,
-            @Schema(description = "입학년도", example = "2021") int admissionYear,
+            @Schema(description = "학과", example = "컴퓨터공학과") String major,
+            @Schema(description = "학번", example = "21") int admissionYear,
             @Schema(description = "멤버 티어 정보") TierInfo tierInfo
     ) {
     }
