@@ -149,4 +149,24 @@ public class JwtProvider {
         return getPayload(token).get("isAuthorized", Boolean.class);
     }
 
+//    public Map<String, String> buildCookieFromTokenDto(TokenDto tokenDto) {
+//        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", tokenDto.accessToken())
+//                .httpOnly(true)
+//                .sameSite(Cookie.SameSite.LAX.name())
+//                .path("/")
+//                .maxAge(accessTokenExpiration / 1000)
+//                .build();
+//
+//        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", tokenDto.refreshToken())
+//                .httpOnly(true)
+//                .sameSite(Cookie.SameSite.LAX.name())
+//                .path("/")
+//                .maxAge(refreshTokenExpiration / 1000)
+//                .build();
+//
+//        return Map.of(
+//                "accessToken", accessTokenCookie.toString(),
+//                "refreshToken", refreshTokenCookie.toString()
+//        );
+//    }
 }
