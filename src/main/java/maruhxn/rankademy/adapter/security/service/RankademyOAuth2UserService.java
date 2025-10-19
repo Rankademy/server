@@ -56,6 +56,7 @@ public class RankademyOAuth2UserService implements OAuth2UserService<OAuth2UserR
                                 ))
                 );
 
+        user.updateLastLoginAt();
         UserInfo userInfo = UserInfo.from(user);
         return RankademyUser.from(userInfo, oAuth2ProviderUser.getAttributes());
     }

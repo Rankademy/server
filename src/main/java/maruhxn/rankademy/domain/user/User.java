@@ -79,6 +79,7 @@ public class User extends AbstractEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<GroupMember> groupMembers = new HashSet<>();
 
+    private LocalDateTime lastLoginAt;
 
     public User(String username, Email email) {
         this.username = username;
@@ -151,6 +152,10 @@ public class User extends AbstractEntity {
     }
 
     public void updateProfile(ProfileUpdateRequest profileUpdateRequest) {
+        Assert.state(
+                profileUpdateRequest.mainPosition() != profileUpdateRequest.subPosition(),
+                "주 포지션과 부 포지션은 달라야 합니다."
+                );
         this.username = profileUpdateRequest.username();
         this.description = profileUpdateRequest.description();
         this.mainPosition = profileUpdateRequest.mainPosition();
@@ -182,5 +187,9 @@ public class User extends AbstractEntity {
 
     public String getFullSummonerName() {
         return "%s#%s".formatted(this.summonerInfo.getSummonerName(), this.summonerInfo.getSummonerTag());
+    }
+
+    public void updateLastLoginAt() {
+        this.lastLoginAt = LocalDateTime.now();
     }
 }
