@@ -1,7 +1,6 @@
 package maruhxn.rankademy.application.user.provided;
 
 import jakarta.persistence.EntityManager;
-import maruhxn.rankademy.RankademyTestConfiguration;
 import maruhxn.rankademy.application.user.required.EmailSender;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.user.LolPosition;
@@ -14,10 +13,7 @@ import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 
 import static maruhxn.rankademy.domain.user.UserFixture.createEnrollUnivRequest;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -126,7 +122,7 @@ class UserWriterTest extends IntegrationTestSupport {
                 "newname",
                 "자기소개입니다.",
                 LolPosition.TOP,
-                LolPosition.JG
+                LolPosition.JUNGLE
         );
 
         user = userWriter.updateProfile(user.getId(), request);

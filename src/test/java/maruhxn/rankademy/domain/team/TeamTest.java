@@ -92,10 +92,10 @@ class TeamTest {
         TeamMember representative = TeamFixture.createTeamMember(1L, new TierInfo(Tier.IRON, Rank.IV, 0), LolPosition.TOP);
         Set<TeamMember> members = new HashSet<>();
         members.add(representative);
-        members.add(TeamFixture.createTeamMember(2L, new TierInfo(Tier.BRONZE, Rank.IV, 0), LolPosition.JG));
-        members.add(TeamFixture.createTeamMember(3L, new TierInfo(Tier.SILVER, Rank.IV, 0), LolPosition.MID));
-        members.add(TeamFixture.createTeamMember(4L, new TierInfo(Tier.GOLD, Rank.IV, 0), LolPosition.ADC));
-        members.add(TeamFixture.createTeamMember(5L, new TierInfo(Tier.PLATINUM, Rank.IV, 0), LolPosition.SUP));
+        members.add(TeamFixture.createTeamMember(2L, new TierInfo(Tier.BRONZE, Rank.IV, 0), LolPosition.JUNGLE));
+        members.add(TeamFixture.createTeamMember(3L, new TierInfo(Tier.SILVER, Rank.IV, 0), LolPosition.MIDDLE));
+        members.add(TeamFixture.createTeamMember(4L, new TierInfo(Tier.GOLD, Rank.IV, 0), LolPosition.BOTTOM));
+        members.add(TeamFixture.createTeamMember(5L, new TierInfo(Tier.PLATINUM, Rank.IV, 0), LolPosition.UTILITY));
 
         Team team = Team.create(TeamFixture.createTeamCreateRequest(representative.getUser().getId(), TeamFixture.toSlots(members)), members);
 

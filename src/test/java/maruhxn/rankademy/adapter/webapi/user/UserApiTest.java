@@ -44,7 +44,7 @@ class UserApiTest extends IntegrationTestSupport {
     void getProfile_success() throws Exception {
         User viewer = userRepository.save(UserFixture.createAuthorizedMember("viewer@test.com", "viewer"));
         User target = UserFixture.createAuthorizedMember("target@test.com", "target");
-        target.updateProfile(new ProfileUpdateRequest("target", "test description", LolPosition.TOP, LolPosition.JG));
+        target.updateProfile(new ProfileUpdateRequest("target", "test description", LolPosition.TOP, LolPosition.JUNGLE));
         userRepository.save(target);
 
         Long viewerId = viewer.getId();

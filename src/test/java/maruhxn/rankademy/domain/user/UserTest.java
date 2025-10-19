@@ -172,7 +172,7 @@ class UserTest {
                 "updated",
                 "description",
                 LolPosition.TOP,
-                LolPosition.JG
+                LolPosition.JUNGLE
         );
 
         // when
@@ -182,7 +182,7 @@ class UserTest {
         assertThat(user.getUsername()).isEqualTo("updated");
         assertThat(user.getDescription()).isEqualTo("description");
         assertThat(user.getMainPosition()).isEqualTo(LolPosition.TOP);
-        assertThat(user.getSubPosition()).isEqualTo(LolPosition.JG);
+        assertThat(user.getSubPosition()).isEqualTo(LolPosition.JUNGLE);
     }
 
     @Test

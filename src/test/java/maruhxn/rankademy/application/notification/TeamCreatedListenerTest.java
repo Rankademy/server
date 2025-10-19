@@ -59,7 +59,7 @@ class TeamCreatedListenerTest extends IntegrationTestSupport {
         Set<TeamMember> members = new LinkedHashSet<>();
         members.add(new TeamMember(representative, LolPosition.TOP));
 
-        List<LolPosition> positions = List.of(LolPosition.JG, LolPosition.MID, LolPosition.ADC, LolPosition.SUP);
+        List<LolPosition> positions = List.of(LolPosition.JUNGLE, LolPosition.MIDDLE, LolPosition.BOTTOM, LolPosition.UTILITY);
         for (int i = 0; i < positions.size(); i++) {
             String memberSuffix = suffix + "-m" + i;
             User member = UserFixture.createAuthorizedMember("member-" + memberSuffix + "@test.com", "member-" + memberSuffix);

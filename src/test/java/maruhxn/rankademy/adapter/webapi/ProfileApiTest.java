@@ -87,7 +87,7 @@ class ProfileApiTest extends IntegrationTestSupport {
                 "new-summonerName",
                 "it's about",
                 LolPosition.TOP,
-                LolPosition.JG
+                LolPosition.JUNGLE
         );
         String requestJson = objectMapper.writeValueAsString(request);
 
