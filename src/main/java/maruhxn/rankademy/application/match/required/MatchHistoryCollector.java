@@ -6,5 +6,5 @@ import maruhxn.rankademy.domain.user.User;
 import java.util.List;
 
 public interface MatchHistoryCollector {
-    List<MatchData> collectAllMatches(User user);
+    List<MatchData> collectMatchesWithLastMatchId(User user, String lastMatchId);
 }

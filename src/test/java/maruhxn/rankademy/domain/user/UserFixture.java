@@ -1,6 +1,5 @@
 package maruhxn.rankademy.domain.user;
 
-import maruhxn.rankademy.domain.user.Email;
 import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
 import maruhxn.rankademy.domain.user.dto.UserOAuth2CreateRequest;
@@ -55,7 +54,9 @@ public class UserFixture {
                 new TierInfo(Tier.BRONZE, Rank.II, 50),
                 100,
                 100,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                null,
+                null
         );
     }
 
@@ -68,7 +69,9 @@ public class UserFixture {
                 new TierInfo(Tier.BRONZE, Rank.II, 50),
                 100,
                 100,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                null,
+                null
         );
     }
 
@@ -81,7 +84,9 @@ public class UserFixture {
                 tierInfo,
                 100,
                 100,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                null,
+                null
         );
     }
 
@@ -94,7 +99,9 @@ public class UserFixture {
                 tierInfo,
                 100,
                 100,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                null,
+                null
         );
     }
 

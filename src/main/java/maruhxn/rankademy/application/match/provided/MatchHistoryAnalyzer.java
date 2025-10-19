@@ -2,5 +2,5 @@ package maruhxn.rankademy.application.match.provided;
 
 public interface MatchHistoryAnalyzer {
 
-    void fetchAndAnalyzeMatches(Long userId);
+    void refreshMatches(Long userId);
 }

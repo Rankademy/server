@@ -17,6 +17,6 @@ public class RiotAuthEventHandler {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(RiotAuthEvent event) {
-        matchHistoryAnalyzer.fetchAndAnalyzeMatches(event.getUserId());
+        matchHistoryAnalyzer.refreshMatches(event.getUserId());
     }
 }

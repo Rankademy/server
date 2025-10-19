@@ -11,6 +11,8 @@ public interface UserReader {
 
     User get(Long userId);
 
+    User getWithSummonerInfo(Long userId);
+
     ProfileResponse getProfile(Long userId);
 
     MyProfileResponse getMyProfile(Long userId);

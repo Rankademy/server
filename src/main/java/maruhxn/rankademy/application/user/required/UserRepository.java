@@ -17,6 +17,9 @@ public interface UserRepository extends Repository<User, Long> {
 
     Optional<User> findById(Long userId);
 
+    @Query("select u from User u join fetch u.summonerInfo si where u.id = :userId")
+    Optional<User> findByIdWithSummonerInfo(Long userId);
+
     Optional<User> findByEmail(Email email);
 
     Optional<User> findByUsername(String username);

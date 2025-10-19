@@ -38,7 +38,7 @@ public class RankademyTestConfiguration {
 
     @Bean
     public RiotAuthEventHandler riotAuthEventHandler() {
-        return new RiotAuthEventHandler(userId -> System.out.println("Fetching matches for user: " + userId));
+        return new RiotAuthEventHandler(userId -> System.out.println("Refreshing matches for user: " + userId));
     }
 
 }

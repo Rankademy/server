@@ -51,8 +51,13 @@ public class SummonerInfo extends AbstractEntity {
 
     private LocalDateTime enrolledAt;
 
+    @Column(name = "last_synced_match_id", length = 100)
+    private String lastSyncedMatchId;
+
+    private LocalDateTime matchSyncedAt;
+
     @Builder
-    public SummonerInfo(String puuid, String summonerName, String summonerTag, int summonerIconNum, TierInfo tierInfo, int winCount, int lossCount, LocalDateTime enrolledAt) {
+    public SummonerInfo(String puuid, String summonerName, String summonerTag, int summonerIconNum, TierInfo tierInfo, int winCount, int lossCount, LocalDateTime enrolledAt, String lastSyncedMatchId, LocalDateTime matchSyncedAt) {
         this.puuid = puuid;
         this.summonerName = summonerName;
         this.summonerTag = summonerTag;
@@ -61,6 +66,8 @@ public class SummonerInfo extends AbstractEntity {
         this.winCount = winCount;
         this.lossCount = lossCount;
         this.enrolledAt = enrolledAt;
+        this.lastSyncedMatchId = lastSyncedMatchId;
+        this.matchSyncedAt = matchSyncedAt;
     }
 
     public static SummonerInfo of(String puuid, RiotAuthRequest riotAuthRequest, int summonerIconId, RiotLeagueEntryResponse soloRankEntry) {
@@ -73,6 +80,8 @@ public class SummonerInfo extends AbstractEntity {
                 .winCount(soloRankEntry.wins())
                 .lossCount(soloRankEntry.losses())
                 .enrolledAt(LocalDateTime.now())
+                .lastSyncedMatchId(null)
+                .matchSyncedAt(null)
                 .build();
     }
 
@@ -98,5 +107,14 @@ public class SummonerInfo extends AbstractEntity {
 
     public double getWinRate() {
         return (double) winCount / getTotalMatchCnt() * 100;
+    }
+
+    public void updateMatchSyncStatus(String lastSyncedMatchId) {
+        this.lastSyncedMatchId = lastSyncedMatchId;
+        this.matchSyncedAt = LocalDateTime.now();
+    }
+
+    public void touchMatchSync() {
+        this.matchSyncedAt = LocalDateTime.now();
     }
 }

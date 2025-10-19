@@ -23,19 +23,36 @@ public class MatchHistoryService implements MatchHistoryAnalyzer {
     private final MatchHistoryCollector matchHistoryCollector;
     private final MostChampionCalculator mostChampionCalculator;
 
+    @Override
     @Transactional
-    public void fetchAndAnalyzeMatches(Long userId) {
-        User user = userReader.get(userId);
+    public void refreshMatches(Long userId) {
+        User user = userReader.getWithSummonerInfo(userId);
+        SummonerInfo summonerInfo = user.getSummonerInfo();
 
-        // 외부에서 새로운 매치 기록을 가져옴
-        List<MatchData> newMatches = matchHistoryCollector.collectAllMatches(user);
+        List<MatchData> newMatches = matchHistoryCollector.collectMatchesWithLastMatchId(
+                user,
+                summonerInfo.getLastSyncedMatchId()
+        );
 
-        if (newMatches.isEmpty()) return;
+        int saved = persistMatches(user, newMatches);
+        if (saved == 0) {
+            summonerInfo.touchMatchSync();
+        }
+    }
+
+    private int persistMatches(User user, List<MatchData> newMatches) {
+        if (newMatches.isEmpty()) {
+            return 0;
+        }
 
         matchDataRepository.saveAll(newMatches);
 
-        // 모스트 챔피언 업데이트
+        List<MatchData> allMatches = matchDataRepository.findAllByUserId(user.getId());
+
         SummonerInfo summonerInfo = user.getSummonerInfo();
-        summonerInfo.updateMostChampions(mostChampionCalculator, newMatches);
+        summonerInfo.updateMostChampions(mostChampionCalculator, allMatches);
+        summonerInfo.updateMatchSyncStatus(newMatches.get(0).getMatchId());
+
+        return newMatches.size();
     }
 }

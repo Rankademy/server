@@ -28,6 +28,7 @@ import java.util.UUID;
 import static maruhxn.rankademy.domain.user.UserFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -76,16 +77,16 @@ class MatchHistoryAnalyzerTest {
                         .jsonData(jsonData)
                         .build());
 
-        when(matchHistoryCollector.collectAllMatches(user))
+        when(matchHistoryCollector.collectMatchesWithLastMatchId(user, null))
                 .thenReturn(mockMatches);
 
         // matchDataRepository.saveAll() 호출을 모킹
         when(matchDataRepository.saveAll(any())).thenReturn(mockMatches);
 
         // matchDataRepository.findAll() 호출을 모킹
-        when(matchDataRepository.findAll()).thenReturn(mockMatches);
+        when(matchDataRepository.findAllByUserId(userId)).thenReturn(mockMatches);
 
-        matchHistoryAnalyzer.fetchAndAnalyzeMatches(userId);
+        matchHistoryAnalyzer.refreshMatches(userId);
         em.flush();
         em.clear();
 
@@ -95,6 +96,49 @@ class MatchHistoryAnalyzerTest {
         verify(matchDataRepository).saveAll(mockMatches);
 
         assertThat(user.getSummonerInfo().getMostChampions()).hasSize(1);
+    }
+
+    @Test
+    void fetchAndAnalyzeMatchesWhenLastMatchIdExists() throws IOException {
+        User user = createUser();
+        user.enrollUnivInfo(createEnrollUnivRequest());
+        user.completeUnivAuthentication();
+        user.connectSummonerInfo(createSummonerInfoConnector("MfiVjqqTLQ_XhERTcyHydIdiFmlQhK9zNTfKSel_DECSZHGgTIITI7QmHGGaPDbpjlPVOqAahCtHzA"), createRiotAuthRequest());
+
+        String lastMatchId = "KR_7694397953";
+        user.getSummonerInfo().updateMatchSyncStatus(lastMatchId);
+
+        userRepository.save(user);
+        em.flush();
+        em.clear();
+
+        Long userId = user.getId();
+        String jsonData = getMatchJsonData();
+
+        List<MatchData> mockMatches = Arrays.asList(
+                MatchData.builder()
+                        .matchId(UUID.randomUUID().toString())
+                        .userId(userId)
+                        .jsonData(jsonData)
+                        .build());
+
+        when(matchHistoryCollector.collectMatchesWithLastMatchId(any(User.class), eq(lastMatchId)))
+                .thenReturn(mockMatches);
+
+        when(matchDataRepository.saveAll(any())).thenReturn(mockMatches);
+        when(matchDataRepository.findAllByUserId(userId)).thenReturn(mockMatches);
+
+        matchHistoryAnalyzer.refreshMatches(userId);
+        em.flush();
+        em.clear();
+
+        verify(matchHistoryCollector).collectMatchesWithLastMatchId(any(User.class), eq(lastMatchId));
+        verify(matchDataRepository).saveAll(mockMatches);
+
+        User refreshedUser = userRepository.findById(userId).get();
+        assertThat(refreshedUser.getSummonerInfo().getMostChampions()).hasSize(1);
+        assertThat(refreshedUser.getSummonerInfo().getLastSyncedMatchId())
+                .isEqualTo(mockMatches.get(0).getMatchId());
     }
 
     private static String getMatchJsonData() throws IOException {

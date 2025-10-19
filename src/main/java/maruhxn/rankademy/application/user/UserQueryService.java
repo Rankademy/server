@@ -30,6 +30,12 @@ public class UserQueryService implements UserReader {
     }
 
     @Override
+    public User getWithSummonerInfo(Long userId) {
+        return userRepository.findByIdWithSummonerInfo(userId)
+                .orElseThrow(() -> new NoSuchElementException("회원을 찾을 수 없습니다. id: " + userId));
+    }
+
+    @Override
     public ProfileResponse getProfile(Long userId) {
         return userQueryRepository.getProfile(userId)
                 .orElseThrow(() -> new NoSuchElementException("회원을 찾을 수 없습니다. id: " + userId));
