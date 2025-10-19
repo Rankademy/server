@@ -81,6 +81,8 @@ dependencies {
     // api-docs
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
 
+    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring3x:4.21.0")
+
     mockitoAgent("org.mockito:mockito-core:5.18.0") { isTransitive = false }
 }
 
