@@ -1,13 +1,13 @@
 package maruhxn.rankademy;
 
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class RankademyApplicationTests {
+class RankademyApplicationTests extends IntegrationTestSupport {
 
     @Test
     void contextLoads() {

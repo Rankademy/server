@@ -3,7 +3,6 @@ package maruhxn.rankademy.adapter.webapi;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
-import maruhxn.rankademy.RankademyTestConfiguration;
 import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.adapter.security.model.UserInfo;
 import maruhxn.rankademy.application.group.provided.dto.RecruitmentPostDetailResponse;
@@ -14,18 +13,16 @@ import maruhxn.rankademy.domain.group.Group;
 import maruhxn.rankademy.domain.group.GroupFixture;
 import maruhxn.rankademy.domain.group.dto.CreateRecruitmentPostRequest;
 import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,11 +30,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
-@SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
-@Import(RankademyTestConfiguration.class)
-class RecruitmentPostApiTest {
+class RecruitmentPostApiTest extends IntegrationTestSupport {
 
     static final String BASE_URL = "/api/v1/groups";
 

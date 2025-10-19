@@ -8,6 +8,7 @@ import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.group.Group;
 import maruhxn.rankademy.domain.group.GroupRole;
 import maruhxn.rankademy.domain.user.*;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,10 +23,8 @@ import static maruhxn.rankademy.domain.group.GroupFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
-@Transactional
 @DisplayName("GroupReader 테스트")
-class GroupReaderTest {
+class GroupReaderTest extends IntegrationTestSupport {
 
     @Autowired
     GroupReader groupReader;

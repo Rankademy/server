@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import maruhxn.rankademy.application.notification.provided.NotificationModifier;
 import maruhxn.rankademy.application.notification.required.NotificationRepository;
 import maruhxn.rankademy.domain.notification.Notification;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,8 @@ import java.util.NoSuchElementException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
-@Transactional
 @DisplayName("NotificationModifier 테스트")
-class NotificationModifierTest {
+class NotificationModifierTest extends IntegrationTestSupport {
 
     @Autowired
     NotificationModifier modifier;

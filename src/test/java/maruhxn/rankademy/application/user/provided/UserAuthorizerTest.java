@@ -7,6 +7,7 @@ import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,10 +22,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@Transactional
-@Import(RankademyTestConfiguration.class)
-class UserAuthorizerTest {
+class UserAuthorizerTest extends IntegrationTestSupport {
 
     @Autowired
     UserAuthorizer userAuthorizer;

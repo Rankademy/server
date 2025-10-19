@@ -1,22 +1,16 @@
 package maruhxn.rankademy.application.user.provided;
 
 import jakarta.persistence.EntityManager;
-import maruhxn.rankademy.RankademyTestConfiguration;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Transactional;
 
 import static maruhxn.rankademy.domain.user.UserFixture.createUser;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@Transactional
-@Import(RankademyTestConfiguration.class)
-class UserReaderTest {
+class UserReaderTest extends IntegrationTestSupport {
 
     @Autowired
     UserReader userReader;

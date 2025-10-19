@@ -3,20 +3,18 @@ package maruhxn.rankademy.adapter.webapi;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.security.dto.TokenDto;
 import maruhxn.rankademy.adapter.security.jwt.JwtProvider;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.user.Email;
 import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
@@ -26,11 +24,8 @@ import static maruhxn.rankademy.domain.user.UserFixture.createUser;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
-@RequiredArgsConstructor
-class AuthApiTest {
+class AuthApiTest extends IntegrationTestSupport {
 
     static final String BASE_URL = "/api/v1/auth";
 

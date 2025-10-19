@@ -3,6 +3,7 @@ package maruhxn.rankademy.application.notification;
 import maruhxn.rankademy.application.notification.provided.dto.NotificationPageResponse;
 import maruhxn.rankademy.application.notification.required.NotificationRepository;
 import maruhxn.rankademy.domain.notification.Notification;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,10 +15,8 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@Transactional
 @DisplayName("애플리케이션 - 알림 조회 서비스 (통합 테스트)")
-class NotificationQueryServiceTest {
+class NotificationQueryServiceTest extends IntegrationTestSupport {
 
     @Autowired
     private NotificationQueryService notificationQueryService;

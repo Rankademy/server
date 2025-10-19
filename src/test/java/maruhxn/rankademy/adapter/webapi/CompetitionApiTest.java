@@ -2,7 +2,6 @@ package maruhxn.rankademy.adapter.webapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
-import maruhxn.rankademy.RankademyTestConfiguration;
 import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.adapter.security.model.UserInfo;
 import maruhxn.rankademy.application.competition.provided.dto.CompetitionDetailResponse;
@@ -25,19 +24,17 @@ import maruhxn.rankademy.domain.team.TeamMember;
 import maruhxn.rankademy.domain.team.dto.TeamCreateRequest;
 import maruhxn.rankademy.domain.user.LolPosition;
 import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -49,12 +46,9 @@ import static maruhxn.rankademy.domain.group.GroupFixture.createMember;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
-@SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
-@Import(RankademyTestConfiguration.class)
 @DisplayName("Competition API 테스트")
-class CompetitionApiTest {
+class CompetitionApiTest extends IntegrationTestSupport {
 
     static final String BASE_URL = "/api/v1/competitions";
 

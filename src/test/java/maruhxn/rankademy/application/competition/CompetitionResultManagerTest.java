@@ -17,6 +17,7 @@ import maruhxn.rankademy.domain.team.TeamFixture;
 import maruhxn.rankademy.domain.team.TeamMember;
 import maruhxn.rankademy.domain.user.LolPosition;
 import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,10 +33,8 @@ import static maruhxn.rankademy.domain.competition.CompetitionFixture.createSubm
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
-@Transactional
 @DisplayName("CompetitionResultManager 테스트")
-class CompetitionResultManagerTest {
+class CompetitionResultManagerTest extends IntegrationTestSupport {
 
     @Autowired
     CompetitionResultManager competitionResultManager;

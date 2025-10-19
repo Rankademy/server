@@ -10,6 +10,7 @@ import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
 import maruhxn.rankademy.domain.user.dto.UserOAuth2CreateRequest;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest
-@Transactional
-@Import(RankademyTestConfiguration.class)
-class UserWriterTest {
+class UserWriterTest extends IntegrationTestSupport {
 
     @Autowired
     UserWriter userWriter;

@@ -3,10 +3,10 @@ package maruhxn.rankademy.application.match.required;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.match.MatchData;
 import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
@@ -14,8 +14,7 @@ import static maruhxn.rankademy.domain.user.UserFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Disabled
-@SpringBootTest(properties = "de.flapdoodle.mongodb.embedded.version=8.0.12")
-class MatchHistoryCollectorTest {
+class MatchHistoryCollectorTest extends IntegrationTestSupport {
 
     @Autowired
     private MatchHistoryCollector matchHistoryCollector;

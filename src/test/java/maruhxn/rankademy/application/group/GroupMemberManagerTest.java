@@ -7,6 +7,7 @@ import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.group.Group;
 import maruhxn.rankademy.domain.group.GroupRole;
 import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,10 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import static maruhxn.rankademy.domain.group.GroupFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@Transactional
 @DisplayName("GroupMemberManager 테스트")
-class GroupMemberManagerTest {
+class GroupMemberManagerTest extends IntegrationTestSupport {
 
     @Autowired
     private GroupMemberManager groupMemberManager;

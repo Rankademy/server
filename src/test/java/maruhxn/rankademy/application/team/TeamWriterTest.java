@@ -15,12 +15,11 @@ import maruhxn.rankademy.domain.team.dto.TeamCreateRequest;
 import maruhxn.rankademy.domain.user.LolPosition;
 import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.domain.user.UserFixture;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.transaction.TestTransaction;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,10 +29,8 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
-@Transactional
 @DisplayName("TeamWriter 테스트")
-class TeamWriterTest {
+class TeamWriterTest extends IntegrationTestSupport {
 
     @Autowired
     TeamWriter teamWriter;

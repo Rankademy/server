@@ -7,6 +7,7 @@ import maruhxn.rankademy.application.match.required.MatchHistoryCollector;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.match.MatchData;
 import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +33,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@Transactional
-@Import(RankademyTestConfiguration.class)
-class MatchHistoryAnalyzerTest {
+class MatchHistoryAnalyzerTest extends IntegrationTestSupport {
 
     @Autowired
     MatchHistoryAnalyzer matchHistoryAnalyzer;

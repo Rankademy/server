@@ -16,6 +16,7 @@ import maruhxn.rankademy.domain.team.TeamMember;
 import maruhxn.rankademy.domain.team.dto.TeamCreateRequest;
 import maruhxn.rankademy.domain.user.LolPosition;
 import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,10 +32,8 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
-@Transactional
 @DisplayName("CompetitionRequestManager 테스트")
-class CompetitionRequestManagerTest {
+class CompetitionRequestManagerTest extends IntegrationTestSupport {
 
     @Autowired
     private CompetitionRequestManager competitionRequestManager;

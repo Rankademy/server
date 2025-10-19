@@ -6,21 +6,18 @@ import maruhxn.rankademy.application.group.required.GroupRepository;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.group.Group;
 import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import static maruhxn.rankademy.domain.group.GroupFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
-@Transactional
 @DisplayName("GroupJoinRequestManager 테스트")
-class GroupJoinRequestManagerTest {
+class GroupJoinRequestManagerTest extends IntegrationTestSupport {
 
     @Autowired
     GroupJoinRequestManager groupJoinRequestManager;

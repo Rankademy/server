@@ -6,6 +6,7 @@ import maruhxn.rankademy.domain.match.MatchData;
 import maruhxn.rankademy.domain.match.service.MostChampionCalculator;
 import maruhxn.rankademy.domain.match.service.MyChampionIdParser;
 import maruhxn.rankademy.domain.user.ChampionPlayRecord;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,10 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@Transactional
-@Import(RankademyTestConfiguration.class)
-class MostChampionCalculatorTest {
+class MostChampionCalculatorTest extends IntegrationTestSupport {
 
     @Autowired
     MostChampionCalculator calculator;

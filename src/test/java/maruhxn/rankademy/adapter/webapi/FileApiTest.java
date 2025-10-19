@@ -1,26 +1,23 @@
 package maruhxn.rankademy.adapter.webapi;
 
 import jakarta.persistence.EntityManager;
-import maruhxn.rankademy.RankademyTestConfiguration;
 import maruhxn.rankademy.adapter.integration.file.FileProvider;
 import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.adapter.security.model.UserInfo;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 
@@ -30,13 +27,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-@Import(RankademyTestConfiguration.class)
-@DisplayName("FileApi 테스트")
 @Disabled
-class FileApiTest {
+@AutoConfigureMockMvc
+@DisplayName("FileApi 테스트")
+class FileApiTest extends IntegrationTestSupport {
 
     static final String BASE_URL = "/api/v1/files";
 
