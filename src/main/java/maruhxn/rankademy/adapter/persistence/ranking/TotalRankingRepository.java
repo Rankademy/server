@@ -128,6 +128,7 @@ public class TotalRankingRepository {
                         summonerInfo.summonerName,
                         summonerInfo.summonerTag,
                         summonerInfo.summonerIconNum,
+                        user.univInfo.univName,
                         summonerInfo.tierInfo,
                         summonerInfo.winCount,
                         summonerInfo.lossCount,
