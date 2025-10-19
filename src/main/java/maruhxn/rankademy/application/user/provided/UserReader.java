@@ -5,6 +5,8 @@ import maruhxn.rankademy.application.user.dto.ProfileResponse;
 import maruhxn.rankademy.domain.user.OAuth2Provider;
 import maruhxn.rankademy.domain.user.User;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface UserReader {
@@ -24,4 +26,6 @@ public interface UserReader {
     User getByRefreshToken(String refreshToken);
 
     Optional<User> findByProviderAndOauthId(OAuth2Provider provider, String oauthId);
+
+    List<User> findActiveUsers(LocalDateTime dateTime);
 }

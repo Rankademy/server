@@ -1,6 +1,7 @@
 package maruhxn.rankademy.application.match;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import maruhxn.rankademy.application.match.provided.MatchHistoryAnalyzer;
 import maruhxn.rankademy.application.match.required.MatchDataRepository;
 import maruhxn.rankademy.application.match.required.MatchHistoryCollector;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MatchHistoryService implements MatchHistoryAnalyzer {
@@ -26,6 +28,7 @@ public class MatchHistoryService implements MatchHistoryAnalyzer {
     @Override
     @Transactional
     public void refreshMatches(Long userId) {
+        log.info("[MatchHistoryService] - 유저 전적 갱신 시작, userId: {}", userId);
         User user = userReader.getWithSummonerInfo(userId);
         SummonerInfo summonerInfo = user.getSummonerInfo();
 
@@ -35,6 +38,7 @@ public class MatchHistoryService implements MatchHistoryAnalyzer {
         );
 
         int saved = persistMatches(user, newMatches);
+        log.info("[MatchHistoryService] - userId: {}, 추가된 매치 개수: {}", userId, saved);
         if (saved == 0) {
             summonerInfo.touchMatchSync();
         }

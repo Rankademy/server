@@ -6,6 +6,8 @@ import maruhxn.rankademy.domain.user.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -31,4 +33,6 @@ public interface UserRepository extends Repository<User, Long> {
 
     @Query("select u from User u join fetch u.oauthAccounts oa where oa.provider = :provider and oa.oauthId = :oauthId")
     Optional<User> findByProviderAndOAuthId(OAuth2Provider provider, String oauthId);
+
+    List<User> findByLastLoginAtGreaterThanEqual(LocalDateTime dateTime);
 }

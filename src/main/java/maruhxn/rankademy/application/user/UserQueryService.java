@@ -12,6 +12,8 @@ import maruhxn.rankademy.domain.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -67,5 +69,10 @@ public class UserQueryService implements UserReader {
     @Override
     public Optional<User> findByProviderAndOauthId(OAuth2Provider provider, String oauthId) {
         return userRepository.findByProviderAndOAuthId(provider, oauthId);
+    }
+
+    @Override
+    public List<User> findActiveUsers(LocalDateTime dateTime) {
+        return userRepository.findByLastLoginAtGreaterThanEqual(dateTime.minusDays(14));
     }
 }
