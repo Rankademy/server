@@ -30,7 +30,7 @@ public class TeamCreatedListener {
         Team team = teamRepository.findByIdWithTeamMember(event.getTeamId())
                 .orElseThrow(() -> new NoSuchElementException("팀 정보를 찾을 수 없습니다. teamId: " + event.getTeamId()));
 
-        String message = "팀 %s이 생성되었습니다.".formatted(team.getName());
+        String message = "%s 팀 생성".formatted(team.getName());
 
         team.getTeamMembers().forEach(member -> {
             Notification notification = Notification.create(

@@ -110,8 +110,8 @@ class TeamWriterTest {
                 baseRequest.members()
         );
         Team team = teamWriter.create(request);
-        String creationMessage = "팀 %s이 생성되었습니다.".formatted(team.getName());
-        String deactivationMessage = "팀 %s이 비활성화되었습니다.".formatted(team.getName());
+        String creationMessage = "%s 팀 생성".formatted(team.getName());
+        String deactivationMessage = "%s 팀 해제".formatted(team.getName());
         Long teamId = team.getId();
 
         // 팀 생성 트랜잭션 커밋 후 이벤트 발행

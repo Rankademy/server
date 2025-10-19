@@ -7,8 +7,8 @@ import maruhxn.rankademy.application.team.required.TeamRepository;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.shared.event.TeamCreatedEvent;
 import maruhxn.rankademy.domain.team.Team;
-import maruhxn.rankademy.domain.team.TeamMember;
 import maruhxn.rankademy.domain.team.TeamFixture;
+import maruhxn.rankademy.domain.team.TeamMember;
 import maruhxn.rankademy.domain.team.dto.TeamCreateRequest;
 import maruhxn.rankademy.domain.user.LolPosition;
 import maruhxn.rankademy.domain.user.User;
@@ -21,11 +21,7 @@ import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,7 +80,7 @@ class TeamCreatedListenerTest {
         );
 
         Team team = teamWriter.create(request);
-        String expectedMessage = "팀 %s이 생성되었습니다.".formatted(team.getName());
+        String expectedMessage = "%s 팀 생성".formatted(team.getName());
 
         // when: commit current transaction to trigger afterCommit listener
         TestTransaction.flagForCommit();

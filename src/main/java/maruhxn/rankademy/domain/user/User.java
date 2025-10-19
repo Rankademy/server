@@ -7,7 +7,10 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import maruhxn.rankademy.domain.group.GroupMember;
 import maruhxn.rankademy.domain.shared.AbstractEntity;
-import maruhxn.rankademy.domain.user.dto.*;
+import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
+import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
+import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
+import maruhxn.rankademy.domain.user.dto.UserOAuth2CreateRequest;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
 import maruhxn.rankademy.domain.user.service.UserTitleProvider;
 import org.hibernate.annotations.NaturalId;
@@ -175,5 +178,9 @@ public class User extends AbstractEntity {
 
     public void addOAuthAccount(OAuth2Provider provider, String oauthId) {
         this.oauthAccounts.add(new OAuthAccount(provider, oauthId));
+    }
+
+    public String getFullSummonerName() {
+        return "%s#%s".formatted(this.summonerInfo.getSummonerName(), this.summonerInfo.getSummonerTag());
     }
 }

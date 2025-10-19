@@ -32,18 +32,17 @@ public class CompetitionMatchingListener {
     public void on(CompetitionAcceptEvent event) {
         Team team1 = getTeam(event.getFromTeamId());
         Team team2 = getTeam(event.getToTeamId());
-        LocalDateTime now = LocalDateTime.now();
 
-        createNotificationForAllMembers(team1, team2, now);
-        createNotificationForAllMembers(team2, team1, now);
+        createNotificationForAllMembers(team1, team2, event.getOccurredAt());
+        createNotificationForAllMembers(team2, team1, event.getOccurredAt());
     }
 
-    private void createNotificationForAllMembers(Team fromTeam, Team toTeam, LocalDateTime now) {
+    private void createNotificationForAllMembers(Team fromTeam, Team toTeam, LocalDateTime occuredAt) {
         fromTeam.getTeamMembers().forEach(member -> {
             Notification notification = Notification.create(
                     member.getUser().getId(),
                     "%s와(과)의 대항전이 성사되었습니다!".formatted(toTeam.getName()),
-                    now
+                    occuredAt
             );
             notificationRepository.save(notification);
         });

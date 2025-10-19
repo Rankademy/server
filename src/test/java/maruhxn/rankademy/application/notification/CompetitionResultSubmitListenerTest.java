@@ -70,6 +70,7 @@ class CompetitionResultSubmitListenerTest {
         TeamMember member1 = mock(TeamMember.class);
         given(member1.getUser()).willReturn(user1);
         Team team1 = mock(Team.class);
+        given(team1.getName()).willReturn("team1");
         given(team1.getTeamMembers()).willReturn(Set.of(member1));
 
         User user2 = mock(User.class);
@@ -77,6 +78,7 @@ class CompetitionResultSubmitListenerTest {
         TeamMember member2 = mock(TeamMember.class);
         given(member2.getUser()).willReturn(user2);
         Team team2 = mock(Team.class);
+        given(team2.getName()).willReturn("team2");
         given(team2.getTeamMembers()).willReturn(Set.of(member2));
 
         given(competitionRepository.findById(competitionId)).willReturn(Optional.of(competition));
@@ -95,8 +97,8 @@ class CompetitionResultSubmitListenerTest {
 
         List<Notification> notifications = captor.getAllValues();
         assertThat(notifications).hasSize(2);
-        assertThat(notifications.get(0).getMessage()).isEqualTo("actingUser#KR1님이 대항전 결과를 등록했습니다.");
-        assertThat(notifications.get(1).getMessage()).isEqualTo("actingUser#KR1님이 대항전 결과를 등록했습니다.");
+        assertThat(notifications.get(0).getMessage()).isEqualTo("team1(등록 유저: actingUser#KR1) 팀의 대항전 결과 등록");
+        assertThat(notifications.get(1).getMessage()).isEqualTo("team2(등록 유저: actingUser#KR1) 팀의 대항전 결과 등록");
     }
 
     @Test

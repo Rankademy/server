@@ -5,6 +5,8 @@ import maruhxn.rankademy.application.group.provided.GroupJoinRequestManager;
 import maruhxn.rankademy.application.group.provided.GroupReader;
 import maruhxn.rankademy.application.user.provided.UserReader;
 import maruhxn.rankademy.domain.group.Group;
+import maruhxn.rankademy.domain.shared.DomainEventPublisher;
+import maruhxn.rankademy.domain.shared.event.SendGroupJoinRequestEvent;
 import maruhxn.rankademy.domain.user.User;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ public class GroupJoinRequestService implements GroupJoinRequestManager {
 
     private final UserReader userReader;
     private final GroupReader groupReader;
+    private final DomainEventPublisher publisher;
 
     @Override
     public void sendJoinRequest(Long userId, Long groupId) {
@@ -21,6 +24,7 @@ public class GroupJoinRequestService implements GroupJoinRequestManager {
         User user = userReader.get(userId);
 
         group.addJoinRequest(user);
+        publisher.publish(new SendGroupJoinRequestEvent(groupId, user.getFullSummonerName()));
     }
 
     @Override

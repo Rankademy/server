@@ -41,7 +41,6 @@ public class CompetitionResultSubmitListener {
         team1.deactivate();
         team2.deactivate();
 
-        LocalDateTime now = LocalDateTime.now();
 
         String actingUserName = Stream.of(team1.getTeamMembers(), team2.getTeamMembers())
                 .flatMap(Collection::stream)
@@ -57,15 +56,15 @@ public class CompetitionResultSubmitListener {
                         new IllegalStateException("참여 멤버 중 다음의 유저를 찾을 수 없습니다. userId: " + event.getActingUserId())
                 );
 
-        createNotificationForAllMembers(team1, actingUserName, now);
-        createNotificationForAllMembers(team2, actingUserName, now);
+        createNotificationForAllMembers(team1, actingUserName, event.getOccurredAt());
+        createNotificationForAllMembers(team2, actingUserName, event.getOccurredAt());
     }
 
     private void createNotificationForAllMembers(Team team, String actingUserName, LocalDateTime now) {
         team.getTeamMembers().forEach(member -> {
             Notification notification = Notification.create(
                     member.getUser().getId(),
-                    "%s님이 대항전 결과를 등록했습니다.".formatted(actingUserName),
+                    "%s(등록 유저: %s) 팀의 대항전 결과 등록".formatted(team.getName(), actingUserName),
                     now
             );
             notificationRepository.save(notification);

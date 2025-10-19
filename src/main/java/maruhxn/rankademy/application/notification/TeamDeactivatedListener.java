@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
 @Component
@@ -30,15 +29,12 @@ public class TeamDeactivatedListener {
         Team team = teamRepository.findByIdWithTeamMember(event.getTeamId())
                 .orElseThrow(() -> new NoSuchElementException("팀 정보를 찾을 수 없습니다. teamId: " + event.getTeamId()));
 
-        LocalDateTime now = LocalDateTime.now();
-        String message = "팀 %s이 비활성화되었습니다.".formatted(team.getName());
-
         // 탈퇴자는 이미 팀 멤버에서 제외되었으므로 남은 멤버 모두에게 전송
         team.getTeamMembers().forEach(member -> {
             Notification notification = Notification.create(
                     member.getUser().getId(),
-                    message,
-                    now
+                    "%s 팀 해제".formatted(team.getName()),
+                    event.getOccurredAt()
             );
             notificationRepository.save(notification);
         });

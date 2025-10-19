@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
 @Component
@@ -32,13 +31,12 @@ public class CompetitionRequestSendListener {
     public void on(SendCompetitionRequestEvent event) {
         Team fromTeam = getTeam(event.getFromTeamId());
         Team toTeam = getTeam(event.getToTeamId());
-        LocalDateTime now = LocalDateTime.now();
 
         toTeam.getTeamMembers().forEach(member -> {
             Notification notification = Notification.create(
                     member.getUser().getId(),
-                    "%s의 결투 요청".formatted(fromTeam.getName()),
-                    now
+                    "%s 팀의 대항전 요청".formatted(fromTeam.getName()),
+                    event.getRequestedAt()
             );
             notificationRepository.save(notification);
         });

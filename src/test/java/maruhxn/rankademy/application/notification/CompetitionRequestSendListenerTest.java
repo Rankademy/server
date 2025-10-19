@@ -82,7 +82,7 @@ class CompetitionRequestSendListenerTest {
         assertThat(capturedNotifications)
                 .hasSize(2)
                 .extracting("message")
-                .containsExactly("TeamA의 결투 요청", "TeamA의 결투 요청");
+                .containsExactly("TeamA 팀의 대항전 요청", "TeamA 팀의 대항전 요청");
     }
 
     @Test
