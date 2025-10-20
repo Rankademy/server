@@ -7,14 +7,12 @@ import maruhxn.rankademy.application.group.required.GroupRepository;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.group.Group;
 import maruhxn.rankademy.domain.group.GroupRole;
-import maruhxn.rankademy.domain.user.*;
+import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -107,7 +105,7 @@ class GroupReaderTest extends IntegrationTestSupport {
         assertThat(groupDetail.name()).isEqualTo("테스트 그룹");
         assertThat(groupDetail.about()).isEqualTo("테스트 그룹입니다.");
         assertThat(groupDetail.logoImageUrl()).isEqualTo("logo.jpg");
-        assertThat(groupDetail.leader().username()).isEqualTo(leader.getSummonerInfo().getSummonerName());
+        assertThat(groupDetail.leader().summonerName()).isEqualTo(leader.getSummonerInfo().getSummonerName());
         assertThat(groupDetail.isJoined()).isTrue();
         assertThat(groupDetail.isLeader()).isTrue();
     }
@@ -123,7 +121,7 @@ class GroupReaderTest extends IntegrationTestSupport {
         assertThat(groupDetail.name()).isEqualTo("테스트 그룹");
         assertThat(groupDetail.about()).isEqualTo("테스트 그룹입니다.");
         assertThat(groupDetail.logoImageUrl()).isEqualTo("logo.jpg");
-        assertThat(groupDetail.leader().username()).isEqualTo(leader.getSummonerInfo().getSummonerName());
+        assertThat(groupDetail.leader().summonerName()).isEqualTo(leader.getSummonerInfo().getSummonerName());
         assertThat(groupDetail.isJoined()).isFalse();
         assertThat(groupDetail.isLeader()).isFalse();
     }
@@ -299,7 +297,8 @@ class GroupReaderTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("최근 경기 목록 조회 - 현재는 비어있음") // TODO: 대항전 정보 추가 필요
+    @DisplayName("최근 경기 목록 조회 - 현재는 비어있음")
+        // TODO: 대항전 정보 추가 필요
     void getRecentCompetitions() {
         // when
         List<RecentCompetitionResponse> recentCompetitions = groupReader.getRecentCompetitions(group.getId());

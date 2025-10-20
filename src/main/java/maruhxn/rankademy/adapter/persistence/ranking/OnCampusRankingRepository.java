@@ -114,6 +114,7 @@ public class OnCampusRankingRepository {
                                         LeaderDto.class,
                                         leaderUser.id,
                                         leaderUser.summonerInfo.summonerName,
+                                        leaderUser.summonerInfo.summonerTag,
                                         leaderUser.summonerInfo.summonerIconNum
                                 )
                         )

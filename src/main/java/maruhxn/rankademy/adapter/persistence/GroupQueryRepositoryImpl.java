@@ -116,6 +116,7 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
         LeaderDto leaderDto = new LeaderDto(
                 head.get(leaderUser.id),
                 head.get(leaderUser.summonerInfo.summonerName),
+                head.get(leaderUser.summonerInfo.summonerTag),
                 head.get(leaderUser.summonerInfo.summonerIconNum)
         );
 
