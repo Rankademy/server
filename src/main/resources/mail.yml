@@ -1,0 +1,17 @@
+spring:
+  mail:
+    host: smtp.gmail.com
+    username: rankademy@gmail.com
+    password: ${GMAIL_PASSWORD}
+    port: 587
+    default-encoding: UTF-8
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+        transport:
+          protocol: smtp

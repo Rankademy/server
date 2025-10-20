@@ -12,4 +12,5 @@ spring:
       - storage.yml
       - logging.yml
       - docker.yml
+      - mail.yml
       - optional:file:.env[.properties]

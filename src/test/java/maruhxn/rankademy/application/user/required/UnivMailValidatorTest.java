@@ -1,6 +1,6 @@
 package maruhxn.rankademy.application.user.required;
 
-import maruhxn.rankademy.adapter.integration.JsonUnivMailValidator;
+import maruhxn.rankademy.adapter.integration.mail.JsonUnivMailValidator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

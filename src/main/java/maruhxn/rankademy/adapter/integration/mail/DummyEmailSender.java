@@ -1,4 +1,4 @@
-package maruhxn.rankademy.adapter.integration;
+package maruhxn.rankademy.adapter.integration.mail;
 
 import maruhxn.rankademy.application.user.required.EmailSender;
 import maruhxn.rankademy.domain.user.Email;

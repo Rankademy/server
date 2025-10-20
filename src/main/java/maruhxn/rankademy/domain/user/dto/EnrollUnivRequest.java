@@ -24,7 +24,7 @@ public record EnrollUnivRequest(
         Boolean inCollege,
 
         @NotNull
-        @Schema(description = "입학년도", example = "2021")
+        @Schema(description = "입학년도", example = "21")
         int admissionYear,
 
         @NotEmpty

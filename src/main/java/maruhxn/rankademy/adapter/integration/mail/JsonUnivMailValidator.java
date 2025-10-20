@@ -1,4 +1,4 @@
-package maruhxn.rankademy.adapter.integration;
+package maruhxn.rankademy.adapter.integration.mail;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

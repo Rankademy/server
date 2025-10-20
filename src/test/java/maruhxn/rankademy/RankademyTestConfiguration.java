@@ -20,8 +20,8 @@ public class RankademyTestConfiguration {
     public UnivMailCertifier univMailCertifier() {
         return new UnivMailCertifier() {
             @Override
-            public void sendCertifyMail(String email, String univName, boolean inCollege) {
-                System.out.println("Sending email: " + email);
+            public void sendCertifyMail(String email, String univName, int code) {
+                System.out.println("Sending email: " + email + " code: " + code);
             }
 
             @Override

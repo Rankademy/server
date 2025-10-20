@@ -1,7 +1,6 @@
 package maruhxn.rankademy.application.user.provided;
 
 import jakarta.persistence.EntityManager;
-import maruhxn.rankademy.RankademyTestConfiguration;
 import maruhxn.rankademy.application.user.required.UnivMailCertifier;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.user.User;
@@ -10,15 +9,11 @@ import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
 import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 
 import static maruhxn.rankademy.domain.user.UserFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -47,7 +42,7 @@ class UserAuthorizerTest extends IntegrationTestSupport {
         userAuthorizer.sendUnivCertifyMail(user.getId());
 
         verify(univMailCertifier, times(1))
-                .sendCertifyMail(anyString(), anyString(), anyBoolean());
+                .sendCertifyMail(anyString(), anyString(), anyInt());
     }
 
     @Test

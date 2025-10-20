@@ -1,6 +1,7 @@
 package maruhxn.rankademy.application.user;
 
 import lombok.RequiredArgsConstructor;
+import maruhxn.rankademy.application.univ_certification_code.provided.UnivCertificationCodeManager;
 import maruhxn.rankademy.application.user.provided.UserAuthorizer;
 import maruhxn.rankademy.application.user.provided.UserReader;
 import maruhxn.rankademy.application.user.required.UnivMailCertifier;
@@ -14,8 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 @Service
 @Validated
+@Transactional
 @RequiredArgsConstructor
 public class UserAuthService implements UserAuthorizer {
 
@@ -24,6 +28,7 @@ public class UserAuthService implements UserAuthorizer {
     private final UnivMailCertifier univMailCertifier;
     private final SummonerInfoConnector summonerInfoConnector;
     private final DomainEventPublisher publisher;
+    private final UnivCertificationCodeManager univCertificationCodeManager;
 
     @Override
     public void sendUnivCertifyMail(Long userId) {
@@ -33,15 +38,25 @@ public class UserAuthService implements UserAuthorizer {
             throw new IllegalStateException("학교 정보를 등록해주세요.");
         }
 
+        String univMail = user.getUnivInfo().getUnivMail().address();
+        String univName = user.getUnivInfo().getUnivName();
+        int code = ThreadLocalRandom.current().nextInt(100000, 1000000);
+
         univMailCertifier.sendCertifyMail(
-                user.getUnivInfo().getUnivMail().address(),
-                user.getUnivInfo().getUnivName(),
-                user.getUnivInfo().isInCollege()
+                univMail,
+                univName,
+                code
+        );
+
+        univCertificationCodeManager.generateCode(
+                userId,
+                univMail,
+                univName,
+                code
         );
     }
 
     @Override
-    @Transactional
     public User completeUnivAuthentication(Long userId, int code) {
         User user = userReader.get(userId);
 
@@ -57,7 +72,6 @@ public class UserAuthService implements UserAuthorizer {
     }
 
     @Override
-    @Transactional
     public User completeRiotAuthentication(Long userId, RiotAuthRequest riotAuthRequest) {
         User user = userReader.get(userId);
         user.connectSummonerInfo(summonerInfoConnector, riotAuthRequest);
@@ -66,7 +80,6 @@ public class UserAuthService implements UserAuthorizer {
     }
 
     @Override
-    @Transactional
     public User removeRiotAuthentication(Long userId) {
         User user = userReader.get(userId);
         user.removeRiotAuthentication();
