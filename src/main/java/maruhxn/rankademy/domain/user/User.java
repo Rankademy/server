@@ -32,7 +32,7 @@ import static java.util.Objects.requireNonNull;
 @NaturalIdCache
 public class User extends AbstractEntity {
 
-    @Column(unique = true, length = 20)
+    @Column(unique = true, length = 100)
     private String username;
 
     @NaturalId
@@ -155,7 +155,7 @@ public class User extends AbstractEntity {
         Assert.state(
                 profileUpdateRequest.mainPosition() != profileUpdateRequest.subPosition(),
                 "주 포지션과 부 포지션은 달라야 합니다."
-                );
+        );
         this.username = profileUpdateRequest.username();
         this.description = profileUpdateRequest.description();
         this.mainPosition = profileUpdateRequest.mainPosition();
