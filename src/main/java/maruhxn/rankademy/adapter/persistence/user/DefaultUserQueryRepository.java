@@ -11,6 +11,7 @@ import maruhxn.rankademy.domain.user.TierInfo;
 import maruhxn.rankademy.domain.user.UserAuthStatus;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,7 +63,7 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
                 )
                 .fetchOne();
 
-        if(base == null) return Optional.empty();
+        if (base == null) return Optional.empty();
 
         List<String> mostChampions = queryFactory
                 .select(championPlayRecord.championId)
@@ -117,14 +118,17 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
                 .where(user.id.eq(userId))
                 .fetchOne();
 
-        if(base == null) return Optional.empty();
+        if (base == null) return Optional.empty();
 
-        List<String> mostChampions = queryFactory
-                .select(championPlayRecord.championId)
-                .from(summonerInfo)
-                .join(summonerInfo.mostChampions, championPlayRecord)
-                .where(summonerInfo.id.eq(base.summonerInfoId))
-                .fetch();
+        List<String> mostChampions = new ArrayList<>();
+        if (base.summonerInfoId != null) {
+            mostChampions = queryFactory
+                    .select(championPlayRecord.championId)
+                    .from(summonerInfo)
+                    .join(summonerInfo.mostChampions, championPlayRecord)
+                    .where(summonerInfo.id.eq(base.summonerInfoId))
+                    .fetch();
+        }
 
         return Optional.of(new MyProfileResponse(
                 base.id(),
@@ -138,7 +142,9 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
         ));
     }
 
-    /** 내부 조립용 베이스 DTO (레코드 예시) */
+    /**
+     * 내부 조립용 베이스 DTO (레코드 예시)
+     */
     public record ProfileBase(
             Long id,
             ProfileResponse.SummonerInfoResponse summonerInfo,
