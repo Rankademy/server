@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record RankerDto(
         @Schema(description = "유저 ID", example = "10") Long id,
         @Schema(description = "소환사 이름", example = "TopRanker") String summonerName,
+        @Schema(description = "소환사 태그", example = "123") String summonerTag,
         @Schema(description = "소환사 아이콘 번호", example = "1234") int summonerIcon
 ) {
 }

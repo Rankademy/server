@@ -17,6 +17,7 @@ public enum PermitAllUrls {
     ICON("/*/icon-*", GET),
     REFRESH("/api/v1/auth/refresh", GET),
     UNIV_RANKING("/api/v1/rankings/univ", GET),
+    USER_RANKING("/api/v1/rankings/users", GET),
     UNIV_STUDENT_RANKING("/api/v1/rankings/univ/{univName}", GET),
     GROUP_RANKING("/api/v1/rankings/univ/{univName}/groups*", GET),
     GROUP_DETAIL("/api/v1/groups/{groupId}", GET),

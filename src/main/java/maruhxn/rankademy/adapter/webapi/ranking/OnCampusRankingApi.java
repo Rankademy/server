@@ -58,8 +58,6 @@ public class OnCampusRankingApi {
             @PathVariable("univName") String univName,
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
             @RequestParam("page") int page,
-            @Parameter(description = "정렬 기준", schema = @Schema(implementation = GroupSortKey.class))
-            @RequestParam(value = "sortKey", required = false) GroupSortKey sortKey,
             @Parameter(description = "그룹명 검색 키워드")
             @RequestParam(value = "groupNameKey", required = false) String groupNameKey,
             @Parameter(description = "전공 필터")
@@ -70,6 +68,6 @@ public class OnCampusRankingApi {
             @RequestParam(value = "mainPosition", required = false) LolPosition mainPosition
     ) {
         GroupRankingFilter groupRankingFilter = new GroupRankingFilter(groupNameKey, major, admissionYear, mainPosition);
-        return onCampusRankingRepository.getGroupRanking(univName, page, sortKey, groupRankingFilter);
+        return onCampusRankingRepository.getGroupRanking(univName, page, GroupSortKey.WIN_COUNT, groupRankingFilter);
     }
 }

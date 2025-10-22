@@ -2,13 +2,20 @@ package maruhxn.rankademy.adapter.persistence;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.application.group.provided.dto.*;
 import maruhxn.rankademy.application.group.required.GroupQueryRepository;
+import maruhxn.rankademy.domain.competition.QCompetition;
 import maruhxn.rankademy.domain.group.GroupRole;
+import maruhxn.rankademy.domain.group.QGroup;
 import maruhxn.rankademy.domain.group.QGroupMember;
+import maruhxn.rankademy.domain.team.QTeam;
 import maruhxn.rankademy.domain.user.QUser;
 import org.springframework.stereotype.Repository;
 
@@ -45,6 +52,46 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                 .from(groupMember)
                 .join(groupMember.group, group)
                 .where(groupMember.user.id.eq(userId))
+                .fetch();
+    }
+
+    @Override
+    public List<RecentCompetitionResponse> getRecentCompetitions(Long groupId) {
+        QCompetition competition = QCompetition.competition;
+        QTeam teamA = new QTeam("teamA");
+        QTeam teamB = new QTeam("teamB");
+        QGroup groupA = new QGroup("groupA");
+        QGroup groupB = new QGroup("groupB");
+
+        StringExpression opponentGroupName = new CaseBuilder()
+                .when(teamA.groupId.eq(groupId)).then(groupB.name)
+                .otherwise(groupA.name);
+
+        NumberExpression<Long> opponentGroupId = new CaseBuilder()
+                .when(teamA.groupId.eq(groupId)).then(groupB.id)
+                .otherwise(groupA.id);
+
+        BooleanExpression isWin = new CaseBuilder()
+                .when(competition.finalWinnerGroupId.eq(groupId)).then(true)
+                .otherwise(false);
+
+        return queryFactory
+                .select(Projections.constructor(
+                        RecentCompetitionResponse.class,
+                        competition.id,
+                        opponentGroupId,
+                        opponentGroupName,
+                        isWin,
+                        competition.status
+                ))
+                .from(competition)
+                .join(teamA).on(teamA.id.eq(competition.team1Id))
+                .join(groupA).on(teamA.groupId.eq(groupA.id))
+                .join(teamB).on(teamB.id.eq(competition.team2Id))
+                .join(groupB).on(teamB.groupId.eq(groupB.id))
+                .where(teamA.groupId.eq(groupId).or(teamB.groupId.eq(groupId)))
+                .orderBy(competition.id.desc())
+                .limit(3)
                 .fetch();
     }
 

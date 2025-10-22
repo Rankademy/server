@@ -30,7 +30,7 @@ public class TotalRankingApi {
             description = "전체 대학교 랭킹을 페이지 단위로 조회합니다."
     )
     @ApiResponse(responseCode = "200", description = "대학교 랭킹 조회 성공")
-    public List<UnivRankingResponse> getUnivRanking(
+    public PagedModel<UnivRankingResponse> getUnivRanking(
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
             @RequestParam(value = "page", defaultValue = "0") int page,
             @Parameter(description = "대학교명 검색 키워드")

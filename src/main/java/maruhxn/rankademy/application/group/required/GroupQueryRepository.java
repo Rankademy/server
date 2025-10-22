@@ -18,4 +18,6 @@ public interface GroupQueryRepository {
     List<JoinRequestResponse> getJoinRequestList(Long groupId, int page);
 
     List<MyGroupResponse> getMyGroupList(Long userId);
+
+    List<RecentCompetitionResponse> getRecentCompetitions(Long groupId);
 }

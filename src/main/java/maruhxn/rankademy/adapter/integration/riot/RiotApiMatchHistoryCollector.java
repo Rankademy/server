@@ -22,7 +22,7 @@ public class RiotApiMatchHistoryCollector implements MatchHistoryCollector {
     private static final Long SEASON_START_TIME = LocalDate.of(2025, 1, 9)
             .atStartOfDay(ZoneOffset.UTC).toEpochSecond();
 
-    private static final int CHUNK_SIZE = 100;
+    private static final int CHUNK_SIZE = 10;
 
     private final RiotApiProvider riotApiProvider;
 

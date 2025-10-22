@@ -23,12 +23,12 @@ public class SummonerMatchRefreshScheduler {
     private final TimeProvider timeProvider;
 
     @Transactional
-    @Scheduled(fixedRate = 6, timeUnit = TimeUnit.HOURS)
+    @Scheduled(fixedRate = 2, timeUnit = TimeUnit.MINUTES) // TODO: 배치주기
     public void refreshMatchHistory() {
         log.info("[전적 자동 갱신 배치] - 시작");
         // 최근 활동 기록이 있는 유저 리스트 조회
         List<User> activeUsers = userReader.findActiveUsers(timeProvider.getCurrentTime());
-        log.info("[전적 자동 갱신 배치] - 활성 유저 수: {}",  activeUsers.size());
+        log.info("[전적 자동 갱신 배치] - 활성 유저 수: {}", activeUsers.size());
 
         // 유저 전적 갱신
         activeUsers.forEach(u -> matchHistoryService.refreshMatches(u.getId()));

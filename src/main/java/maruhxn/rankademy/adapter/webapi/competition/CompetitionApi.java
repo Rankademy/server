@@ -33,7 +33,7 @@ public class CompetitionApi {
             description = "사용자가 참여한 대항전 목록을 페이지 단위로 조회합니다."
     )
     @ApiResponse(responseCode = "200", description = "대항전 목록 조회 성공")
-    public CompetitionPageResponse getMyCompetitions(
+    public CompetitionPageResponse getGroupCompetitions(
             @AuthenticationPrincipal RankademyUser user,
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
             @RequestParam("page") int page
@@ -47,7 +47,7 @@ public class CompetitionApi {
             description = "그룹이 참여한 대항전 이력을 페이지 단위로 조회합니다."
     )
     @ApiResponse(responseCode = "200", description = "그룹 대항전 조회 성공")
-    public CompetitionPageResponse getMyCompetitions(
+    public CompetitionPageResponse getGroupCompetitions(
             @Parameter(description = "그룹 ID", example = "1")
             @PathVariable Long groupId,
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")

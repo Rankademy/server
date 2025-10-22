@@ -116,12 +116,13 @@ class TotalRankingRepositoryTest extends IntegrationTestSupport {
         em.clear();
 
         // when
-        List<UnivRankingResponse> rows = totalRankingRepository.getUnivRanking(0, null);
+        PagedModel<UnivRankingResponse> rows = totalRankingRepository.getUnivRanking(0, null);
 
         // then: 서울과기대가 승리 2로 1위, 고려대가 승리 1로 2위
-        assertThat(rows).hasSize(2);
-        UnivRankingResponse seoultech = rows.get(0);
-        UnivRankingResponse korea = rows.get(1);
+        List<UnivRankingResponse> content = rows.getContent();
+        assertThat(content.size()).isEqualTo(2);
+        UnivRankingResponse seoultech = content.get(0);
+        UnivRankingResponse korea = content.get(1);
 
         assertThat(seoultech.univName()).isEqualTo("서울과학기술대학교");
         assertThat(korea.univName()).isEqualTo("고려대학교");
@@ -135,20 +136,20 @@ class TotalRankingRepositoryTest extends IntegrationTestSupport {
 
         // 활성 유저 수 & 랭커 확인
         assertThat(seoultech.totalUserCnt()).isEqualTo(2L);        // user1, user2
-        assertThat(seoultech.rankerDto().summonerName()).isEqualTo("user2"); // EMERALD > GOLD
+        assertThat(seoultech.rankerDto().summonerName()).isEqualTo(user2.getSummonerInfo().getSummonerName()); // EMERALD > GOLD
         assertThat(korea.totalUserCnt()).isEqualTo(1L);            // user3
-        assertThat(korea.rankerDto().summonerName()).isEqualTo("user3");
+        assertThat(korea.rankerDto().summonerName()).isEqualTo(user3.getSummonerInfo().getSummonerName());
     }
 
     @Test
     @DisplayName("getUnivRanking: 대학명 키워드로 필터링된다")
     void getUnivRanking_filterByUnivNameKey() {
         // when
-        List<UnivRankingResponse> rows = totalRankingRepository.getUnivRanking(0, "서울과");
+        PagedModel<UnivRankingResponse> rows = totalRankingRepository.getUnivRanking(0, "서울과");
 
         // then
-        assertThat(rows).hasSize(1);
-        assertThat(rows.get(0).univName()).isEqualTo("서울과학기술대학교");
+        assertThat(rows.getContent()).hasSize(1);
+        assertThat(rows.getContent().get(0).univName()).isEqualTo("서울과학기술대학교");
     }
 
     private Competition createCompletedCompetition(Long winnerGroupId, Long loserGroupId) {

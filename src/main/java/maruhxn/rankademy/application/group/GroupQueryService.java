@@ -58,8 +58,6 @@ public class GroupQueryService implements GroupReader {
 
     @Override
     public List<RecentCompetitionResponse> getRecentCompetitions(Long groupId) {
-        return List.of(); // TODO: 대항전 추가
+        return groupQueryRepository.getRecentCompetitions(groupId);
     }
-
-
 }

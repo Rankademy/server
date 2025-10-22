@@ -33,8 +33,23 @@ public class TotalRankingRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<UnivRankingResponse> getUnivRanking(int page, String univNameKey) {
+    public PagedModel<UnivRankingResponse> getUnivRanking(int page, String univNameKey) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+
+        // Calculate total count for pagination
+        Long totalCount = queryFactory
+                .select(user.univInfo.univName.countDistinct())
+                .from(user)
+                .where(
+                        isAuthorized(),
+                        filteredByUnivNameKey(univNameKey)
+                )
+                .fetchOne();
+
+        long total = (totalCount == null ? 0L : totalCount);
+        if (total <= 0) {
+            return new PagedModel<>(new PageImpl<>(List.of(), pageable, 0L));
+        }
 
         NumberExpression<Long> competitionCnt =
                 Expressions.numberTemplate(Long.class,
@@ -76,12 +91,13 @@ public class TotalRankingRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        return results.stream().map(ur -> {
+        List<UnivRankingResponse> content = results.stream().map(ur -> {
             RankerDto ranker = queryFactory.select(
                             Projections.constructor(
                                     RankerDto.class,
                                     user.id,
-                                    user.username,
+                                    user.summonerInfo.summonerName,
+                                    user.summonerInfo.summonerTag,
                                     user.summonerInfo.summonerIconNum
                             )
                     )
@@ -100,6 +116,8 @@ public class TotalRankingRepository {
                     ranker
             );
         }).toList();
+
+        return new PagedModel<>(new PageImpl<>(content, pageable, total));
     }
 
     public PagedModel<TotalUserRankingResponse> getTotalUserRanking(int page, String userNameKey) {
