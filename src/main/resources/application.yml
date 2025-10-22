@@ -14,3 +14,7 @@ spring:
       - docker.yml
       - mail.yml
       - optional:file:.env[.properties]
+  cache:
+    cache-names: ddragonLatestVersion
+    caffeine:
+      spec: expireAfterWrite=1h

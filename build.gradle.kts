@@ -71,6 +71,10 @@ dependencies {
     // webflux
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 
+    // Cache
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("com.github.ben-manes.caffeine:caffeine")
+
     // File Upload
     implementation(platform("software.amazon.awssdk:bom:2.25.30"))
     implementation("software.amazon.awssdk:s3")
