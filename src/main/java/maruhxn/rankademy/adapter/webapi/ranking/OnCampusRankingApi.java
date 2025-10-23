@@ -11,11 +11,9 @@ import maruhxn.rankademy.adapter.webapi.dto.UnivStudentRankingResponse;
 import maruhxn.rankademy.adapter.webapi.ranking.dto.GroupRankingFilter;
 import maruhxn.rankademy.adapter.webapi.ranking.dto.UnivStudentRankingFilter;
 import maruhxn.rankademy.application.group.provided.dto.GroupResponse;
-import maruhxn.rankademy.application.group.provided.dto.GroupSortKey;
 import maruhxn.rankademy.domain.user.LolPosition;
+import org.springframework.data.web.PagedModel;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/rankings/univ/{univName}")
@@ -31,7 +29,7 @@ public class OnCampusRankingApi {
             description = "대학교 내 학생 랭킹을 다양한 필터로 조회합니다."
     )
     @ApiResponse(responseCode = "200", description = "학생 랭킹 조회 성공")
-    public List<UnivStudentRankingResponse> getUnivStudentRanking(
+    public PagedModel<UnivStudentRankingResponse> getUnivStudentRanking(
             @Parameter(description = "대학교 이름", example = "서울과학기술대학교")
             @PathVariable("univName") String univName,
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
@@ -53,7 +51,7 @@ public class OnCampusRankingApi {
             description = "대학교 내 그룹 랭킹을 정렬 및 필터 조건과 함께 조회합니다."
     )
     @ApiResponse(responseCode = "200", description = "그룹 랭킹 조회 성공")
-    public List<GroupResponse> getGroupRankingList(
+    public PagedModel<GroupResponse> getGroupRankingList(
             @Parameter(description = "대학교 이름", example = "서울과학기술대학교")
             @PathVariable("univName") String univName,
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
@@ -68,6 +66,6 @@ public class OnCampusRankingApi {
             @RequestParam(value = "mainPosition", required = false) LolPosition mainPosition
     ) {
         GroupRankingFilter groupRankingFilter = new GroupRankingFilter(groupNameKey, major, admissionYear, mainPosition);
-        return onCampusRankingRepository.getGroupRanking(univName, page, GroupSortKey.WIN_COUNT, groupRankingFilter);
+        return onCampusRankingRepository.getGroupRanking(univName, page, groupRankingFilter);
     }
 }

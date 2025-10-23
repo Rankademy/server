@@ -6,15 +6,16 @@ import maruhxn.rankademy.adapter.webapi.ranking.dto.GroupRankingFilter;
 import maruhxn.rankademy.adapter.webapi.ranking.dto.UnivStudentRankingFilter;
 import maruhxn.rankademy.application.competition.required.CompetitionRepository;
 import maruhxn.rankademy.application.group.provided.dto.GroupResponse;
-import maruhxn.rankademy.application.group.provided.dto.GroupSortKey;
 import maruhxn.rankademy.application.group.required.GroupRepository;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.competition.Competition;
 import maruhxn.rankademy.domain.competition.dto.SubmitCompetitionResultRequest;
 import maruhxn.rankademy.domain.group.Group;
-import maruhxn.rankademy.domain.group.GroupRole;
 import maruhxn.rankademy.domain.match.service.MostChampionCalculator;
-import maruhxn.rankademy.domain.user.*;
+import maruhxn.rankademy.domain.user.ChampionPlayRecord;
+import maruhxn.rankademy.domain.user.LolPosition;
+import maruhxn.rankademy.domain.user.TierInfo;
+import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
 import maruhxn.rankademy.support.IntegrationTestSupport;
@@ -22,12 +23,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.web.PagedModel;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static maruhxn.rankademy.domain.group.GroupFixture.*;
+import static maruhxn.rankademy.domain.group.GroupFixture.createGroup;
+import static maruhxn.rankademy.domain.group.GroupFixture.createLeader;
 import static maruhxn.rankademy.domain.user.Rank.I;
 import static maruhxn.rankademy.domain.user.Rank.II;
 import static maruhxn.rankademy.domain.user.Tier.*;
@@ -110,19 +113,19 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
         UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter(null, null, null);
 
         // when
-        List<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
+        PagedModel<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
 
         // then
-        assertThat(snutUnivStudentRanking).hasSize(2);
-        assertThat(snutUnivStudentRanking.get(0).summonerName()).isEqualTo("summoner2");
-        assertThat(snutUnivStudentRanking.get(0).tierInfo().getTier()).isEqualTo(EMERALD);
-        assertThat(snutUnivStudentRanking.get(1).summonerName()).isEqualTo("summoner1");
-        assertThat(snutUnivStudentRanking.get(1).tierInfo().getTier()).isEqualTo(GOLD);
+        assertThat(snutUnivStudentRanking.getContent()).hasSize(2);
+        assertThat(snutUnivStudentRanking.getContent().get(0).summonerName()).isEqualTo("summoner2");
+        assertThat(snutUnivStudentRanking.getContent().get(0).tierInfo().getTier()).isEqualTo(EMERALD);
+        assertThat(snutUnivStudentRanking.getContent().get(1).summonerName()).isEqualTo("summoner1");
+        assertThat(snutUnivStudentRanking.getContent().get(1).tierInfo().getTier()).isEqualTo(GOLD);
 
-        List<UnivStudentRankingResponse> koreaUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("고려대학교", 0, univStudentRankingFilter);
-        assertThat(koreaUnivStudentRanking).hasSize(1);
-        assertThat(koreaUnivStudentRanking.get(0).summonerName()).isEqualTo("summoner3");
-        assertThat(koreaUnivStudentRanking.get(0).tierInfo().getTier()).isEqualTo(BRONZE);
+        PagedModel<UnivStudentRankingResponse> koreaUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("고려대학교", 0, univStudentRankingFilter);
+        assertThat(koreaUnivStudentRanking.getContent()).hasSize(1);
+        assertThat(koreaUnivStudentRanking.getContent().get(0).summonerName()).isEqualTo("summoner3");
+        assertThat(koreaUnivStudentRanking.getContent().get(0).tierInfo().getTier()).isEqualTo(BRONZE);
 
     }
 
@@ -133,11 +136,11 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
         UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter("컴퓨터공학과", null, null);
 
         // when
-        List<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
+        PagedModel<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
 
         // then
-        assertThat(snutUnivStudentRanking).hasSize(1);
-        assertThat(snutUnivStudentRanking.get(0).summonerName()).isEqualTo("summoner1");
+        assertThat(snutUnivStudentRanking.getContent()).hasSize(1);
+        assertThat(snutUnivStudentRanking.getContent().get(0).summonerName()).isEqualTo("summoner1");
     }
 
     @Test
@@ -147,11 +150,11 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
         UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter(null, 2020, null);
 
         // when
-        List<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
+        PagedModel<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
 
         // then
-        assertThat(snutUnivStudentRanking).hasSize(1);
-        assertThat(snutUnivStudentRanking.get(0).summonerName()).isEqualTo("summoner2");
+        assertThat(snutUnivStudentRanking.getContent()).hasSize(1);
+        assertThat(snutUnivStudentRanking.getContent().get(0).summonerName()).isEqualTo("summoner2");
     }
 
     @Test
@@ -161,11 +164,11 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
         UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter(null, null, LolPosition.TOP);
 
         // when
-        List<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
+        PagedModel<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
 
         // then
-        assertThat(snutUnivStudentRanking).hasSize(1);
-        assertThat(snutUnivStudentRanking.get(0).summonerName()).isEqualTo("summoner1");
+        assertThat(snutUnivStudentRanking.getContent()).hasSize(1);
+        assertThat(snutUnivStudentRanking.getContent().get(0).summonerName()).isEqualTo("summoner1");
     }
 
     @Test
@@ -175,11 +178,11 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
         UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter("전기정보공학과", 2020, LolPosition.MIDDLE);
 
         // when
-        List<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
+        PagedModel<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
 
         // then
-        assertThat(snutUnivStudentRanking).hasSize(1);
-        assertThat(snutUnivStudentRanking.get(0).summonerName()).isEqualTo("summoner2");
+        assertThat(snutUnivStudentRanking.getContent()).hasSize(1);
+        assertThat(snutUnivStudentRanking.getContent().get(0).summonerName()).isEqualTo("summoner2");
     }
 
     @Test
@@ -189,66 +192,66 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
         UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter("기계공학과", null, null);
 
         // when
-        List<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
+        PagedModel<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
 
         // then
-        assertThat(snutUnivStudentRanking).isEmpty();
+        assertThat(snutUnivStudentRanking.getContent()).isEmpty();
     }
 
-    @Test
-    @DisplayName("그룹 랭킹 목록 조회 - 티어 순으로 정렬")
-    void getGroupRankingOrderByTier() {
-        // given
-        User leader = userRepository.save(createLeader());
-        Group group = groupRepository.save(createGroup(leader));
-
-        User leader2 = userRepository.save(createLeader("leader2"));
-        SummonerInfo summonerInfo2 = leader2.getSummonerInfo();
-        leader2.getSummonerInfo().update(
-                summonerInfo2.getSummonerName(),
-                summonerInfo2.getSummonerTag(),
-                summonerInfo2.getSummonerIconNum(),
-                new TierInfo(Tier.DIAMOND, Rank.II, 0),
-                50,
-                50
-        );
-        Group group2 = groupRepository.save(createGroup(leader2, "group2"));
-        User member2 = userRepository.save(createMember("member2@test.com", "member2"));
-        SummonerInfo member2SummonerInfo = member2.getSummonerInfo();
-        member2SummonerInfo.update(
-                member2SummonerInfo.getSummonerName(),
-                member2SummonerInfo.getSummonerTag(),
-                member2SummonerInfo.getSummonerIconNum(),
-                new TierInfo(Tier.PLATINUM, Rank.IV, 0),
-                50,
-                50
-        );
-        group2.addMember(member2, GroupRole.MEMBER);
-
-        User leader3 = userRepository.save(createLeader("leader3"));
-        SummonerInfo summonerInfo3 = leader3.getSummonerInfo();
-        summonerInfo3.update(
-                summonerInfo3.getSummonerName(),
-                summonerInfo3.getSummonerTag(),
-                summonerInfo3.getSummonerIconNum(),
-                new TierInfo(Tier.PLATINUM, Rank.I, 0),
-                40,
-                60
-        );
-        Group group3 = groupRepository.save(createGroup(leader3, "group3"));
-        em.flush();
-        em.clear();
-
-        GroupRankingFilter filter = new GroupRankingFilter(null, null, null, null);
-
-        // when
-        List<GroupResponse> rankingList = onCampusRankingRepository.getGroupRanking("서울과학기술대학교", 0, GroupSortKey.TIER, filter);
-
-        // then
-        assertThat(rankingList).hasSize(3)
-                .extracting(GroupResponse::groupId)
-                .containsExactly(group2.getId(), group3.getId(), group.getId());
-    }
+//    @Test
+//    @DisplayName("그룹 랭킹 목록 조회 - 티어 순으로 정렬")
+//    void getGroupRankingOrderByTier() {
+//        // given
+//        User leader = userRepository.save(createLeader());
+//        Group group = groupRepository.save(createGroup(leader));
+//
+//        User leader2 = userRepository.save(createLeader("leader2"));
+//        SummonerInfo summonerInfo2 = leader2.getSummonerInfo();
+//        leader2.getSummonerInfo().update(
+//                summonerInfo2.getSummonerName(),
+//                summonerInfo2.getSummonerTag(),
+//                summonerInfo2.getSummonerIconNum(),
+//                new TierInfo(Tier.DIAMOND, Rank.II, 0),
+//                50,
+//                50
+//        );
+//        Group group2 = groupRepository.save(createGroup(leader2, "group2"));
+//        User member2 = userRepository.save(createMember("member2@test.com", "member2"));
+//        SummonerInfo member2SummonerInfo = member2.getSummonerInfo();
+//        member2SummonerInfo.update(
+//                member2SummonerInfo.getSummonerName(),
+//                member2SummonerInfo.getSummonerTag(),
+//                member2SummonerInfo.getSummonerIconNum(),
+//                new TierInfo(Tier.PLATINUM, Rank.IV, 0),
+//                50,
+//                50
+//        );
+//        group2.addMember(member2, GroupRole.MEMBER);
+//
+//        User leader3 = userRepository.save(createLeader("leader3"));
+//        SummonerInfo summonerInfo3 = leader3.getSummonerInfo();
+//        summonerInfo3.update(
+//                summonerInfo3.getSummonerName(),
+//                summonerInfo3.getSummonerTag(),
+//                summonerInfo3.getSummonerIconNum(),
+//                new TierInfo(Tier.PLATINUM, Rank.I, 0),
+//                40,
+//                60
+//        );
+//        Group group3 = groupRepository.save(createGroup(leader3, "group3"));
+//        em.flush();
+//        em.clear();
+//
+//        GroupRankingFilter filter = new GroupRankingFilter(null, null, null, null);
+//
+//        // when
+//        PagedModel<GroupResponse> rankingList = onCampusRankingRepository.getGroupRanking("서울과학기술대학교", 0, filter);
+//
+//        // then
+//        assertThat(rankingList.getContent()).hasSize(3)
+//                .extracting(GroupResponse::groupId)
+//                .containsExactly(group2.getId(), group3.getId(), group.getId());
+//    }
 
     @Test
     @DisplayName("그룹 랭킹 목록 조회 - 페이징")
@@ -261,10 +264,10 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
         GroupRankingFilter filter = new GroupRankingFilter(null, null, null, null);
 
         // when
-        List<GroupResponse> rankingList = onCampusRankingRepository.getGroupRanking("서울과학기술대학교", 1, GroupSortKey.TIER, filter);
+        PagedModel<GroupResponse> rankingList = onCampusRankingRepository.getGroupRanking("서울과학기술대학교", 1, filter);
 
         // then
-        assertThat(rankingList).hasSize(1)
+        assertThat(rankingList.getContent()).hasSize(1)
                 .extracting(GroupResponse::name)
                 .containsExactly("group20");
     }
@@ -280,10 +283,10 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
         GroupRankingFilter filter = new GroupRankingFilter("5", null, null, null);
 
         // when
-        List<GroupResponse> rankingList = onCampusRankingRepository.getGroupRanking("서울과학기술대학교", 0, GroupSortKey.TIER, filter);
+        PagedModel<GroupResponse> rankingList = onCampusRankingRepository.getGroupRanking("서울과학기술대학교", 0, filter);
 
         // then
-        assertThat(rankingList).hasSize(2)
+        assertThat(rankingList.getContent()).hasSize(2)
                 .extracting(GroupResponse::name)
                 .containsExactly("group5", "group15");
     }
@@ -319,12 +322,12 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
         GroupRankingFilter filter = new GroupRankingFilter(null, null, null, null);
 
         // when
-        List<GroupResponse> rankingList = onCampusRankingRepository.getGroupRanking(
-                "서울과학기술대학교", 0, GroupSortKey.WIN_COUNT, filter
+        PagedModel<GroupResponse> rankingList = onCampusRankingRepository.getGroupRanking(
+                "서울과학기술대학교", 0, filter
         );
 
         // then: 승리 수 내림차순으로 group2(2승), group3(1승), group(0승)
-        assertThat(rankingList).hasSize(3)
+        assertThat(rankingList.getContent()).hasSize(3)
                 .extracting(GroupResponse::groupId)
                 .containsExactly(group2.getId(), group3.getId(), group.getId());
     }

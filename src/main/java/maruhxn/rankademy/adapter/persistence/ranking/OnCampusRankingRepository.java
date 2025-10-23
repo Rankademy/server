@@ -1,6 +1,5 @@
 package maruhxn.rankademy.adapter.persistence.ranking;
 
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -11,7 +10,6 @@ import maruhxn.rankademy.adapter.webapi.dto.UnivStudentRankingResponse;
 import maruhxn.rankademy.adapter.webapi.ranking.dto.GroupRankingFilter;
 import maruhxn.rankademy.adapter.webapi.ranking.dto.UnivStudentRankingFilter;
 import maruhxn.rankademy.application.group.provided.dto.GroupResponse;
-import maruhxn.rankademy.application.group.provided.dto.GroupSortKey;
 import maruhxn.rankademy.application.group.provided.dto.LeaderDto;
 import maruhxn.rankademy.domain.competition.CompetitionStatus;
 import maruhxn.rankademy.domain.group.GroupRole;
@@ -19,6 +17,10 @@ import maruhxn.rankademy.domain.group.QGroupMember;
 import maruhxn.rankademy.domain.user.QUser;
 import maruhxn.rankademy.domain.user.SummonerInfo;
 import maruhxn.rankademy.domain.user.User;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -34,11 +36,26 @@ import static maruhxn.rankademy.domain.user.QUser.user;
 @RequiredArgsConstructor
 public class OnCampusRankingRepository {
 
-    private final Long PAGE_SIZE = 20L;
+    private final int PAGE_SIZE = 20;
 
     private final JPAQueryFactory queryFactory;
 
-    public List<UnivStudentRankingResponse> getUnivStudentRanking(String univName, int page, UnivStudentRankingFilter univStudentRankingFilter) {
+    public PagedModel<UnivStudentRankingResponse> getUnivStudentRanking(String univName, int page, UnivStudentRankingFilter univStudentRankingFilter) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+
+        Long total = queryFactory.select(user.count())
+                .from(user)
+                .join(summonerInfo).on(user.summonerInfo.id.eq(summonerInfo.id))
+                .where(
+                        user.univInfo.univName.eq(univName),
+                        filteredByMajor(univStudentRankingFilter.major()),
+                        filteredByAdmissionYear(univStudentRankingFilter.admissionYear()),
+                        filteredByMainPosition(univStudentRankingFilter.mainPosition())
+                )
+                .fetchOne();
+
+        if(total == null || total <= 0) return new PagedModel<>(new PageImpl<>(List.of(), pageable, 0));
+
         List<User> users = queryFactory.selectFrom(user)
                 .join(summonerInfo).on(user.summonerInfo.id.eq(summonerInfo.id))
                 .where(
@@ -48,11 +65,11 @@ public class OnCampusRankingRepository {
                         filteredByMainPosition(univStudentRankingFilter.mainPosition())
                 )
                 .orderBy(summonerInfo.tierInfo.mappedTier.desc(), summonerInfo.winCount.desc())
-                .offset(page * PAGE_SIZE)
+                .offset((long) page * PAGE_SIZE)
                 .limit(PAGE_SIZE)
                 .fetch();
 
-        return users.stream()
+        List<UnivStudentRankingResponse> content = users.stream()
                 .map(u -> {
                     SummonerInfo s = u.getSummonerInfo();
 
@@ -73,9 +90,13 @@ public class OnCampusRankingRepository {
                     );
                 })
                 .toList();
+
+        return new PagedModel<>(new PageImpl<>(content, pageable, 0));
     }
 
-    public List<GroupResponse> getGroupRanking(String univName, int page, GroupSortKey sortKey, GroupRankingFilter filter) {
+    public PagedModel<GroupResponse> getGroupRanking(String univName, int page, GroupRankingFilter filter) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+
         QGroupMember leaderMember = new QGroupMember("leaderMember");
         QUser leaderUser = new QUser("leaderUser");
 
@@ -93,12 +114,38 @@ public class OnCampusRankingRepository {
                         "coalesce(count({0}), 0)",
                         competition.id);
 
-        OrderSpecifier<?> sortSpecifier = switch (sortKey) {
-            case TIER -> summonerInfo.tierInfo.mappedTier.avg().desc();
-            case WIN_COUNT -> winCount.desc(); // “대항전 승리 순”
-        };
+        Long total = queryFactory
+                .select(group.count())
+                .from(group)
+                // 대항전 참여 매칭 (확정된 경기만 포함)
+                .leftJoin(competition)
+                .on(
+                        competition.status.eq(CompetitionStatus.COMPLETED)
+                                .and(
+                                        competition.finalWinnerGroupId.eq(group.id)
+                                                .or(competition.finalLoserGroupId.eq(group.id))
+                                )
+                )
+                .join(group.members, groupMember)
+                .join(groupMember.user, user)
+                .join(user.summonerInfo, summonerInfo)
+                .join(leaderMember).on(
+                        leaderMember.group.id.eq(group.id)
+                                .and(leaderMember.role.eq(GroupRole.LEADER))
+                )
+                .join(leaderMember.user, leaderUser)
+                .where(
+                        group.univName.eq(univName),
+                        filteredByGroupNameKey(filter.groupNameKey()),
+                        filteredByMajor(filter.major()),
+                        filteredByAdmissionYear(filter.admissionYear()),
+                        filteredByMainPosition(filter.mainPosition())
+                )
+                .fetchOne();
 
-        return queryFactory
+        if(total == null || total <= 0) return new PagedModel<>(new PageImpl<>(List.of(), pageable, 0));
+
+        List<GroupResponse> content = queryFactory
                 .select(
                         Projections.constructor(
                                 GroupResponse.class,
@@ -148,10 +195,12 @@ public class OnCampusRankingRepository {
                         group.id, group.name, group.logoImage, group.capacity,
                         leaderUser.id, leaderUser.summonerInfo.summonerIconNum
                 )
-                .orderBy(sortSpecifier, totalCount.desc(), group.createdAt.asc())
-                .offset(page * PAGE_SIZE)
+                .orderBy(winCount.desc(), totalCount.desc(), group.createdAt.asc())
+                .offset((long) page * PAGE_SIZE)
                 .limit(PAGE_SIZE)
                 .fetch();
+
+        return new PagedModel<>(new PageImpl<>(content, pageable, total));
     }
 
 
