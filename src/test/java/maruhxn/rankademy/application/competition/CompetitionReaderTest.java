@@ -25,8 +25,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -248,17 +246,17 @@ class CompetitionReaderTest extends IntegrationTestSupport {
         var result2 = reader.getMyCompetitionHistory(testUser.getId(), 1);
 
         // then
-        assertThat(result1.totalCount()).isEqualTo(2);
-        assertThat(result1.competitions()).hasSize(2);
-        assertThat(result1.competitions().getLast().competitionId()).isEqualTo(competition1.getId());
-        assertThat(result1.competitions().getLast().status()).isEqualTo(CompetitionStatus.COMPLETED);
-        List<Long> competitionIds = result1.competitions().stream()
-                .map(CompetitionPageResponse.CompetitionListItemResponse::competitionId)
+        assertThat(result1.getMetadata().totalElements()).isEqualTo(2);
+        assertThat(result1.getContent()).hasSize(2);
+        assertThat(result1.getContent().getLast().competitionId()).isEqualTo(competition1.getId());
+        assertThat(result1.getContent().getLast().status()).isEqualTo(CompetitionStatus.COMPLETED);
+        List<Long> competitionIds = result1.getContent().stream()
+                .map(CompetitionPageResponse::competitionId)
                 .toList();
         assertThat(competitionIds).containsExactlyInAnyOrder(competition1.getId(), competition3.getId());
 
-        assertThat(result2.totalCount()).isEqualTo(2);
-        assertThat(result2.competitions()).hasSize(0);
+        assertThat(result2.getMetadata().totalElements()).isEqualTo(2);
+        assertThat(result2.getContent()).hasSize(0);
     }
 
     @Test
@@ -282,8 +280,8 @@ class CompetitionReaderTest extends IntegrationTestSupport {
         var result = reader.getMyCompetitionHistory(testUser.getId(), 0);
 
         // then
-        assertThat(result.totalCount()).isEqualTo(0);
-        assertThat(result.competitions()).hasSize(0);
+        assertThat(result.getMetadata().totalElements()).isEqualTo(0);
+        assertThat(result.getContent()).hasSize(0);
     }
 
     @Test
@@ -327,17 +325,17 @@ class CompetitionReaderTest extends IntegrationTestSupport {
         var result2 = reader.getGroupCompetitionHistory(group1.getId(), 1);
 
         // then
-        assertThat(result1.totalCount()).isEqualTo(2);
-        assertThat(result1.competitions()).hasSize(2);
-        assertThat(result1.competitions().getLast().competitionId()).isEqualTo(competition1.getId());
-        assertThat(result1.competitions().getLast().status()).isEqualTo(CompetitionStatus.COMPLETED);
-        List<Long> competitionIds = result1.competitions().stream()
-                .map(CompetitionPageResponse.CompetitionListItemResponse::competitionId)
+        assertThat(result1.getMetadata().totalElements()).isEqualTo(2);
+        assertThat(result1.getContent()).hasSize(2);
+        assertThat(result1.getContent().getLast().competitionId()).isEqualTo(competition1.getId());
+        assertThat(result1.getContent().getLast().status()).isEqualTo(CompetitionStatus.COMPLETED);
+        List<Long> competitionIds = result1.getContent().stream()
+                .map(CompetitionPageResponse::competitionId)
                 .toList();
         assertThat(competitionIds).containsExactlyInAnyOrder(competition1.getId(), competition2.getId());
 
-        assertThat(result2.totalCount()).isEqualTo(2);
-        assertThat(result2.competitions()).hasSize(0);
+        assertThat(result2.getMetadata().totalElements()).isEqualTo(2);
+        assertThat(result2.getContent()).hasSize(0);
     }
 
     @Test

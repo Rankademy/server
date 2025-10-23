@@ -12,15 +12,14 @@ import java.util.NoSuchElementException;
 @Component
 public class CompetitionAssembler {
 
-    public CompetitionPageResponse assemble(
-            long total,
+    public List<CompetitionPageResponse> assemble(
             List<CompetitionPageRowReader.Row> rows,
             Map<Long, TeamInfoResponse> teamInfo,
             Map<Long, List<SetResultResponse>> setMap
     ) {
         var items = rows.stream()
                 .map(r ->
-                        new CompetitionPageResponse.CompetitionListItemResponse(
+                        new CompetitionPageResponse(
                                 r.cid(),
                                 r.otherUniv(),
                                 r.status(),
@@ -31,7 +30,7 @@ public class CompetitionAssembler {
                         )
                 ).toList();
 
-        return new CompetitionPageResponse(total, items);
+        return items;
     }
 
     public static TeamInfoResponse must(Map<Long, TeamInfoResponse> map, Long teamId) {

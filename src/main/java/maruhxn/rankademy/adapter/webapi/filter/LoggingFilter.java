@@ -69,7 +69,7 @@ public class LoggingFilter extends OncePerRequestFilter {
             responseWrapper.copyBodyToResponse();
             throw ex;
         } finally {
-            MDC.remove(TRACE_ID_MDC_KEY);
+            MDC.clear();
         }
     }
 

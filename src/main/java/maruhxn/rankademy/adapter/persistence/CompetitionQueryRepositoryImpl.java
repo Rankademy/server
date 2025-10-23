@@ -9,9 +9,13 @@ import maruhxn.rankademy.adapter.persistence.competition.CompetitionAssembler;
 import maruhxn.rankademy.adapter.persistence.competition.CompetitionCountReader;
 import maruhxn.rankademy.adapter.persistence.competition.CompetitionPageRowReader;
 import maruhxn.rankademy.adapter.persistence.competition.TeamAndSetLoader;
-import maruhxn.rankademy.application.competition.provided.dto.CompetitionResultResponse;
 import maruhxn.rankademy.application.competition.provided.dto.CompetitionPageResponse;
+import maruhxn.rankademy.application.competition.provided.dto.CompetitionResultResponse;
 import maruhxn.rankademy.application.competition.required.CompetitionQueryRepository;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Repository;
 
 import java.util.LinkedHashSet;
@@ -135,32 +139,32 @@ public class CompetitionQueryRepositoryImpl implements CompetitionQueryRepositor
     }
 
     @Override
-    public CompetitionPageResponse getMyCompetitionHistory(Long userId, int page) {
+    public PagedModel<CompetitionPageResponse> getMyCompetitionHistory(Long userId, int page) {
+        Pageable pageable = PageRequest.of(page, 10);
+
         long total = countReader.countForUser(userId);
-        if (total == 0) return new CompetitionPageResponse(0L, List.of());
+        if (total == 0) return new PagedModel<>(new PageImpl<>(List.of(), pageable, total));
 
         var rows = rowReader.fetchUserPageRows(userId, page, 10);
-        if (rows.isEmpty()) return new CompetitionPageResponse(total, List.of());
+        if (rows.isEmpty()) return new PagedModel<>(new PageImpl<>(List.of(), pageable, total));
 
-        var compIds = rows.stream().map(CompetitionPageRowReader.Row::cid).toList();
-        var teamIds = rows.stream()
-                .flatMap(r -> Stream.of(r.myTid(), r.otherTid()))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-
-        var teamInfo = loader.loadTeams(teamIds);
-        var setMap = loader.loadSetResults(compIds);
-
-        return assembler.assemble(total, rows, teamInfo, setMap);
+        return getCompetitionPageResponsePagedModel(pageable, total, rows);
     }
 
     @Override
-    public CompetitionPageResponse getGroupCompetitionHistory(Long groupId, int page) {
+    public PagedModel<CompetitionPageResponse> getGroupCompetitionHistory(Long groupId, int page) {
+        Pageable pageable = PageRequest.of(page, 10);
+
         long total = countReader.countForGroup(groupId);
-        if (total == 0) return new CompetitionPageResponse(0L, List.of());
+        if (total == 0) return new PagedModel<>(new PageImpl<>(List.of(), pageable, total));
 
         var rows = rowReader.fetchGroupPageRows(groupId, page, 10);
-        if (rows.isEmpty()) return new CompetitionPageResponse(total, List.of());
+        if (rows.isEmpty()) new PagedModel<>(new PageImpl<>(List.of(), pageable, total));
 
+        return getCompetitionPageResponsePagedModel(pageable, total, rows);
+    }
+
+    private PagedModel<CompetitionPageResponse> getCompetitionPageResponsePagedModel(Pageable pageable, long total, List<CompetitionPageRowReader.Row> rows) {
         var compIds = rows.stream().map(CompetitionPageRowReader.Row::cid).toList();
         var teamIds = rows.stream()
                 .flatMap(r -> Stream.of(r.myTid(), r.otherTid()))
@@ -169,6 +173,8 @@ public class CompetitionQueryRepositoryImpl implements CompetitionQueryRepositor
         var teamInfo = loader.loadTeams(teamIds);
         var setMap = loader.loadSetResults(compIds);
 
-        return assembler.assemble(total, rows, teamInfo, setMap);
+        List<CompetitionPageResponse> content = assembler.assemble(rows, teamInfo, setMap);
+
+        return new PagedModel<>(new PageImpl<>(content, pageable, total));
     }
 }

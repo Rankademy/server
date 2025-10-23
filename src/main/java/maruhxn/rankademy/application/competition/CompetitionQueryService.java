@@ -13,6 +13,7 @@ import maruhxn.rankademy.application.team.required.TeamRepository;
 import maruhxn.rankademy.domain.competition.Competition;
 import maruhxn.rankademy.domain.team.Team;
 import maruhxn.rankademy.domain.team.TeamMember;
+import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,12 +77,12 @@ public class CompetitionQueryService implements CompetitionReader {
     }
 
     @Override
-    public CompetitionPageResponse getMyCompetitionHistory(Long userId, int page) {
+    public PagedModel<CompetitionPageResponse> getMyCompetitionHistory(Long userId, int page) {
         return competitionQueryRepository.getMyCompetitionHistory(userId, page);
     }
 
     @Override
-    public CompetitionPageResponse getGroupCompetitionHistory(Long groupId, int page) {
+    public PagedModel<CompetitionPageResponse> getGroupCompetitionHistory(Long groupId, int page) {
         return competitionQueryRepository.getGroupCompetitionHistory(groupId, page);
     }
 }
