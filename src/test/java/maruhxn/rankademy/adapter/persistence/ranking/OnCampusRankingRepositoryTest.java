@@ -2,7 +2,6 @@ package maruhxn.rankademy.adapter.persistence.ranking;
 
 import jakarta.persistence.EntityManager;
 import maruhxn.rankademy.adapter.webapi.dto.UnivStudentRankingResponse;
-import maruhxn.rankademy.adapter.webapi.ranking.dto.GroupRankingFilter;
 import maruhxn.rankademy.adapter.webapi.ranking.dto.UnivStudentRankingFilter;
 import maruhxn.rankademy.application.competition.required.CompetitionRepository;
 import maruhxn.rankademy.application.group.provided.dto.GroupResponse;
@@ -261,10 +260,9 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
             User newLeader = userRepository.save(createLeader("leader" + i));
             groupRepository.save(createGroup(newLeader, "group" + i));
         }
-        GroupRankingFilter filter = new GroupRankingFilter(null, null, null, null);
 
         // when
-        PagedModel<GroupResponse> rankingList = onCampusRankingRepository.getGroupRanking("서울과학기술대학교", 1, filter);
+        PagedModel<GroupResponse> rankingList = onCampusRankingRepository.getGroupRanking("서울과학기술대학교", 1, null);
 
         // then
         assertThat(rankingList.getContent()).hasSize(1)
@@ -280,10 +278,9 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
             User newLeader = userRepository.save(createLeader("leader" + i));
             groupRepository.save(createGroup(newLeader, "group" + i));
         }
-        GroupRankingFilter filter = new GroupRankingFilter("5", null, null, null);
 
         // when
-        PagedModel<GroupResponse> rankingList = onCampusRankingRepository.getGroupRanking("서울과학기술대학교", 0, filter);
+        PagedModel<GroupResponse> rankingList = onCampusRankingRepository.getGroupRanking("서울과학기술대학교", 0, "5");
 
         // then
         assertThat(rankingList.getContent()).hasSize(2)
@@ -319,11 +316,9 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
         em.flush();
         em.clear();
 
-        GroupRankingFilter filter = new GroupRankingFilter(null, null, null, null);
-
         // when
         PagedModel<GroupResponse> rankingList = onCampusRankingRepository.getGroupRanking(
-                "서울과학기술대학교", 0, filter
+                "서울과학기술대학교", 0, null
         );
 
         // then: 승리 수 내림차순으로 group2(2승), group3(1승), group(0승)

@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.persistence.ranking.OnCampusRankingRepository;
 import maruhxn.rankademy.adapter.webapi.dto.UnivStudentRankingResponse;
-import maruhxn.rankademy.adapter.webapi.ranking.dto.GroupRankingFilter;
 import maruhxn.rankademy.adapter.webapi.ranking.dto.UnivStudentRankingFilter;
 import maruhxn.rankademy.application.group.provided.dto.GroupResponse;
 import maruhxn.rankademy.domain.user.LolPosition;
@@ -57,15 +56,8 @@ public class OnCampusRankingApi {
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
             @RequestParam("page") int page,
             @Parameter(description = "그룹명 검색 키워드")
-            @RequestParam(value = "groupNameKey", required = false) String groupNameKey,
-            @Parameter(description = "전공 필터")
-            @RequestParam(value = "major", required = false) String major,
-            @Parameter(description = "입학년도 필터", example = "2021")
-            @RequestParam(value = "admissionYear", required = false) Integer admissionYear,
-            @Parameter(description = "주 포지션 필터", schema = @Schema(implementation = LolPosition.class))
-            @RequestParam(value = "mainPosition", required = false) LolPosition mainPosition
+            @RequestParam(value = "groupNameKey", required = false) String groupNameKey
     ) {
-        GroupRankingFilter groupRankingFilter = new GroupRankingFilter(groupNameKey, major, admissionYear, mainPosition);
-        return onCampusRankingRepository.getGroupRanking(univName, page, groupRankingFilter);
+        return onCampusRankingRepository.getGroupRanking(univName, page, groupNameKey);
     }
 }

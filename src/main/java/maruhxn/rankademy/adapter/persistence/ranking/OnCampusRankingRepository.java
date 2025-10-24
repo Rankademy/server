@@ -7,7 +7,6 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.webapi.dto.UnivStudentRankingResponse;
-import maruhxn.rankademy.adapter.webapi.ranking.dto.GroupRankingFilter;
 import maruhxn.rankademy.adapter.webapi.ranking.dto.UnivStudentRankingFilter;
 import maruhxn.rankademy.application.group.provided.dto.GroupResponse;
 import maruhxn.rankademy.application.group.provided.dto.LeaderDto;
@@ -94,7 +93,7 @@ public class OnCampusRankingRepository {
         return new PagedModel<>(new PageImpl<>(content, pageable, 0));
     }
 
-    public PagedModel<GroupResponse> getGroupRanking(String univName, int page, GroupRankingFilter filter) {
+    public PagedModel<GroupResponse> getGroupRanking(String univName, int page, String groupNameKey) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
 
         QGroupMember leaderMember = new QGroupMember("leaderMember");
@@ -136,10 +135,7 @@ public class OnCampusRankingRepository {
                 .join(leaderMember.user, leaderUser)
                 .where(
                         group.univName.eq(univName),
-                        filteredByGroupNameKey(filter.groupNameKey()),
-                        filteredByMajor(filter.major()),
-                        filteredByAdmissionYear(filter.admissionYear()),
-                        filteredByMainPosition(filter.mainPosition())
+                        filteredByGroupNameKey(groupNameKey)
                 )
                 .fetchOne();
 
@@ -186,10 +182,7 @@ public class OnCampusRankingRepository {
                 .join(leaderMember.user, leaderUser)
                 .where(
                         group.univName.eq(univName),
-                        filteredByGroupNameKey(filter.groupNameKey()),
-                        filteredByMajor(filter.major()),
-                        filteredByAdmissionYear(filter.admissionYear()),
-                        filteredByMainPosition(filter.mainPosition())
+                        filteredByGroupNameKey(groupNameKey)
                 )
                 .groupBy(
                         group.id, group.name, group.logoImage, group.capacity,
