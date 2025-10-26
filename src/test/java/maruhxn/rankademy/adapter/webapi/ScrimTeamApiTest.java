@@ -65,7 +65,7 @@ class ScrimTeamApiTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("내전 팀 목록 조회 - 성공")
+    @DisplayName("스크림 팀 목록 조회 - 성공")
     void getScrimTeamList() throws Exception {
         // given
         for (int i = 0; i < 5; i++) {
@@ -87,7 +87,7 @@ class ScrimTeamApiTest extends IntegrationTestSupport {
 
     @Test
     @WithAnonymousUser
-    @DisplayName("내전 팀 목록 조회 - 인증되지 않은 사용자")
+    @DisplayName("스크림 팀 목록 조회 - 인증되지 않은 사용자")
     void getScrimTeamList_withAnonymousUser() throws Exception {
         // when
         MvcTestResult result = mvcTester.get().uri(BASE_URL + "?page=0")
@@ -98,7 +98,7 @@ class ScrimTeamApiTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("내전 팀 생성 - 성공")
+    @DisplayName("스크림 팀 생성 - 성공")
     void createScrimTeam_success() throws Exception {
         // given
         ScrimTeamCreateRequest request = createScrimTeamCreateRequest(leader, "scrim");
@@ -116,7 +116,7 @@ class ScrimTeamApiTest extends IntegrationTestSupport {
 
     @Test
     @WithAnonymousUser
-    @DisplayName("내전 팀 생성 - 인증되지 않은 사용자")
+    @DisplayName("스크림 팀 생성 - 인증되지 않은 사용자")
     void createScrimTeam_withAnonymousUser() throws Exception {
         // given
         ScrimTeamCreateRequest request = createScrimTeamCreateRequest(leader, "scrim");
@@ -132,7 +132,7 @@ class ScrimTeamApiTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("내전 팀 상세 조회 - 성공")
+    @DisplayName("스크림 팀 상세 조회 - 성공")
     void getScrimTeamDetail() throws Exception {
         // given
         ScrimTeam scrimTeam = createScrimTeam("scrim", leader);
@@ -149,7 +149,7 @@ class ScrimTeamApiTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("내전 팀 상세 조회 - 팀 정보 없음")
+    @DisplayName("스크림 팀 상세 조회 - 팀 정보 없음")
     void getScrimTeamDetail_notFound() throws Exception {
         // when
         MvcTestResult result = mvcTester.get().uri(BASE_URL + "/999")
@@ -162,7 +162,7 @@ class ScrimTeamApiTest extends IntegrationTestSupport {
 
     @Test
     @WithAnonymousUser
-    @DisplayName("내전 팀 상세 조회 - 인증되지 않은 사용자")
+    @DisplayName("스크림 팀 상세 조회 - 인증되지 않은 사용자")
     void getScrimTeamDetail_withAnonymousUser() throws Exception {
         // when
         MvcTestResult result = mvcTester.get().uri(BASE_URL + "/1")
@@ -173,7 +173,7 @@ class ScrimTeamApiTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("내전 팀 정보 수정 - 성공")
+    @DisplayName("스크림 팀 정보 수정 - 성공")
     void updateScrimTeam() throws Exception {
         // given
         ScrimTeam scrimTeam = createScrimTeam("scrim", leader);
@@ -196,7 +196,7 @@ class ScrimTeamApiTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("내전 팀 정보 수정 - 작성자가 아닌 경우")
+    @DisplayName("스크림 팀 정보 수정 - 작성자가 아닌 경우")
     void updateScrimTeam_forbidden() throws Exception {
         // given
         ScrimTeam scrimTeam = createScrimTeam("scrim", leader);
@@ -217,7 +217,7 @@ class ScrimTeamApiTest extends IntegrationTestSupport {
 
     @Test
     @WithAnonymousUser
-    @DisplayName("내전 팀 정보 수정 - 인증되지 않은 사용자")
+    @DisplayName("스크림 팀 정보 수정 - 인증되지 않은 사용자")
     void updateScrimTeam_withAnonymousUser() throws Exception {
         // given
         ScrimTeamUpdateRequest request = new ScrimTeamUpdateRequest("updated name", "updated intro");
@@ -233,7 +233,7 @@ class ScrimTeamApiTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("내전 팀 삭제 - 성공")
+    @DisplayName("스크림 팀 삭제 - 성공")
     void deleteScrimTeam() throws Exception {
         // given
         ScrimTeam scrimTeam = createScrimTeam("scrim", leader);
@@ -251,7 +251,7 @@ class ScrimTeamApiTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("내전 팀 삭제 - 작성자가 아닌 경우")
+    @DisplayName("스크림 팀 삭제 - 작성자가 아닌 경우")
     void deleteScrimTeam_forbidden() throws Exception {
         // given
         ScrimTeam scrimTeam = createScrimTeam("scrim", leader);
@@ -269,7 +269,7 @@ class ScrimTeamApiTest extends IntegrationTestSupport {
 
     @Test
     @WithAnonymousUser
-    @DisplayName("내전 팀 삭제 - 인증되지 않은 사용자")
+    @DisplayName("스크림 팀 삭제 - 인증되지 않은 사용자")
     void deleteScrimTeam_withAnonymousUser() throws Exception {
         // when
         MvcTestResult result = mvcTester.delete().uri(BASE_URL + "/1")
