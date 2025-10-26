@@ -11,12 +11,11 @@ import maruhxn.rankademy.application.group.provided.RecruitPostWriter;
 import maruhxn.rankademy.application.group.provided.dto.RecruitmentPostDetailResponse;
 import maruhxn.rankademy.application.group.provided.dto.RecruitmentPostResponse;
 import maruhxn.rankademy.domain.group.dto.CreateRecruitmentPostRequest;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/groups")
@@ -33,7 +32,7 @@ public class RecruitmentPostApi {
             description = "모집 중인 그룹의 모집글을 페이지 단위로 조회합니다."
     )
     @ApiResponse(responseCode = "200", description = "모집글 조회 성공")
-    public List<RecruitmentPostResponse> getRecruitmentPostList(
+    public PagedModel<RecruitmentPostResponse> getRecruitmentPostList(
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
             @RequestParam("page") int page
     ) {

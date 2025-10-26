@@ -9,12 +9,11 @@ import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.application.group.provided.GroupJoinRequestManager;
 import maruhxn.rankademy.application.group.provided.GroupReader;
 import maruhxn.rankademy.application.group.provided.dto.JoinRequestResponse;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/groups/{groupId}/join-requests")
@@ -32,7 +31,7 @@ public class GroupJoinRequestApi {
             description = "그룹 리더가 받은 가입 요청 목록을 페이지 단위로 조회합니다."
     )
     @ApiResponse(responseCode = "200", description = "가입 요청 조회 성공")
-    public List<JoinRequestResponse> getJoinRequests(
+    public PagedModel<JoinRequestResponse> getJoinRequests(
             @Parameter(description = "그룹 ID", example = "1")
             @PathVariable Long groupId,
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")

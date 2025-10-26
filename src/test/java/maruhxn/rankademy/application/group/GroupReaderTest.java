@@ -140,10 +140,10 @@ class GroupReaderTest extends IntegrationTestSupport {
         }
 
         // when
-        List<RecruitmentPostResponse> recruitmentPostList = groupReader.getRecruitmentPostList(1);
+        PagedModel<RecruitmentPostResponse> recruitmentPostList = groupReader.getRecruitmentPostList(1);
 
         // then
-        assertThat(recruitmentPostList).hasSize(1)
+        assertThat(recruitmentPostList.getContent()).hasSize(1)
                 .extracting(RecruitmentPostResponse::groupName)
                 .containsExactly(group.getName());
     }
@@ -160,11 +160,11 @@ class GroupReaderTest extends IntegrationTestSupport {
         group2.closeRecruitment();
 
         // when
-        List<RecruitmentPostResponse> recruitmentPostList = groupReader.getRecruitmentPostList(0);
+        PagedModel<RecruitmentPostResponse> recruitmentPostList = groupReader.getRecruitmentPostList(0);
 
         // then
-        assertThat(recruitmentPostList).hasSize(1);
-        assertThat(recruitmentPostList.get(0).title()).isEqualTo("그룹원 모집합니다");
+        assertThat(recruitmentPostList.getMetadata().totalElements()).isEqualTo(1);
+        assertThat(recruitmentPostList.getContent().get(0).title()).isEqualTo("그룹원 모집합니다");
     }
 
     @Test
@@ -179,11 +179,11 @@ class GroupReaderTest extends IntegrationTestSupport {
         group2.getRecruitmentPost().deactivate();
 
         // when
-        List<RecruitmentPostResponse> recruitmentPostList = groupReader.getRecruitmentPostList(0);
+        PagedModel<RecruitmentPostResponse> recruitmentPostList = groupReader.getRecruitmentPostList(0);
 
         // then
-        assertThat(recruitmentPostList).hasSize(1);
-        assertThat(recruitmentPostList.get(0).title()).isEqualTo("그룹원 모집합니다");
+        assertThat(recruitmentPostList.getMetadata().totalElements()).isEqualTo(1);
+        assertThat(recruitmentPostList.getContent().get(0).title()).isEqualTo("그룹원 모집합니다");
     }
 
     @Test
@@ -262,21 +262,21 @@ class GroupReaderTest extends IntegrationTestSupport {
         group.addJoinRequest(user);
 
         // when
-        List<JoinRequestResponse> joinRequests = groupReader.getJoinRequests(group.getId(), 0);
+        PagedModel<JoinRequestResponse> joinRequests = groupReader.getJoinRequests(group.getId(), 0);
 
         // then
-        assertThat(joinRequests).hasSize(1);
-        assertThat(joinRequests.get(0).summonerName()).isEqualTo(user.getSummonerInfo().getSummonerName());
+        assertThat(joinRequests.getContent()).hasSize(1);
+        assertThat(joinRequests.getContent().get(0).summonerName()).isEqualTo(user.getSummonerInfo().getSummonerName());
     }
 
     @Test
     @DisplayName("그룹 가입 신청 목록 조회 - 신청이 없는 경우")
     void getJoinRequestsWithEmptyList() {
         // when
-        List<JoinRequestResponse> joinRequests = groupReader.getJoinRequests(group.getId(), 0);
+        PagedModel<JoinRequestResponse> joinRequests = groupReader.getJoinRequests(group.getId(), 0);
 
         // then
-        assertThat(joinRequests).isEmpty();
+        assertThat(joinRequests.getContent()).isEmpty();
     }
 
     @Test
@@ -289,12 +289,12 @@ class GroupReaderTest extends IntegrationTestSupport {
         }
 
         // when
-        List<JoinRequestResponse> firstPage = groupReader.getJoinRequests(group.getId(), 0);
-        List<JoinRequestResponse> secondPage = groupReader.getJoinRequests(group.getId(), 1);
+        PagedModel<JoinRequestResponse> firstPage = groupReader.getJoinRequests(group.getId(), 0);
+        PagedModel<JoinRequestResponse> secondPage = groupReader.getJoinRequests(group.getId(), 1);
 
         // then
-        assertThat(firstPage).hasSize(10);
-        assertThat(secondPage).hasSize(1);
+        assertThat(firstPage.getContent()).hasSize(10);
+        assertThat(secondPage.getContent()).hasSize(1);
     }
 
     @Test

@@ -14,13 +14,13 @@ public interface GroupReader {
 
     GroupDetailResponse getDetail(Long userId, Long groupId);
 
-    List<RecruitmentPostResponse> getRecruitmentPostList(int page);
+    PagedModel<RecruitmentPostResponse> getRecruitmentPostList(int page);
 
     RecruitmentPostDetailResponse getRecruitmentPostDetail(Long userId, Long groupId);
 
     PagedModel<GroupMemberResponse> getGroupMembers(Long groupId, int page);
 
-    List<JoinRequestResponse> getJoinRequests(Long groupId, int page);
+    PagedModel<JoinRequestResponse> getJoinRequests(Long groupId, int page);
 
     List<RecentCompetitionResponse> getRecentCompetitions(Long groupId);
 

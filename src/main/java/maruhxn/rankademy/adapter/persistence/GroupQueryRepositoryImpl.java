@@ -20,6 +20,7 @@ import maruhxn.rankademy.domain.user.QUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -188,8 +189,18 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
     }
 
     @Override
-    public List<RecruitmentPostResponse> getRecruitmentPostList(int page) {
-        return queryFactory
+    public Page<RecruitmentPostResponse> getRecruitmentPostList(int page) {
+        Pageable pageable = PageRequest.of(page, 10);
+
+        Long total = queryFactory.select(groupRecruitmentPost.count())
+                .from(groupRecruitmentPost)
+                .join(group).on(group.recruitmentPost.id.eq(groupRecruitmentPost.id).and(group.isRecruiting.eq(true)))
+                .where(groupRecruitmentPost.isActive.eq(true))
+                .fetchOne();
+
+        if(total == null || total <= 0L) return new PageImpl<>(List.of(), pageable, 0L);
+
+        List<RecruitmentPostResponse> result = queryFactory
                 .select(
                         Projections.constructor(
                                 RecruitmentPostResponse.class,
@@ -205,9 +216,11 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                 .join(group).on(group.recruitmentPost.id.eq(groupRecruitmentPost.id).and(group.isRecruiting.eq(true)))
                 .where(groupRecruitmentPost.isActive.eq(true))
                 .orderBy(groupRecruitmentPost.lastUppedAt.desc(), groupRecruitmentPost.createdAt.desc())
-                .offset(page * 10L)
-                .limit(10)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
+
+        return new PageImpl<>(result, pageable, total);
     }
 
     @Override
@@ -272,16 +285,29 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                 .join(groupMember.user, user)
                 .join(user.summonerInfo, summonerInfo)
                 .where(groupMember.group.id.eq(groupId))
-                .offset(page * 20L)
-                .limit(20)
+                .offset(pageRequest.getOffset())
+                .limit(pageRequest.getPageSize())
                 .fetch();
 
         return new PageImpl(result, pageRequest, total);
     }
 
     @Override
-    public List<JoinRequestResponse> getJoinRequestList(Long groupId, int page) {
-        return queryFactory
+    public Page<JoinRequestResponse> getJoinRequestList(Long groupId, int page) {
+        PageRequest pageRequest = PageRequest.of(page, 10);
+
+        Long total = queryFactory
+                .select(group.count())
+                .from(group)
+                .join(group.joinRequests, joinRequest)
+                .join(user).on(user.id.eq(joinRequest.userId))
+                .join(user.summonerInfo, summonerInfo)
+                .where(group.id.eq(groupId))
+                .fetchOne();
+
+        if(total == null || total <= 0L) return new PageImpl<>(List.of(), pageRequest, 0L);
+
+        List<JoinRequestResponse> result = queryFactory
                 .select(
                         Projections.constructor(
                                 JoinRequestResponse.class,
@@ -296,8 +322,10 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                 .join(user).on(user.id.eq(joinRequest.userId))
                 .join(user.summonerInfo, summonerInfo)
                 .where(group.id.eq(groupId))
-                .offset(page * 10L)
-                .limit(10)
+                .offset(pageRequest.getOffset())
+                .limit(pageRequest.getPageSize())
                 .fetch();
+
+        return new PageImpl(result, pageRequest, total);
     }
 }

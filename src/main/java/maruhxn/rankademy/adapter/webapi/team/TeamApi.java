@@ -11,6 +11,10 @@ import maruhxn.rankademy.application.team.provided.TeamWriter;
 import maruhxn.rankademy.application.team.provided.dto.TeamDetailResponse;
 import maruhxn.rankademy.application.team.provided.dto.TeamPageResponse;
 import maruhxn.rankademy.domain.team.dto.TeamCreateRequest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -30,11 +34,14 @@ public class TeamApi {
             description = "페이지 번호에 따라 팀 목록을 페이지 단위로 조회합니다."
     )
     @ApiResponse(responseCode = "200", description = "팀 목록 조회 성공")
-    public TeamPageResponse getTeamList(
+    public PagedModel<TeamPageResponse.TeamResponse> getTeamList(
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
             @RequestParam("page") int page
     ) {
-        return teamReader.getTeamList(page);
+        TeamPageResponse response = teamReader.getTeamList(page);
+        long totalCount = response.totalCount() == null ? 0L : response.totalCount();
+        Pageable pageable = PageRequest.of(page, 10);
+        return new PagedModel<>(new PageImpl<>(response.teams(), pageable, totalCount));
     }
 
     @PostMapping

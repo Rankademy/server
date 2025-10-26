@@ -62,7 +62,7 @@ class TeamReaderTest extends IntegrationTestSupport {
     @DisplayName("팀 목록 조회 - 페이징")
     void getTeamList() {
         // given
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 15; i++) {
             User representative = GroupFixture.createLeader("re" + i);
             userRepository.save(representative);
 
@@ -87,11 +87,11 @@ class TeamReaderTest extends IntegrationTestSupport {
         TeamPageResponse secondPage = teamReader.getTeamList(1);
 
         // then
-        assertThat(firstPage.totalCount()).isEqualTo(5);
-        assertThat(firstPage.teams()).hasSize(3);
+        assertThat(firstPage.totalCount()).isEqualTo(15);
+        assertThat(firstPage.teams()).hasSize(10);
 
-        assertThat(secondPage.totalCount()).isEqualTo(5);
-        assertThat(secondPage.teams()).hasSize(2);
+        assertThat(secondPage.totalCount()).isEqualTo(15);
+        assertThat(secondPage.teams()).hasSize(5);
     }
 
     @Test

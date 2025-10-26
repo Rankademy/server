@@ -56,8 +56,8 @@ public class TeamQueryRepositoryImpl implements TeamQueryRepository {
                 .where(team.isActive.eq(true))
                 .groupBy(team.id)
                 .orderBy(team.id.desc())
-                .offset(page * 3L)
-                .limit(3)
+                .offset(page * 10L)
+                .limit(10)
                 .fetch();
 
 

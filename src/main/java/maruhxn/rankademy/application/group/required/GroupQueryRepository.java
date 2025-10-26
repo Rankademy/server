@@ -10,13 +10,13 @@ public interface GroupQueryRepository {
 
     Optional<GroupDetailResponse> getGroupDetails(Long userId, Long groupId);
 
-    List<RecruitmentPostResponse> getRecruitmentPostList(int page);
+    Page<RecruitmentPostResponse> getRecruitmentPostList(int page);
 
     Optional<RecruitmentPostDetailResponse> getRecruitmentPostDetail(Long userId, Long groupId);
 
     Page<GroupMemberResponse> getGroupMembers(Long groupId, int page);
 
-    List<JoinRequestResponse> getJoinRequestList(Long groupId, int page);
+    Page<JoinRequestResponse> getJoinRequestList(Long groupId, int page);
 
     List<MyGroupResponse> getMyGroupList(Long userId);
 

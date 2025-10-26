@@ -38,8 +38,9 @@ public class GroupQueryService implements GroupReader {
     }
 
     @Override
-    public List<RecruitmentPostResponse> getRecruitmentPostList(int page) {
-        return groupQueryRepository.getRecruitmentPostList(page);
+    public PagedModel<RecruitmentPostResponse> getRecruitmentPostList(int page) {
+        Page<RecruitmentPostResponse> result = groupQueryRepository.getRecruitmentPostList(page);
+        return new PagedModel(result);
     }
 
     @Override
@@ -55,8 +56,9 @@ public class GroupQueryService implements GroupReader {
     }
 
     @Override
-    public List<JoinRequestResponse> getJoinRequests(Long groupId, int page) {
-        return groupQueryRepository.getJoinRequestList(groupId, page);
+    public PagedModel<JoinRequestResponse> getJoinRequests(Long groupId, int page) {
+        Page<JoinRequestResponse> result = groupQueryRepository.getJoinRequestList(groupId, page);
+        return new PagedModel(result);
     }
 
     @Override

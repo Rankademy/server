@@ -11,6 +11,10 @@ import maruhxn.rankademy.application.scrim_team.provided.dto.ScrimTeamDetailResp
 import maruhxn.rankademy.application.scrim_team.provided.dto.ScrimTeamPageResponse;
 import maruhxn.rankademy.domain.scrim_team.dto.ScrimTeamCreateRequest;
 import maruhxn.rankademy.domain.scrim_team.dto.ScrimTeamUpdateRequest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -30,11 +34,14 @@ public class ScrimTeamApi {
             description = "스크림 팀 목록을 페이지 단위로 조회합니다."
     )
     @ApiResponse(responseCode = "200", description = "스크림 팀 조회 성공")
-    public ScrimTeamPageResponse getScrimTeamList(
+    public PagedModel<ScrimTeamPageResponse.ScrimTeamResponse> getScrimTeamList(
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
             @RequestParam("page") int page
     ) {
-        return scrimTeamReader.getScrimTeamList(page);
+        ScrimTeamPageResponse response = scrimTeamReader.getScrimTeamList(page);
+        long totalCount = response.totalCount() == null ? 0L : response.totalCount();
+        Pageable pageable = PageRequest.of(page, 10);
+        return new PagedModel<>(new PageImpl<>(response.teams(), pageable, totalCount));
     }
 
     @PostMapping
