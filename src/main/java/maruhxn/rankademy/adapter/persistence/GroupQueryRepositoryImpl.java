@@ -17,6 +17,9 @@ import maruhxn.rankademy.domain.group.QGroup;
 import maruhxn.rankademy.domain.group.QGroupMember;
 import maruhxn.rankademy.domain.team.QTeam;
 import maruhxn.rankademy.domain.user.QUser;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -233,8 +236,20 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
     }
 
     @Override
-    public List<GroupMemberResponse> getGroupMembers(Long groupId, int page) {
-        return queryFactory
+    public Page<GroupMemberResponse> getGroupMembers(Long groupId, int page) {
+        PageRequest pageRequest = PageRequest.of(page, 20);
+
+        Long total = queryFactory
+                .select(groupMember.count())
+                .from(groupMember)
+                .join(groupMember.user, user)
+                .join(user.summonerInfo, summonerInfo)
+                .where(groupMember.group.id.eq(groupId))
+                .fetchOne();
+
+        if(total == null || total <= 0L) return new PageImpl(List.of(), pageRequest, total);
+
+        List<GroupMemberResponse> result = queryFactory
                 .select(
                         Projections.constructor(
                                 GroupMemberResponse.class,
@@ -257,9 +272,11 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                 .join(groupMember.user, user)
                 .join(user.summonerInfo, summonerInfo)
                 .where(groupMember.group.id.eq(groupId))
-                .offset(page * 7L)
-                .limit(7)
+                .offset(page * 20L)
+                .limit(20)
                 .fetch();
+
+        return new PageImpl(result, pageRequest, total);
     }
 
     @Override

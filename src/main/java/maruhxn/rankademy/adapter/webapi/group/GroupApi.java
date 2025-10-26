@@ -16,6 +16,7 @@ import maruhxn.rankademy.application.group.provided.dto.RecentCompetitionRespons
 import maruhxn.rankademy.domain.group.Group;
 import maruhxn.rankademy.domain.group.dto.GroupCreateRequest;
 import maruhxn.rankademy.domain.group.dto.GroupUpdateRequest;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -94,7 +95,7 @@ public class GroupApi {
             description = "그룹 멤버 목록을 페이지 단위로 조회합니다."
     )
     @ApiResponse(responseCode = "200", description = "그룹 멤버 조회 성공")
-    public List<GroupMemberResponse> getGroupMembers(
+    public PagedModel<GroupMemberResponse> getGroupMembers(
             @Parameter(description = "대상 그룹 ID", example = "1")
             @PathVariable Long groupId,
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")

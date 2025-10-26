@@ -39,6 +39,8 @@ public class DefaultGroupInvitationQueryRepository implements GroupInvitationQue
                 .from(groupInvitation)
                 .join(group).on(groupInvitation.groupId.eq(group.id))
                 .where(groupInvitation.userId.eq(userId))
+                .offset(page * 20)
+                .limit(20)
                 .fetch();
 
         return new GroupInvitationPageResponse(totalCount, result);

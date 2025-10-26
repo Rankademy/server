@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.web.PagedModel;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -227,11 +228,11 @@ class GroupReaderTest extends IntegrationTestSupport {
         group.addMember(user, GroupRole.MEMBER);
 
         // when
-        List<GroupMemberResponse> groupMembers = groupReader.getGroupMembers(group.getId(), 0);
+        PagedModel<GroupMemberResponse> groupMembers = groupReader.getGroupMembers(group.getId(), 0);
 
         // then
-        assertThat(groupMembers).hasSize(2); // leader + user
-        assertThat(groupMembers.stream().map(GroupMemberResponse::summonerName))
+        assertThat(groupMembers.getContent()).hasSize(2); // leader + user
+        assertThat(groupMembers.getContent().stream().map(GroupMemberResponse::summonerName))
                 .containsExactlyInAnyOrder(leader.getSummonerInfo().getSummonerName(), user.getSummonerInfo().getSummonerName());
     }
 
@@ -246,12 +247,12 @@ class GroupReaderTest extends IntegrationTestSupport {
         }
 
         // when
-        List<GroupMemberResponse> firstPage = groupReader.getGroupMembers(group.getId(), 0);
-        List<GroupMemberResponse> secondPage = groupReader.getGroupMembers(group.getId(), 1);
+        PagedModel<GroupMemberResponse> firstPage = groupReader.getGroupMembers(group.getId(), 0);
+        PagedModel<GroupMemberResponse> secondPage = groupReader.getGroupMembers(group.getId(), 1);
 
         // then
-        assertThat(firstPage).hasSize(7);
-        assertThat(secondPage).hasSize(1);
+        assertThat(firstPage.getContent()).hasSize(8);
+        assertThat(secondPage.getContent()).hasSize(0);
     }
 
     @Test

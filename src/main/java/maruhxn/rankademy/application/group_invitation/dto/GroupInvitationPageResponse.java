@@ -8,7 +8,7 @@ import java.util.List;
 @Schema(description = "그룹 초대 페이지 응답")
 public record GroupInvitationPageResponse(
         @Schema(description = "총 초대 수", example = "3") Long totalCount,
-        @Schema(description = "초대 목록") List<GroupInvitationResponse> competitionRequests
+        @Schema(description = "초대 목록") List<GroupInvitationResponse> groupInvitations
 ) {
 
     @Schema(description = "그룹 초대 정보")

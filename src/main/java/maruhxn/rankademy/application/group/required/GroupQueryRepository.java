@@ -1,6 +1,7 @@
 package maruhxn.rankademy.application.group.required;
 
 import maruhxn.rankademy.application.group.provided.dto.*;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +14,7 @@ public interface GroupQueryRepository {
 
     Optional<RecruitmentPostDetailResponse> getRecruitmentPostDetail(Long userId, Long groupId);
 
-    List<GroupMemberResponse> getGroupMembers(Long groupId, int page);
+    Page<GroupMemberResponse> getGroupMembers(Long groupId, int page);
 
     List<JoinRequestResponse> getJoinRequestList(Long groupId, int page);
 

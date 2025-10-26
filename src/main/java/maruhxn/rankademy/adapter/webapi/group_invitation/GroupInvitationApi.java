@@ -9,6 +9,10 @@ import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.application.group_invitation.dto.GroupInvitationPageResponse;
 import maruhxn.rankademy.application.group_invitation.provided.GroupInvitationManager;
 import maruhxn.rankademy.application.group_invitation.provided.GroupInvitationReader;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,12 +32,15 @@ public class GroupInvitationApi {
             description = "사용자에게 도착한 그룹 초대 목록을 페이지 단위로 조회합니다."
     )
     @ApiResponse(responseCode = "200", description = "그룹 초대 조회 성공")
-    public GroupInvitationPageResponse getInvitations(
+    public PagedModel<GroupInvitationPageResponse.GroupInvitationResponse> getInvitations(
             @AuthenticationPrincipal RankademyUser user,
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
             @RequestParam("page") int page
     ) {
-        return groupInvitationReader.getInvitations(user.getId(), page);
+        GroupInvitationPageResponse response = groupInvitationReader.getInvitations(user.getId(), page);
+        long totalCount = response.totalCount() == null ? 0L : response.totalCount();
+        Pageable pageable = PageRequest.of(page, 20);
+        return new PagedModel<>(new PageImpl<>(response.groupInvitations(), pageable, totalCount));
     }
 
     @PostMapping("/send")

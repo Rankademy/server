@@ -6,6 +6,8 @@ import maruhxn.rankademy.application.group.provided.dto.*;
 import maruhxn.rankademy.application.group.required.GroupQueryRepository;
 import maruhxn.rankademy.application.group.required.GroupRepository;
 import maruhxn.rankademy.domain.group.Group;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,8 +49,9 @@ public class GroupQueryService implements GroupReader {
     }
 
     @Override
-    public List<GroupMemberResponse> getGroupMembers(Long groupId, int page) {
-        return groupQueryRepository.getGroupMembers(groupId, page);
+    public PagedModel<GroupMemberResponse> getGroupMembers(Long groupId, int page) {
+        Page<GroupMemberResponse> result = groupQueryRepository.getGroupMembers(groupId, page);
+        return new PagedModel<>(result);
     }
 
     @Override

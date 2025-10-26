@@ -2,6 +2,7 @@ package maruhxn.rankademy.application.group.provided;
 
 import maruhxn.rankademy.application.group.provided.dto.*;
 import maruhxn.rankademy.domain.group.Group;
+import org.springframework.data.web.PagedModel;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public interface GroupReader {
 
     RecruitmentPostDetailResponse getRecruitmentPostDetail(Long userId, Long groupId);
 
-    List<GroupMemberResponse> getGroupMembers(Long groupId, int page);
+    PagedModel<GroupMemberResponse> getGroupMembers(Long groupId, int page);
 
     List<JoinRequestResponse> getJoinRequests(Long groupId, int page);
 

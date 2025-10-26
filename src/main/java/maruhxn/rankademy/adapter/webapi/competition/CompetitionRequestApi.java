@@ -9,6 +9,10 @@ import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.application.competitionrequest.provided.CompetitionRequestManager;
 import maruhxn.rankademy.application.competitionrequest.provided.CompetitionRequestReader;
 import maruhxn.rankademy.application.competitionrequest.required.dto.CompetitionRequestPageResponse;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -48,13 +52,16 @@ public class CompetitionRequestApi {
             description = "팀에 도착한 대항전 요청을 페이지 단위로 조회합니다."
     )
     @ApiResponse(responseCode = "200", description = "대항전 요청 조회 성공")
-    public CompetitionRequestPageResponse getCompetitionRequests(
+    public PagedModel<CompetitionRequestPageResponse.CompetitionRequestResponse> getCompetitionRequests(
             @Parameter(description = "팀 ID", example = "1")
             @PathVariable Long teamId,
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
             @RequestParam("page") int page
     ) {
-        return competitionRequestReader.getRequests(teamId, page);
+        CompetitionRequestPageResponse response = competitionRequestReader.getRequests(teamId, page);
+        long totalCount = response.totalCount() == null ? 0L : response.totalCount();
+        Pageable pageable = PageRequest.of(page, 20);
+        return new PagedModel<>(new PageImpl<>(response.competitionRequests(), pageable, totalCount));
     }
 
     @PatchMapping("/accept/{requestId}")

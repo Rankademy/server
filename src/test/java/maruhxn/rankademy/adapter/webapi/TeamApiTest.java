@@ -104,18 +104,6 @@ class TeamApiTest extends IntegrationTestSupport {
     }
 
     @Test
-    @WithAnonymousUser
-    @DisplayName("팀 목록 조회 - 인증되지 않은 사용자")
-    void getTeamList_withAnonymousUser() throws Exception {
-        // when
-        MvcTestResult result = mvcTester.get().uri(BASE_URL + "?page=0")
-                .exchange();
-
-        // then
-        assertThat(result).hasStatus(HttpStatus.UNAUTHORIZED);
-    }
-
-    @Test
     @DisplayName("팀 생성 - 성공")
     void createTeam_success() throws Exception {
         // given

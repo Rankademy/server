@@ -70,7 +70,7 @@ class CompetitionRequestQueryServiceTest extends IntegrationTestSupport {
     void getRequests_withPaging() {
         // given
 
-        // Create 25 competitionRequests
+        // Create 25 groupInvitations
         for (int i = 0; i < 25; i++) {
             User u = GroupFixture.createLeader("user_" + i);
             userRepository.save(u);

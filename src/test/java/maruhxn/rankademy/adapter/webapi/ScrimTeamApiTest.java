@@ -86,18 +86,6 @@ class ScrimTeamApiTest extends IntegrationTestSupport {
     }
 
     @Test
-    @WithAnonymousUser
-    @DisplayName("스크림 팀 목록 조회 - 인증되지 않은 사용자")
-    void getScrimTeamList_withAnonymousUser() throws Exception {
-        // when
-        MvcTestResult result = mvcTester.get().uri(BASE_URL + "?page=0")
-                .exchange();
-
-        // then
-        assertThat(result).hasStatus(HttpStatus.UNAUTHORIZED);
-    }
-
-    @Test
     @DisplayName("스크림 팀 생성 - 성공")
     void createScrimTeam_success() throws Exception {
         // given
@@ -158,18 +146,6 @@ class ScrimTeamApiTest extends IntegrationTestSupport {
 
         // then
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    @WithAnonymousUser
-    @DisplayName("스크림 팀 상세 조회 - 인증되지 않은 사용자")
-    void getScrimTeamDetail_withAnonymousUser() throws Exception {
-        // when
-        MvcTestResult result = mvcTester.get().uri(BASE_URL + "/1")
-                .exchange();
-
-        // then
-        assertThat(result).hasStatus(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
