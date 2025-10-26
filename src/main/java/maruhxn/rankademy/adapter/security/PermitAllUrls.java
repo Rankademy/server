@@ -29,6 +29,7 @@ public enum PermitAllUrls {
     SWAGGER_UI("/docs/swagger-ui.html", GET),
     SWAGGER_UI_RESOURCES("/docs/swagger-ui/**", GET),
     SWAGGER_API_DOCS("/docs/api-docs/**", GET),
+    GROUP_COMPETITIONS_LIST("/api/v1/competitions/groups/{groupId}**", GET),
     ;
 
     private final String url;

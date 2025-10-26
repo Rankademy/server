@@ -9,7 +9,8 @@ public record UserInfo(
         String username,
         String email,
         boolean isAuthorized,
-        String role
+        String role,
+        Integer summonerIconNum
 ) {
     public static UserInfo from(User user) {
         return UserInfo.builder()
@@ -18,6 +19,7 @@ public record UserInfo(
                 .email(user.getEmail().address())
                 .isAuthorized(user.isAuthorized())
                 .role(user.getRole().name())
+                .summonerIconNum(user.getSummonerInfo() != null ? user.getSummonerInfo().getSummonerIconNum() : null)
                 .build();
     }
 }

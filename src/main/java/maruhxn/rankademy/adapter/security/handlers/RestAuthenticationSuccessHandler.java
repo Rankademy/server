@@ -56,6 +56,7 @@ public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHa
         LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.put("accessToken", List.of(tokenDto.accessToken()));
         params.put("refreshToken", List.of(tokenDto.refreshToken()));
+        params.put("summonerIconNum", List.of(String.valueOf(tokenDto.summonerIconNum())));
 
         return UriComponentsBuilder
                 .fromHttpUrl(clientUrl + "/auth/callback")

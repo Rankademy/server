@@ -9,6 +9,6 @@ public record RecordInfoDto(
         @Schema(description = "승률", example = "0.6667") double winRate
 ) {
     public RecordInfoDto(int winCount, int lossCount) {
-        this(winCount, lossCount, (double) winCount / (winCount + lossCount));
+        this(winCount, lossCount, (double) winCount / (winCount + lossCount) * 100);
     }
 }

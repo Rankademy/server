@@ -115,6 +115,7 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                         memberCountExpr,
                         leaderUser.id,
                         leaderUser.summonerInfo.summonerName,
+                        leaderUser.summonerInfo.summonerTag,
                         leaderUser.summonerInfo.summonerIconNum,
                         group.createdAt
                 )

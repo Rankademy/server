@@ -71,11 +71,12 @@ public class JwtProvider {
     public TokenDto createJwt(RankademyUser rankademyUser) {
         String accessToken = this.generateAccessToken(rankademyUser, new Date());
         String refreshToken = this.generateRefreshToken(rankademyUser.getEmail(), new Date());
-
+        Integer summonerIconNum = rankademyUser.userInfo().summonerIconNum();
         return new TokenDto(
                 rankademyUser.getEmail(),
                 accessToken,
-                refreshToken
+                refreshToken,
+                summonerIconNum
         );
     }
 
@@ -89,7 +90,6 @@ public class JwtProvider {
                 .claim("summonerName", rankademyUser.getNickname())
                 .claim("isAuthorized", rankademyUser.userInfo().isAuthorized())
                 .claim("role", authorities.get(0).getAuthority())
-//                .claim("provider", rankademyUser.getProvider())
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + accessTokenExpiration))
                 .signWith(secretKey)
