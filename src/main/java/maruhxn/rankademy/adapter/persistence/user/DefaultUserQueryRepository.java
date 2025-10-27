@@ -35,7 +35,7 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
                                 ProfileResponse.SummonerInfoResponse.class,
                                 summonerInfo.summonerName,
                                 summonerInfo.summonerTag,
-                                summonerInfo.summonerIconNum,
+                                summonerInfo.summonerIcon,
                                 summonerInfo.tierInfo,
                                 summonerInfo.winCount,
                                 summonerInfo.lossCount
@@ -95,7 +95,7 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
                                 summonerInfo.puuid,
                                 summonerInfo.summonerName,
                                 summonerInfo.summonerTag,
-                                summonerInfo.summonerIconNum,
+                                summonerInfo.summonerIcon,
                                 summonerInfo.tierInfo,
                                 summonerInfo.winCount,
                                 summonerInfo.lossCount

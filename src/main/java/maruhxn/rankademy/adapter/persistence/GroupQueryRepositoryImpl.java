@@ -120,7 +120,7 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                         leaderUser.id,
                         leaderUser.summonerInfo.summonerName,
                         leaderUser.summonerInfo.summonerTag,
-                        leaderUser.summonerInfo.summonerIconNum,
+                        leaderUser.summonerInfo.summonerIcon,
                         group.createdAt
                 )
                 .from(group)
@@ -138,7 +138,7 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                         group.capacity,
                         leaderUser.id,
                         leaderUser.summonerInfo.summonerName,
-                        leaderUser.summonerInfo.summonerIconNum,
+                        leaderUser.summonerInfo.summonerIcon,
                         group.createdAt
                 )
                 .fetchOne();
@@ -169,7 +169,7 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                 head.get(leaderUser.id),
                 head.get(leaderUser.summonerInfo.summonerName),
                 head.get(leaderUser.summonerInfo.summonerTag),
-                head.get(leaderUser.summonerInfo.summonerIconNum)
+                head.get(leaderUser.summonerInfo.summonerIcon)
         );
 
         return Optional.of(new GroupDetailResponse(
@@ -268,7 +268,7 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                                 GroupMemberResponse.class,
                                 summonerInfo.summonerName,
                                 summonerInfo.summonerTag,
-                                summonerInfo.summonerIconNum,
+                                summonerInfo.summonerIcon,
                                 user.univInfo.major,
                                 user.univInfo.admissionYear,
                                 user.mainPosition,

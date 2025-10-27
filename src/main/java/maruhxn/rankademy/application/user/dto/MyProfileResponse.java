@@ -33,22 +33,22 @@ public record MyProfileResponse(
             @Schema(description = "소환사 PUUID") String puuid,
             @Schema(description = "소환사 이름") String summonerName,
             @Schema(description = "소환사 태그") String summonerTag,
-            @Schema(description = "소환사 아이콘 번호") int summonerIconNum,
+            @Schema(description = "소환사 아이콘 번호") int summonerIcon,
             @Schema(description = "현재 티어 정보") TierInfo tierInfo,
             @Schema(description = "승리 횟수", example = "20") int winCount,
             @Schema(description = "패배 횟수", example = "10") int lossCount,
             @Schema(description = "승률(%)", example = "66.7") double winRate
     ) {
-        public SummonerInfoResponse(String puuid, String summonerName, String summonerTag, int summonerIconNum, TierInfo tierInfo, int winCount, int lossCount) {
+        public SummonerInfoResponse(String puuid, String summonerName, String summonerTag, int summonerIcon, TierInfo tierInfo, int winCount, int lossCount) {
             this(
-                puuid,
-                summonerName,
-                summonerTag,
-                summonerIconNum,
-                tierInfo,
-                winCount,
-                lossCount,
-                (double) winCount / Math.max(1, winCount + lossCount) * 100.0
+                    puuid,
+                    summonerName,
+                    summonerTag,
+                    summonerIcon,
+                    tierInfo,
+                    winCount,
+                    lossCount,
+                    (double) winCount / Math.max(1, winCount + lossCount) * 100.0
             );
         }
     }

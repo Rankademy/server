@@ -98,7 +98,7 @@ public class TotalRankingRepository {
                                     user.id,
                                     user.summonerInfo.summonerName,
                                     user.summonerInfo.summonerTag,
-                                    user.summonerInfo.summonerIconNum
+                                    user.summonerInfo.summonerIcon
                             )
                     )
                     .from(user)
@@ -145,7 +145,7 @@ public class TotalRankingRepository {
                         summonerInfo.puuid,
                         summonerInfo.summonerName,
                         summonerInfo.summonerTag,
-                        summonerInfo.summonerIconNum,
+                        summonerInfo.summonerIcon,
                         user.univInfo.univName,
                         summonerInfo.tierInfo,
                         summonerInfo.winCount,

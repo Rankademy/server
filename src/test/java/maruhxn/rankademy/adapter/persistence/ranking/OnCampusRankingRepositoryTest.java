@@ -209,7 +209,7 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
 //        leader2.getSummonerInfo().update(
 //                summonerInfo2.getSummonerName(),
 //                summonerInfo2.getSummonerTag(),
-//                summonerInfo2.getSummonerIconNum(),
+//                summonerInfo2.getsummonerIcon(),
 //                new TierInfo(Tier.DIAMOND, Rank.II, 0),
 //                50,
 //                50
@@ -220,7 +220,7 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
 //        member2SummonerInfo.update(
 //                member2SummonerInfo.getSummonerName(),
 //                member2SummonerInfo.getSummonerTag(),
-//                member2SummonerInfo.getSummonerIconNum(),
+//                member2SummonerInfo.getsummonerIcon(),
 //                new TierInfo(Tier.PLATINUM, Rank.IV, 0),
 //                50,
 //                50
@@ -232,7 +232,7 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
 //        summonerInfo3.update(
 //                summonerInfo3.getSummonerName(),
 //                summonerInfo3.getSummonerTag(),
-//                summonerInfo3.getSummonerIconNum(),
+//                summonerInfo3.getsummonerIcon(),
 //                new TierInfo(Tier.PLATINUM, Rank.I, 0),
 //                40,
 //                60

@@ -34,7 +34,7 @@ public class SummonerInfo extends AbstractEntity {
     private String summonerTag;
 
     @Column(nullable = false)
-    private int summonerIconNum;
+    private int summonerIcon;
 
     @Embedded
     private TierInfo tierInfo;
@@ -57,11 +57,11 @@ public class SummonerInfo extends AbstractEntity {
     private LocalDateTime matchSyncedAt;
 
     @Builder
-    public SummonerInfo(String puuid, String summonerName, String summonerTag, int summonerIconNum, TierInfo tierInfo, int winCount, int lossCount, LocalDateTime enrolledAt, String lastSyncedMatchId, LocalDateTime matchSyncedAt) {
+    public SummonerInfo(String puuid, String summonerName, String summonerTag, int summonerIcon, TierInfo tierInfo, int winCount, int lossCount, LocalDateTime enrolledAt, String lastSyncedMatchId, LocalDateTime matchSyncedAt) {
         this.puuid = puuid;
         this.summonerName = summonerName;
         this.summonerTag = summonerTag;
-        this.summonerIconNum = summonerIconNum;
+        this.summonerIcon = summonerIcon;
         this.tierInfo = tierInfo;
         this.winCount = winCount;
         this.lossCount = lossCount;
@@ -70,12 +70,12 @@ public class SummonerInfo extends AbstractEntity {
         this.matchSyncedAt = matchSyncedAt;
     }
 
-    public static SummonerInfo of(String puuid, RiotAuthRequest riotAuthRequest, int summonerIconId, RiotLeagueEntryResponse soloRankEntry) {
+    public static SummonerInfo of(String puuid, RiotAuthRequest riotAuthRequest, int summonerIcon, RiotLeagueEntryResponse soloRankEntry) {
         return SummonerInfo.builder()
                 .puuid(requireNonNull(puuid))
                 .summonerName(riotAuthRequest.summonerName())
                 .summonerTag(riotAuthRequest.summonerTag())
-                .summonerIconNum(summonerIconId)
+                .summonerIcon(summonerIcon)
                 .tierInfo(TierInfo.from(soloRankEntry))
                 .winCount(soloRankEntry.wins())
                 .lossCount(soloRankEntry.losses())
@@ -85,10 +85,10 @@ public class SummonerInfo extends AbstractEntity {
                 .build();
     }
 
-    public void update(String summonerName, String summonerTag, int summonerIconNum, TierInfo tierInfo, int winCount, int lossCount) {
+    public void update(String summonerName, String summonerTag, int summonerIcon, TierInfo tierInfo, int winCount, int lossCount) {
         this.summonerName = summonerName;
         this.summonerTag = summonerTag;
-        this.summonerIconNum = summonerIconNum;
+        this.summonerIcon = summonerIcon;
         this.tierInfo = tierInfo;
         this.winCount = winCount;
         this.lossCount = lossCount;

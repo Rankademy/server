@@ -22,17 +22,17 @@ public record ProfileResponse(
     public record SummonerInfoResponse(
             String summonerName,
             String summonerTag,
-            int summonerIconNum,
+            int summonerIcon,
             TierInfo tierInfo,
             int winCount,
             int lossCount,
             double winRate
     ) {
-        public SummonerInfoResponse(String summonerName, String summonerTag, int summonerIconNum, TierInfo tierInfo, int winCount, int lossCount) {
+        public SummonerInfoResponse(String summonerName, String summonerTag, int summonerIcon, TierInfo tierInfo, int winCount, int lossCount) {
             this(
                     summonerName,
                     summonerTag,
-                    summonerIconNum,
+                    summonerIcon,
                     tierInfo,
                     winCount,
                     lossCount,

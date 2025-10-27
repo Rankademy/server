@@ -106,7 +106,7 @@ public class ScrimTeamQueryRepositoryImpl implements ScrimTeamQueryRepository {
                         stm.position,
                         si.summonerName,
                         si.summonerTag,
-                        si.summonerIconNum,
+                        si.summonerIcon,
                         u.univInfo.univName,
                         si.tierInfo
                 ))

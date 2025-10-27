@@ -77,7 +77,7 @@ public class OnCampusRankingRepository {
                             s.getPuuid(),
                             s.getSummonerName(),
                             s.getSummonerTag(),
-                            s.getSummonerIconNum(),
+                            s.getSummonerIcon(),
                             s.getTierInfo(),
                             s.getWinRate(),
                             s.getWinCount(),
@@ -158,7 +158,7 @@ public class OnCampusRankingRepository {
                                         leaderUser.id,
                                         leaderUser.summonerInfo.summonerName,
                                         leaderUser.summonerInfo.summonerTag,
-                                        leaderUser.summonerInfo.summonerIconNum
+                                        leaderUser.summonerInfo.summonerIcon
                                 )
                         )
                 )
@@ -186,7 +186,7 @@ public class OnCampusRankingRepository {
                 )
                 .groupBy(
                         group.id, group.name, group.logoImage, group.capacity,
-                        leaderUser.id, leaderUser.summonerInfo.summonerIconNum
+                        leaderUser.id, leaderUser.summonerInfo.summonerIcon
                 )
                 .orderBy(winCount.desc(), totalCount.desc(), group.createdAt.asc())
                 .offset((long) page * PAGE_SIZE)

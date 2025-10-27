@@ -71,12 +71,12 @@ public class JwtProvider {
     public TokenDto createJwt(RankademyUser rankademyUser) {
         String accessToken = this.generateAccessToken(rankademyUser, new Date());
         String refreshToken = this.generateRefreshToken(rankademyUser.getEmail(), new Date());
-        Integer summonerIconNum = rankademyUser.userInfo().summonerIconNum();
+        Integer summonerIcon = rankademyUser.userInfo().summonerIcon();
         return new TokenDto(
                 rankademyUser.getEmail(),
                 accessToken,
                 refreshToken,
-                summonerIconNum
+                summonerIcon
         );
     }
 
