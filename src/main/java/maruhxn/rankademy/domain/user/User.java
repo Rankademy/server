@@ -45,11 +45,13 @@ public class User extends AbstractEntity {
 
     private LocalDateTime joinedAt;
 
+    @Column(name = "main_position", nullable = false)
     @Enumerated(EnumType.STRING)
-    private LolPosition mainPosition;
+    private LolPosition mainPosition = LolPosition.ANY;
 
+    @Column(name = "sub_position", nullable = false)
     @Enumerated(EnumType.STRING)
-    private LolPosition subPosition;
+    private LolPosition subPosition = LolPosition.ANY;
 
     @Enumerated(EnumType.STRING)
     private Role role;
