@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
@@ -27,8 +28,6 @@ public class LoggingFilter extends OncePerRequestFilter {
 
     private static final String TRACE_ID_MDC_KEY = "traceId";
     private static final String REQUEST_ID_HEADER = "X-Request-Id";
-    private static final String CORRELATION_ID_HEADER = "X-Correlation-Id";
-    private static final int MAX_PAYLOAD_LENGTH = 2000;
 
     private static final List<String> URL_WHITELIST = List.of(
             "/favicon.ico",
@@ -50,25 +49,27 @@ public class LoggingFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        ContentCachingRequestWrapper requestWrapper = wrapRequest(request);
-        ContentCachingResponseWrapper responseWrapper = wrapResponse(response);
+        ContentCachingRequestWrapper req = wrapRequest(request);
+        ContentCachingResponseWrapper res = wrapResponse(response);
 
-        String traceId = resolveTraceId(requestWrapper);
+        String traceId = StringUtils.hasText(request.getHeader(REQUEST_ID_HEADER))
+                ? request.getHeader(REQUEST_ID_HEADER)
+                : UUID.randomUUID().toString();
         MDC.put(TRACE_ID_MDC_KEY, traceId);
-        attachTraceHeader(responseWrapper, traceId);
+        res.setHeader(REQUEST_ID_HEADER, traceId);
 
         long startTime = System.currentTimeMillis();
-        logIncomingRequest(requestWrapper, traceId);
+        logRequestLineAndHeaders(req);
 
+        Exception error = null;
         try {
-            filterChain.doFilter(requestWrapper, responseWrapper);
-            logCompletion(requestWrapper, responseWrapper, traceId, startTime, null);
-            responseWrapper.copyBodyToResponse();
+            filterChain.doFilter(req, res);
         } catch (Exception ex) {
-            logCompletion(requestWrapper, responseWrapper, traceId, startTime, ex);
-            responseWrapper.copyBodyToResponse();
+            error = ex;
             throw ex;
         } finally {
+            logCompletion(req, res, startTime, error);
+            res.copyBodyToResponse();
             MDC.clear();
         }
     }
@@ -87,35 +88,18 @@ public class LoggingFilter extends OncePerRequestFilter {
         return new ContentCachingResponseWrapper(response);
     }
 
-    private void attachTraceHeader(HttpServletResponse response, String traceId) {
-        if (!response.containsHeader(REQUEST_ID_HEADER)) {
-            response.addHeader(REQUEST_ID_HEADER, traceId);
-        }
-    }
-
-    private String resolveTraceId(HttpServletRequest request) {
-        String headerTraceId = request.getHeader(REQUEST_ID_HEADER);
-        if (!StringUtils.hasText(headerTraceId)) {
-            headerTraceId = request.getHeader(CORRELATION_ID_HEADER);
-            return headerTraceId;
-        }
-        return UUID.randomUUID().toString();
-    }
-
-    private void logIncomingRequest(ContentCachingRequestWrapper request, String traceId) {
+    private void logRequestLineAndHeaders(ContentCachingRequestWrapper request) {
         String uri = request.getRequestURI();
         String query = request.getQueryString();
         String fullUri = query == null ? uri : uri + '?' + query;
 
         String remoteIp = request.getRemoteAddr();
         String forwardedFor = request.getHeader("X-Forwarded-For");
-        String userAgent = request.getHeader("User-Agent");
-        String referer = request.getHeader("Referer");
-        long contentLength = request.getContentLengthLong();
+        String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
+        String referer = request.getHeader(HttpHeaders.REFERER);
 
         log.info(
-                "Incoming request traceId={} method={} uri={} remoteIp={} forwardedFor={} userAgent={} referer={} contentType={} contentLength={}",
-                traceId,
+                "[{}] uri={} remoteIp={} forwardedFor={} userAgent={} referer={} contentType={} contentLength={}",
                 request.getMethod(),
                 fullUri,
                 remoteIp,
@@ -123,61 +107,56 @@ public class LoggingFilter extends OncePerRequestFilter {
                 userAgent,
                 referer,
                 request.getContentType(),
-                contentLength
+                request.getContentLengthLong()
         );
     }
 
     private void logCompletion(
-            ContentCachingRequestWrapper request,
-            ContentCachingResponseWrapper response,
-            String traceId,
+            ContentCachingRequestWrapper req,
+            ContentCachingResponseWrapper res,
             long startTime,
             Exception exception
     ) {
         long duration = System.currentTimeMillis() - startTime;
-        int status = response.getStatus();
-        int responseSize = response.getContentSize();
-
-        if (exception == null) {
-            log.info(
-                    "Completed request traceId={} status={} duration={}ms responseSize={} contentType={}",
-                    traceId,
-                    status,
-                    duration,
-                    responseSize,
-                    response.getContentType()
-            );
-        } else {
-            log.error(
-                    "Request failed traceId={} status={} duration={}ms responseSize={} contentType={} error={}",
-                    traceId,
-                    status,
-                    duration,
-                    responseSize,
-                    response.getContentType(),
-                    exception.getMessage(),
-                    exception
-            );
-        }
+        int status = res.getStatus();
+        int responseSize = res.getContentSize();
 
         String requestPayload = extractPayload(
-                request.getContentAsByteArray(),
-                resolveCharset(request.getCharacterEncoding()),
-                request.getContentType()
+                req.getContentAsByteArray(),
+                resolveCharset(req.getCharacterEncoding()),
+                req.getContentType()
+        );
+
+        String responsePayload = extractPayload(
+                res.getContentAsByteArray(),
+                resolveCharset(res.getCharacterEncoding()),
+                res.getContentType()
         );
 
         if (StringUtils.hasText(requestPayload)) {
-            log.info("Request payload traceId={} payload={}", traceId, requestPayload);
+            log.debug("Request payload={}", requestPayload);
         }
 
-        String responsePayload = extractPayload(
-                response.getContentAsByteArray(),
-                resolveCharset(response.getCharacterEncoding()),
-                response.getContentType()
-        );
-
-        if (StringUtils.hasText(responsePayload)) {
-            log.info("Response payload traceId={} payload={}", traceId, responsePayload);
+        if (exception == null) {
+            log.info(
+                    "Completed request status={} duration={}ms responseSize={} contentType={} payload={}",
+                    status,
+                    duration,
+                    responseSize,
+                    res.getContentType(),
+                    responsePayload
+            );
+        } else {
+            log.error(
+                    "Request failed status={} duration={}ms responseSize={} payload={} contentType={} error={}",
+                    status,
+                    duration,
+                    responseSize,
+                    res.getContentType(),
+                    responsePayload,
+                    exception.getMessage(),
+                    exception
+            );
         }
     }
 
@@ -201,14 +180,8 @@ public class LoggingFilter extends OncePerRequestFilter {
             return "[binary content omitted]";
         }
 
-        int length = Math.min(content.length, MAX_PAYLOAD_LENGTH);
-        String payload = new String(content, 0, length, charset);
 
-        if (content.length > MAX_PAYLOAD_LENGTH) {
-            payload = payload + "...(truncated)";
-        }
-
-        return payload;
+        return new String(content, charset);
     }
 
     private boolean isReadableContentType(String contentType) {
