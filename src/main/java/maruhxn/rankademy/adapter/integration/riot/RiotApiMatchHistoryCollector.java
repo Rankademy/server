@@ -7,6 +7,8 @@ import maruhxn.rankademy.application.user.required.RiotApiProvider;
 import maruhxn.rankademy.domain.match.MatchData;
 import maruhxn.rankademy.domain.user.User;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -23,6 +25,7 @@ public class RiotApiMatchHistoryCollector implements MatchHistoryCollector {
             .atStartOfDay(ZoneOffset.UTC).toEpochSecond();
 
     private static final int CHUNK_SIZE = 10;
+    private static final int MATCH_FETCH_CONCURRENCY = 5;
 
     private final RiotApiProvider riotApiProvider;
 
@@ -95,13 +98,17 @@ public class RiotApiMatchHistoryCollector implements MatchHistoryCollector {
     }
 
     private List<MatchData> fetchMatches(Long userId, String puuid, List<String> matchIds) {
-        List<MatchData> matches = new ArrayList<>(matchIds.size());
+        if (matchIds.isEmpty()) {
+            return List.of();
+        }
 
-        matchIds.forEach(matchId -> {
-            MatchData matchInfo = riotApiProvider.getMatchInfo(matchId, puuid, userId);
-            matches.add(matchInfo);
-        });
+        // cㅚ대 5개까지 병렬로 매치 상세 수집
+        List<MatchData> matches = Flux.fromIterable(matchIds)
+                .flatMapSequential(matchId -> riotApiProvider.getMatchInfo(matchId, puuid, userId)
+                                .subscribeOn(Schedulers.boundedElastic()), MATCH_FETCH_CONCURRENCY)
+                .collectList()
+                .block();
 
-        return matches;
+        return matches != null ? matches : List.of();
     }
 }
