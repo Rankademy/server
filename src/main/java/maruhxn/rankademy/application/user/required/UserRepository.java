@@ -34,5 +34,6 @@ public interface UserRepository extends Repository<User, Long> {
     @Query("select u from User u join fetch u.oauthAccounts oa where oa.provider = :provider and oa.oauthId = :oauthId")
     Optional<User> findByProviderAndOAuthId(OAuth2Provider provider, String oauthId);
 
+    @Query("select u from User u where u.summonerInfo is not null and u.lastLoginAt >= :dateTime")
     List<User> findByLastLoginAtGreaterThanEqual(LocalDateTime dateTime);
 }
