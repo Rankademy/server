@@ -10,5 +10,5 @@ spring.config.activate.on-profile: prod
 
 client.url: http://localhost:3000
 server.url: https://api.rankademy.kr
-matchmaking.url: https://ai.rankademy.kr:8000
-labels.url: https://ai.rankademy.kr:8001
+matchmaking.url: https://ai.rankademy.kr/match-making
+labels.url: https://ai.rankademy.kr/labels
