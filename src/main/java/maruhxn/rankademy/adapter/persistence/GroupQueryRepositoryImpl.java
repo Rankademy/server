@@ -207,6 +207,7 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                                 groupRecruitmentPost.id,
                                 group.id,
                                 group.name,
+                                group.logoImage,
                                 groupRecruitmentPost.title,
                                 groupRecruitmentPost.content,
                                 groupRecruitmentPost.createdAt
@@ -266,6 +267,7 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                 .select(
                         Projections.constructor(
                                 GroupMemberResponse.class,
+                                user.id,
                                 summonerInfo.summonerName,
                                 summonerInfo.summonerTag,
                                 summonerInfo.summonerIcon,

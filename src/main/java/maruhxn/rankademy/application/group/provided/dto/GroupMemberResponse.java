@@ -6,6 +6,7 @@ import maruhxn.rankademy.domain.user.TierInfo;
 
 @Schema(description = "그룹 구성원 요약 정보")
 public record GroupMemberResponse(
+        @Schema(description = "유저 아이디", example = "1") Long userId,
         @Schema(description = "소환사 이름", example = "Ranker") String summonerName,
         @Schema(description = "소환사 태그", example = "KR1") String summonerTag,
         @Schema(description = "소환사 아이콘 번호", example = "1234") int summonerIconId,

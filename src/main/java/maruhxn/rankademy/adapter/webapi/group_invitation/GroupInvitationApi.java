@@ -19,14 +19,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/groups/{groupId}/invitation")
 @RequiredArgsConstructor
 @Tag(name = "Group Invitations", description = "그룹 초대 관리 API")
 public class GroupInvitationApi {
     private final GroupInvitationManager groupInvitationManager;
     private final GroupInvitationReader groupInvitationReader;
 
-    @GetMapping
+    @GetMapping("/api/v1/groups/invitation")
     @Operation(
             summary = "내 그룹 초대 목록 조회",
             description = "사용자에게 도착한 그룹 초대 목록을 페이지 단위로 조회합니다."
@@ -43,7 +42,7 @@ public class GroupInvitationApi {
         return new PagedModel<>(new PageImpl<>(response.groupInvitations(), pageable, totalCount));
     }
 
-    @PostMapping("/send")
+    @PostMapping("/api/v1/groups/{groupId}/invitation/send")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("@groupLeaderChecker.isGroupLeader(principal.userInfo(), #groupId)")
     @Operation(
@@ -60,7 +59,7 @@ public class GroupInvitationApi {
         groupInvitationManager.invite(groupId, invitedUserId);
     }
 
-    @PatchMapping("/accept/{invitationId}")
+    @PatchMapping("/api/v1/groups/{groupId}/invitation/accept/{invitationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@groupInviteeChecker.isInvitee(principal.userInfo(), #invitationId)")
     @Operation(
@@ -76,7 +75,7 @@ public class GroupInvitationApi {
         groupInvitationManager.acceptInvitation(user.getId(), invitationId);
     }
 
-    @PatchMapping("/reject/{invitationId}")
+    @PatchMapping("/api/v1/groups/{groupId}/invitation/reject/{invitationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@groupInviteeChecker.isInvitee(principal.userInfo(), #invitationId)")
     @Operation(

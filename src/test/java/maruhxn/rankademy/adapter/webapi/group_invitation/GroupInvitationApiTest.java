@@ -76,7 +76,7 @@ class GroupInvitationApiTest extends IntegrationTestSupport {
 
         // when
         MvcTestResult result = mvcTester.get()
-                .uri(BASE_URL + "/" + group.getId() + "/invitation")
+                .uri(BASE_URL + "/invitation")
                 .with(user(RankademyUser.from(UserInfo.from(invitee))))
                 .param("page", "0")
                 .exchange();

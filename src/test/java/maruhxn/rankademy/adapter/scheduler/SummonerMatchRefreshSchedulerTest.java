@@ -8,16 +8,17 @@ import maruhxn.rankademy.domain.match.MatchData;
 import maruhxn.rankademy.domain.shared.TimeProvider;
 import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.support.IntegrationTestSupport;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static maruhxn.rankademy.domain.user.UserFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,13 +54,10 @@ class SummonerMatchRefreshSchedulerTest extends IntegrationTestSupport {
         matchDataRepository.deleteAll();
     }
 
-    @AfterEach
-    void tearDown() {
-        matchDataRepository.deleteAll();
-    }
-
     @Test
     void refreshMatchHistory() {
+        ReflectionTestUtils.setField(scheduler, "running", new AtomicBoolean(false));
+
         User activeUser = createUser("active@rankademy.app", "active");
         activeUser.enrollUnivInfo(createEnrollUnivRequest());
         activeUser.completeUnivAuthentication();
@@ -106,7 +104,7 @@ class SummonerMatchRefreshSchedulerTest extends IntegrationTestSupport {
 
     @Test
     void skipIfPreviousRunInProgress() {
-        ReflectionTestUtils.setField(scheduler, "running", new java.util.concurrent.atomic.AtomicBoolean(true));
+        ReflectionTestUtils.setField(scheduler, "running", new AtomicBoolean(true));
 
         scheduler.refreshMatchHistory();
 

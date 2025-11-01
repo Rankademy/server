@@ -9,6 +9,7 @@ public record RecruitmentPostResponse(
         @Schema(description = "모집글 ID", example = "1") Long postId,
         @Schema(description = "그룹 ID", example = "1") Long groupId,
         @Schema(description = "그룹 이름") String groupName,
+        @Schema(description = "그룹 이미지") String groupLogo,
         @Schema(description = "모집글 제목") String title,
         @Schema(description = "모집글 내용") String content,
         @Schema(description = "작성일") LocalDateTime createdAt

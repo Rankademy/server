@@ -21,6 +21,7 @@ import java.util.UUID;
 /**
  * 로컬에 파일을 CRD 할 수 있다
  */
+@Deprecated
 @Slf4j
 @Component
 @Fallback
