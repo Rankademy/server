@@ -104,6 +104,15 @@ class SummonerMatchRefreshSchedulerTest extends IntegrationTestSupport {
         assertThat(matchDataRepository.findAllByUserId(inactiveUserId)).isEmpty();
     }
 
+    @Test
+    void skipIfPreviousRunInProgress() {
+        ReflectionTestUtils.setField(scheduler, "running", new java.util.concurrent.atomic.AtomicBoolean(true));
+
+        scheduler.refreshMatchHistory();
+
+        verify(matchHistoryCollector, never()).collectMatchesWithLastMatchId(any(User.class), any());
+    }
+
     private String sampleMatchJson(String puuid) {
         return """
                 {
