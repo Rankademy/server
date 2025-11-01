@@ -45,4 +45,8 @@ public class TierInfo {
         int lp = soloRankEntry.leaguePoints();
         return new TierInfo(tier, rank, lp);
     }
+
+    public String getFlattenString() {
+        return tier.name().toLowerCase() + rank.getInteger();
+    }
 }

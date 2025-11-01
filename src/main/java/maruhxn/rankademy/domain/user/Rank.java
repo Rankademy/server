@@ -13,6 +13,10 @@ public enum Rank {
 
     @JsonValue
     public int jsonValue() {
+        return getInteger();
+    }
+
+    public int getInteger() {
         return switch (this) {
             case I -> 1;
             case II -> 2;
