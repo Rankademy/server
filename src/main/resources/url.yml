@@ -3,7 +3,7 @@ spring.config.activate.on-profile: local,dev,test
 client.url: http://localhost:3000
 server.url: http://localhost:8080
 matchmaking.url: http://localhost:9000
-ocr.url: http://localhost:9001
+labels.url: http://localhost:9001
 
 ---
 spring.config.activate.on-profile: prod
@@ -11,4 +11,4 @@ spring.config.activate.on-profile: prod
 client.url: http://localhost:3000
 server.url: https://api.rankademy.kr
 matchmaking.url: https://ai.rankademy.kr:8000
-ocr.url: https://ai.rankademy.kr:8001
+labels.url: https://ai.rankademy.kr:8001
