@@ -16,3 +16,15 @@ services:
       - 'MONGO_INITDB_ROOT_PASSWORD=verysecret'
     ports:
       - '27017:27017'
+
+  matchmaking:
+    image: "ghcr.io/rankademy/rankademy-matchmaking:latest"
+    ports:
+      - "9000:8000"
+    pull_policy: always
+
+  ocr:
+    image: "ghcr.io/rankademy/rankademy-ocr:latest"
+    ports:
+      - "9001:8000"
+    pull_policy: always
