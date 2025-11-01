@@ -83,12 +83,16 @@ public class User extends AbstractEntity {
 
     private LocalDateTime lastLoginAt;
 
+    @Embedded
+    private EffectiveStrength effectiveStrength;
+
     public User(String username, Email email) {
         this.username = username;
         this.email = email;
         this.joinedAt = LocalDateTime.now();
         this.authStatus = UserAuthStatus.UNAUTHORIZED;
         this.role = Role.ROLE_USER;
+        this.effectiveStrength = new EffectiveStrength();
     }
 
     public static User oauth2Register(UserOAuth2CreateRequest userOAuth2CreateRequest) {
@@ -193,5 +197,9 @@ public class User extends AbstractEntity {
 
     public void updateLastLoginAt() {
         this.lastLoginAt = LocalDateTime.now();
+    }
+
+    public void updateEffectiveStrength(EffectiveStrength effectiveStrength) {
+        this.effectiveStrength = effectiveStrength;
     }
 }

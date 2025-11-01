@@ -43,6 +43,9 @@ public class Team extends AbstractEntity {
 
     private boolean isActive;
 
+    @Column(name = "avg_mmr")
+    private Double avgMmr = 0.0;
+
     public Team(Long groupId, String name, String intro, Long representativeId) {
         this.groupId = requireNonNull(groupId);
         this.name = requireNonNull(name);
@@ -114,5 +117,9 @@ public class Team extends AbstractEntity {
 
         // 팀 비활성화
         deactivate();
+    }
+
+    public void updateTeamMmr(Double avgMmr) {
+        this.avgMmr = avgMmr;
     }
 }
