@@ -22,5 +22,5 @@ public interface RiotApiProvider {
     List<String> getMatchIds(String puuid, Long startTime, int start, int chunkSize);
 
     // https://asia.api.riotgames.com/lol/match/v5/matches/{matchId}
-    MatchData getMatchInfo(String matchId, Long userId);
+    MatchData getMatchInfo(String matchId, String puuid, Long userId);
 }

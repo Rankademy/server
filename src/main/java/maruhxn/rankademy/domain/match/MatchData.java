@@ -22,13 +22,18 @@ public class MatchData {
     @Field("user_id")
     private Long userId; // User 엔티티 참조용
 
+    @Indexed
+    @Field("puuid")
+    private String puuid; // User의 puuid
+
     @Field("json_data")
     String jsonData;
 
     @Builder
-    public MatchData(String matchId, Long userId, String jsonData) {
+    public MatchData(String matchId, Long userId, String puuid, String jsonData) {
         this.matchId = matchId;
         this.userId = userId;
+        this.puuid = puuid;
         this.jsonData = jsonData;
     }
 }

@@ -44,7 +44,7 @@ public class RiotApiMatchHistoryCollector implements MatchHistoryCollector {
 
         log.info("Match Ids: {}", matchIds);
 
-        return fetchMatches(user.getId(), matchIds);
+        return fetchMatches(user.getId(), puuid, matchIds);
     }
 
     private List<String> getAllMatchIds(String puuid, int totalMatchCnt) {
@@ -94,11 +94,11 @@ public class RiotApiMatchHistoryCollector implements MatchHistoryCollector {
         return incrementalMatchIds;
     }
 
-    private List<MatchData> fetchMatches(Long userId, List<String> matchIds) {
+    private List<MatchData> fetchMatches(Long userId, String puuid, List<String> matchIds) {
         List<MatchData> matches = new ArrayList<>(matchIds.size());
 
         matchIds.forEach(matchId -> {
-            MatchData matchInfo = riotApiProvider.getMatchInfo(matchId, userId);
+            MatchData matchInfo = riotApiProvider.getMatchInfo(matchId, puuid, userId);
             matches.add(matchInfo);
         });
 

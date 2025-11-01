@@ -82,7 +82,7 @@ public class RiotApiProviderImpl implements RiotApiProvider {
     }
 
     @Override
-    public MatchData getMatchInfo(String matchId, Long userId) {
+    public MatchData getMatchInfo(String matchId, String puuid, Long userId) {
         String url = RiotApiUrlBuilder.getMatchInfoUrl(matchId);
 
         String json = riotClient.get()
@@ -94,6 +94,7 @@ public class RiotApiProviderImpl implements RiotApiProvider {
         return new MatchData(
                 matchId,
                 userId,
+                puuid,
                 json
         );
     }

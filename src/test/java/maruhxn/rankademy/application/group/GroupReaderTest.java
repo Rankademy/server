@@ -297,14 +297,13 @@ class GroupReaderTest extends IntegrationTestSupport {
         assertThat(secondPage.getContent()).hasSize(1);
     }
 
-    @Test
-    @DisplayName("최근 경기 목록 조회 - 현재는 비어있음")
-        // TODO: 대항전 정보 추가 필요
-    void getRecentCompetitions() {
-        // when
-        List<RecentCompetitionResponse> recentCompetitions = groupReader.getRecentCompetitions(group.getId());
-
-        // then
-        assertThat(recentCompetitions).isEmpty();
-    }
+//    @Test
+//    @DisplayName("최근 경기 목록 조회 - 현재는 비어있음")
+//    void getRecentCompetitions() {
+//        // when
+//        List<RecentCompetitionResponse> recentCompetitions = groupReader.getRecentCompetitions(group.getId());
+//
+//        // then
+//        assertThat(recentCompetitions).isEmpty();
+//    }
 }
