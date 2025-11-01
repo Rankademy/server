@@ -162,7 +162,7 @@ class UpdateUserMmrListenerTest extends IntegrationTestSupport {
         Map<Long, StrengthSnapshot> initialStrength = new LinkedHashMap<>();
         Long representativeId = null;
 
-        for (int i = 0; i < positions.length; i++) {
+        for (int i = 0; i < 5; i++) {
             String email = "%s%d@rankademy.test".formatted(prefix, i);
             String username = "%s-user-%d".formatted(prefix, i);
 
