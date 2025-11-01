@@ -3,6 +3,7 @@ package maruhxn.rankademy.application.user.required;
 import maruhxn.rankademy.domain.match.MatchData;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
 import maruhxn.rankademy.domain.user.dto.RiotLeagueEntryResponse;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -22,5 +23,5 @@ public interface RiotApiProvider {
     List<String> getMatchIds(String puuid, Long startTime, int start, int chunkSize);
 
     // https://asia.api.riotgames.com/lol/match/v5/matches/{matchId}
-    MatchData getMatchInfo(String matchId, String puuid, Long userId);
+    Mono<MatchData> getMatchInfo(String matchId, String puuid, Long userId);
 }

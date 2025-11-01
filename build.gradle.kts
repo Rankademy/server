@@ -85,6 +85,9 @@ dependencies {
     // api-docs
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
 
+    // rate limiting
+    implementation("com.bucket4j:bucket4j-core:8.10.1")
+
     // mail
     implementation("org.springframework.boot:spring-boot-starter-mail")
 
