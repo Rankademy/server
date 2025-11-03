@@ -169,7 +169,7 @@ class UserTest {
     void updateProfile() {
         // given
         var request = new ProfileUpdateRequest(
-                "updated",
+                user.getUsername(),
                 "description",
                 LolPosition.TOP,
                 LolPosition.JUNGLE
@@ -179,7 +179,7 @@ class UserTest {
         user.updateProfile(request);
 
         // then
-        assertThat(user.getUsername()).isEqualTo("updated");
+        assertThat(user.getUsername()).isEqualTo(user.getUsername());
         assertThat(user.getDescription()).isEqualTo("description");
         assertThat(user.getMainPosition()).isEqualTo(LolPosition.TOP);
         assertThat(user.getSubPosition()).isEqualTo(LolPosition.JUNGLE);

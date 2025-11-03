@@ -240,7 +240,8 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                                 JPAExpressions.selectOne()
                                         .from(groupMember)
                                         .where(groupMember.group.id.eq(groupId).and(groupMember.user.id.eq(userId)))
-                                        .exists()
+                                        .exists(),
+                                group.leader.id.eq(userId)
                         )
                 )
                 .from(group)
@@ -256,9 +257,10 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
         Long total = queryFactory
                 .select(groupMember.count())
                 .from(groupMember)
+                .join(groupMember.group, group)
                 .join(groupMember.user, user)
                 .join(user.summonerInfo, summonerInfo)
-                .where(groupMember.group.id.eq(groupId))
+                .where(groupMember.group.id.eq(groupId), groupMember.user.id.ne(group.leader.id))
                 .fetchOne();
 
         if(total == null || total <= 0L) return new PageImpl(List.of(), pageRequest, total);
@@ -284,9 +286,10 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                         )
                 )
                 .from(groupMember)
+                .join(groupMember.group, group)
                 .join(groupMember.user, user)
                 .join(user.summonerInfo, summonerInfo)
-                .where(groupMember.group.id.eq(groupId))
+                .where(groupMember.group.id.eq(groupId), groupMember.user.id.ne(group.leader.id))
                 .offset(pageRequest.getOffset())
                 .limit(pageRequest.getPageSize())
                 .fetch();

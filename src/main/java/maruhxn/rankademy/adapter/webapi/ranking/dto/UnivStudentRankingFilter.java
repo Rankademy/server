@@ -5,6 +5,7 @@ import maruhxn.rankademy.domain.user.LolPosition;
 public record UnivStudentRankingFilter(
         String major,
         Integer admissionYear,
-        LolPosition mainPosition
+        LolPosition mainPosition,
+        String userNameKey
 ) {
 }

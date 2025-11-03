@@ -18,4 +18,11 @@ public class WhereClauseHelper {
     public static BooleanExpression filteredByMajor(String major) {
         return major == null ? null : user.univInfo.major.eq(major);
     }
+
+    public static BooleanExpression filteredByUserName(String userName) {
+        if(userName == null) return null;
+        String trimmed = userName.trim();
+        if (trimmed.isEmpty()) return null;
+        return user.summonerInfo.summonerName.containsIgnoreCase(trimmed);
+    }
 }

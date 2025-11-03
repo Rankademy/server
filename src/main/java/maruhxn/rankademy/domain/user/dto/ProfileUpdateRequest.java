@@ -10,7 +10,6 @@ public record ProfileUpdateRequest(
         @Size(min = 2, max = 20)
         @Schema(description = "사용자명", example = "ranker") String username,
 
-        @Size(max = 255)
         @Schema(description = "자기소개") String description,
 
         @NotNull

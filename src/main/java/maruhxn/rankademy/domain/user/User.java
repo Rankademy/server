@@ -16,6 +16,7 @@ import maruhxn.rankademy.domain.user.service.UserTitleProvider;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -162,10 +163,10 @@ public class User extends AbstractEntity {
                 profileUpdateRequest.mainPosition() != profileUpdateRequest.subPosition(),
                 "주 포지션과 부 포지션은 달라야 합니다."
         );
-        this.username = profileUpdateRequest.username();
-        this.description = profileUpdateRequest.description();
-        this.mainPosition = profileUpdateRequest.mainPosition();
-        this.subPosition = profileUpdateRequest.subPosition();
+        if(StringUtils.hasText(profileUpdateRequest.username())) this.username = profileUpdateRequest.username();
+        if(StringUtils.hasText(profileUpdateRequest.description())) this.description = profileUpdateRequest.description();
+        if(profileUpdateRequest.mainPosition() != null) this.mainPosition = profileUpdateRequest.mainPosition();
+        if(profileUpdateRequest.subPosition() != null) this.subPosition = profileUpdateRequest.subPosition();
     }
 
     public void updateTitles(UserTitleProvider titleProvider) {

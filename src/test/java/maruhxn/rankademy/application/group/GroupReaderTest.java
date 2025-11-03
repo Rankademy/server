@@ -231,9 +231,9 @@ class GroupReaderTest extends IntegrationTestSupport {
         PagedModel<GroupMemberResponse> groupMembers = groupReader.getGroupMembers(group.getId(), 0);
 
         // then
-        assertThat(groupMembers.getContent()).hasSize(2); // leader + user
+        assertThat(groupMembers.getContent()).hasSize(1); // user (leader 제외)
         assertThat(groupMembers.getContent().stream().map(GroupMemberResponse::summonerName))
-                .containsExactlyInAnyOrder(leader.getSummonerInfo().getSummonerName(), user.getSummonerInfo().getSummonerName());
+                .containsExactlyInAnyOrder(user.getSummonerInfo().getSummonerName());
     }
 
     @Test
@@ -251,7 +251,7 @@ class GroupReaderTest extends IntegrationTestSupport {
         PagedModel<GroupMemberResponse> secondPage = groupReader.getGroupMembers(group.getId(), 1);
 
         // then
-        assertThat(firstPage.getContent()).hasSize(8);
+        assertThat(firstPage.getContent()).hasSize(7);
         assertThat(secondPage.getContent()).hasSize(0);
     }
 

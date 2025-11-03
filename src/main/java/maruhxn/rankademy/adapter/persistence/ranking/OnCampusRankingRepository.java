@@ -61,7 +61,8 @@ public class OnCampusRankingRepository {
                         user.univInfo.univName.eq(univName),
                         filteredByMajor(univStudentRankingFilter.major()),
                         filteredByAdmissionYear(univStudentRankingFilter.admissionYear()),
-                        filteredByMainPosition(univStudentRankingFilter.mainPosition())
+                        filteredByMainPosition(univStudentRankingFilter.mainPosition()),
+                        filteredByUserName(univStudentRankingFilter.userNameKey())
                 )
                 .orderBy(summonerInfo.tierInfo.mappedTier.desc(), summonerInfo.winCount.desc())
                 .offset((long) page * PAGE_SIZE)

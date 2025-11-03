@@ -38,9 +38,10 @@ public class OnCampusRankingApi {
             @Parameter(description = "입학년도 필터", example = "2021")
             @RequestParam(value = "admissionYear", required = false) Integer admissionYear,
             @Parameter(description = "주 포지션 필터", schema = @Schema(implementation = LolPosition.class))
-            @RequestParam(value = "mainPosition", required = false) LolPosition mainPosition
+            @RequestParam(value = "mainPosition", required = false) LolPosition mainPosition,
+            @RequestParam(value = "userNameKey", required = false) String userNameKey
     ) {
-        UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter(major, admissionYear, mainPosition);
+        UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter(major, admissionYear, mainPosition, userNameKey);
         return onCampusRankingRepository.getUnivStudentRanking(univName, page, univStudentRankingFilter);
     }
 

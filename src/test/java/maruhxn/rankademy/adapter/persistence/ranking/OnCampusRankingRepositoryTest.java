@@ -109,7 +109,7 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
     @DisplayName("getUnivStudentRanking 메서드는 특정 대학교의 학생 랭킹을 올바르게 반환한다")
     void getUnivStudentRanking() {
         // given
-        UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter(null, null, null);
+        UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter(null, null, null, null);
 
         // when
         PagedModel<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
@@ -132,7 +132,7 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
     @DisplayName("getUnivStudentRanking 메서드는 major 필터를 사용하여 특정 대학교의 학생   랭킹을 올바르게 반환한다")
     void getUnivStudentRankingWithMajorFilter() {
         // given
-        UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter("컴퓨터공학과", null, null);
+        UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter("컴퓨터공학과", null, null, null);
 
         // when
         PagedModel<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
@@ -146,7 +146,7 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
     @DisplayName("getUnivStudentRanking 메서드는 admissionYear 필터를 사용하여 특정 대학교의 학생 랭킹을 올바르게 반환한다")
     void getUnivStudentRankingWithAdmissionYearFilter() {
         // given
-        UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter(null, 2020, null);
+        UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter(null, 2020, null, null);
 
         // when
         PagedModel<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
@@ -160,7 +160,7 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
     @DisplayName("getUnivStudentRanking 메서드는 mainPosition 필터를 사용하여 특정 대학교의 학생 랭킹을 올바르게 반환한다")
     void getUnivStudentRankingWithMainPositionFilter() {
         // given
-        UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter(null, null, LolPosition.TOP);
+        UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter(null, null, LolPosition.TOP, null);
 
         // when
         PagedModel<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
@@ -174,7 +174,7 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
     @DisplayName("getUnivStudentRanking 메서드는 여러 필터를 사용하여 특정 대학교의 학생 랭킹을 올바르게 반환한다")
     void getUnivStudentRankingWithMultipleFilters() {
         // given
-        UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter("전기정보공학과", 2020, LolPosition.MIDDLE);
+        UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter("전기정보공학과", 2020, LolPosition.MIDDLE, null);
 
         // when
         PagedModel<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
@@ -188,7 +188,7 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
     @DisplayName("getUnivStudentRanking 메서드는 필터에 해당하는 결과가 없으면 빈 리스트를 반환한다")
     void getUnivStudentRankingWithNoResults() {
         // given
-        UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter("기계공학과", null, null);
+        UnivStudentRankingFilter univStudentRankingFilter = new UnivStudentRankingFilter("기계공학과", null, null, null);
 
         // when
         PagedModel<UnivStudentRankingResponse> snutUnivStudentRanking = onCampusRankingRepository.getUnivStudentRanking("서울과학기술대학교", 0, univStudentRankingFilter);
@@ -241,7 +241,7 @@ class OnCampusRankingRepositoryTest extends IntegrationTestSupport {
 //        em.flush();
 //        em.clear();
 //
-//        GroupRankingFilter filter = new GroupRankingFilter(null, null, null, null);
+//        GroupRankingFilter filter = new GroupRankingFilter(null, null, null, null, null);
 //
 //        // when
 //        PagedModel<GroupResponse> rankingList = onCampusRankingRepository.getGroupRanking("서울과학기술대학교", 0, filter);

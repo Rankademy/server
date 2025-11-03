@@ -113,6 +113,7 @@ public class Group extends AbstractEntity {
     public void addJoinRequest(User user) {
         Assert.state(this.isRecruiting, "모집 기간이 아닙니다.");
         Assert.state(this.univName.equals(user.getUnivInfo().getUnivName()), "동일한 학교 소속의 유저만 가입을 요청할 수 있습니다.");
+        Assert.state(this.joinRequests.stream().noneMatch(j -> j.userId().equals(user.getId())), "이미 대기 중인 요청이 있습니다.");
         Assert.state(
                 this.members.stream()
                         .noneMatch(member -> member.getUser().equals(user)),

@@ -121,6 +121,18 @@ class GroupTest {
     }
 
     @Test
+    @DisplayName("이미 신청한 경우 가입 신청이 불가능하다")
+    void joinRequest_Fail2() {
+        User requester = createMember(1L);
+
+        group.addJoinRequest(requester);
+
+        assertThatThrownBy(() -> group.addJoinRequest(requester))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("이미 대기 중인 요청이 있습니다.");
+    }
+
+    @Test
     @DisplayName("그룹 가입 신청, 수락, 거절")
     void joinRequest() {
         // given
