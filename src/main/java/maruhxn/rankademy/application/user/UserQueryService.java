@@ -1,6 +1,7 @@
 package maruhxn.rankademy.application.user;
 
 import lombok.RequiredArgsConstructor;
+import maruhxn.rankademy.adapter.webapi.dto.SearchedUserResponse;
 import maruhxn.rankademy.application.user.dto.MyProfileResponse;
 import maruhxn.rankademy.application.user.dto.ProfileResponse;
 import maruhxn.rankademy.application.user.provided.UserReader;
@@ -74,5 +75,10 @@ public class UserQueryService implements UserReader {
     @Override
     public List<User> findActiveUsers(LocalDateTime dateTime) {
         return userRepository.findByLastLoginAtGreaterThanEqual(dateTime.minusDays(14));
+    }
+
+    @Override
+    public List<SearchedUserResponse> searchUsers(String userNameKey) {
+        return userQueryRepository.searchUsersByKey(userNameKey);
     }
 }

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static maruhxn.rankademy.adapter.persistence.ranking.WhereClauseHelper.searchBySummonerNameKey;
 import static maruhxn.rankademy.domain.group.QGroup.group;
 import static maruhxn.rankademy.domain.group.QGroupMember.groupMember;
 import static maruhxn.rankademy.domain.group.QGroupRecruitmentPost.groupRecruitmentPost;
@@ -136,12 +137,6 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                 )
                 .limit(4)
                 .fetch();
-    }
-
-    private BooleanExpression searchBySummonerNameKey(String memberNameKey) {
-        return memberNameKey != null
-                ? summonerInfo.summonerName.concat("#").concat(summonerInfo.summonerTag).contains(memberNameKey)
-                : null;
     }
 
     @Override

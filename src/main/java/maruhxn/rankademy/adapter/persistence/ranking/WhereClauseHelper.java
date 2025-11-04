@@ -3,6 +3,7 @@ package maruhxn.rankademy.adapter.persistence.ranking;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import maruhxn.rankademy.domain.user.LolPosition;
 
+import static maruhxn.rankademy.domain.user.QSummonerInfo.summonerInfo;
 import static maruhxn.rankademy.domain.user.QUser.user;
 
 public class WhereClauseHelper {
@@ -24,5 +25,11 @@ public class WhereClauseHelper {
         String trimmed = userName.trim();
         if (trimmed.isEmpty()) return null;
         return user.summonerInfo.summonerName.containsIgnoreCase(trimmed);
+    }
+
+    public static BooleanExpression searchBySummonerNameKey(String memberNameKey) {
+        return memberNameKey != null
+                ? summonerInfo.summonerName.concat("#").concat(summonerInfo.summonerTag).contains(memberNameKey)
+                : null;
     }
 }

@@ -3,6 +3,7 @@ package maruhxn.rankademy.adapter.persistence.user;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import maruhxn.rankademy.adapter.webapi.dto.SearchedUserResponse;
 import maruhxn.rankademy.application.user.dto.MyProfileResponse;
 import maruhxn.rankademy.application.user.dto.ProfileResponse;
 import maruhxn.rankademy.application.user.required.UserQueryRepository;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static maruhxn.rankademy.adapter.persistence.ranking.WhereClauseHelper.searchBySummonerNameKey;
 import static maruhxn.rankademy.domain.user.QChampionPlayRecord.championPlayRecord;
 import static maruhxn.rankademy.domain.user.QSummonerInfo.summonerInfo;
 import static maruhxn.rankademy.domain.user.QUser.user;
@@ -140,6 +142,25 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
                 base.mainPosition(),
                 base.subPosition()
         ));
+    }
+
+    @Override
+    public List<SearchedUserResponse> searchUsersByKey(String userNameKey) {
+        return queryFactory
+                .select(
+                        Projections.constructor(
+                                SearchedUserResponse.class,
+                                user.id,
+                                summonerInfo.summonerName,
+                                summonerInfo.summonerTag,
+                                summonerInfo.summonerIcon
+                        )
+                )
+                .from(user)
+                .join(user.summonerInfo, summonerInfo)
+                .where(searchBySummonerNameKey(userNameKey))
+                .limit(4)
+                .fetch();
     }
 
     /**

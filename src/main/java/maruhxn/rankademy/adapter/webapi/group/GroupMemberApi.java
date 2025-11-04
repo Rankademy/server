@@ -49,7 +49,7 @@ public class GroupMemberApi {
     public List<SearchGroupMemberResponse> searchGroupMembers(
             @Parameter(description = "대상 그룹 ID", example = "1")
             @PathVariable Long groupId,
-            @Parameter(description = "그룹 멤버 이름 키", example = "니카")
+            @Parameter(description = "그룹 멤버 소환사명 키", example = "니카")
             @RequestParam(value = "memberNameKey") String memberNameKey
     ) {
         return groupReader.searchGroupMembers(groupId, memberNameKey);

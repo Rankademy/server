@@ -5,12 +5,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import maruhxn.rankademy.adapter.webapi.dto.SearchedUserResponse;
 import maruhxn.rankademy.application.user.dto.ProfileResponse;
 import maruhxn.rankademy.application.user.provided.UserReader;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -19,6 +19,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserApi {
 
     private final UserReader userReader;
+
+    @GetMapping("/search")
+    @Operation(
+            summary = "전체 유저 검색",
+            description = "userNameKey로 유저를 검색합니다. (최대 4개)"
+    )
+    @ApiResponse(responseCode = "200", description = "프로필 조회 성공")
+    public List<SearchedUserResponse> searchUsers(
+            @Parameter(description = "유저 소환사명 키", example = "니카")
+            @RequestParam(value = "userNameKey") String userNameKey
+    ) {
+        return userReader.searchUsers(userNameKey);
+    }
 
     @GetMapping("/{userId}")
     @Operation(

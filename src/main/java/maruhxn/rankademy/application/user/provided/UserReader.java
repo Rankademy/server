@@ -1,5 +1,6 @@
 package maruhxn.rankademy.application.user.provided;
 
+import maruhxn.rankademy.adapter.webapi.dto.SearchedUserResponse;
 import maruhxn.rankademy.application.user.dto.MyProfileResponse;
 import maruhxn.rankademy.application.user.dto.ProfileResponse;
 import maruhxn.rankademy.domain.user.OAuth2Provider;
@@ -28,4 +29,6 @@ public interface UserReader {
     Optional<User> findByProviderAndOauthId(OAuth2Provider provider, String oauthId);
 
     List<User> findActiveUsers(LocalDateTime dateTime);
+
+    List<SearchedUserResponse> searchUsers(String userNameKey);
 }
