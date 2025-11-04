@@ -6,7 +6,6 @@ import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.adapter.security.model.UserInfo;
 import maruhxn.rankademy.application.group.required.GroupRepository;
 import maruhxn.rankademy.application.team.provided.dto.TeamDetailResponse;
-import maruhxn.rankademy.application.team.provided.dto.TeamPageResponse;
 import maruhxn.rankademy.application.team.required.TeamRepository;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.group.Group;
@@ -102,6 +101,30 @@ class TeamApiTest extends IntegrationTestSupport {
 //        assertThat(response.teams()).hasSize(3);
 //        assertThat(response.totalCount()).isEqualTo(20);
     }
+
+    @Test
+    @DisplayName("나의 팀 목록 조회 - 성공")
+    void getMyTeamList() throws Exception {
+        // given
+        for (int i = 0; i < 20; i++) {
+            createTeam("team" + i);
+        }
+
+        em.flush();
+        em.clear();
+
+        // when
+        MvcTestResult result = mvcTester.get().uri(BASE_URL + "/my?page=6")
+                .with(user(RankademyUser.from(UserInfo.from(groupLeader))))
+                .exchange();
+
+        // then
+        assertThat(result).hasStatusOk();
+//        TeamPageResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), TeamPageResponse.class);
+//        assertThat(response.teams()).hasSize(3);
+//        assertThat(response.totalCount()).isEqualTo(20);
+    }
+
 
     @Test
     @DisplayName("팀 생성 - 성공")

@@ -2,11 +2,14 @@ package maruhxn.rankademy.application.team;
 
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.application.team.provided.TeamReader;
+import maruhxn.rankademy.application.team.provided.dto.MyTeamPageResponse;
 import maruhxn.rankademy.application.team.provided.dto.TeamDetailResponse;
 import maruhxn.rankademy.application.team.provided.dto.TeamPageResponse;
 import maruhxn.rankademy.application.team.required.TeamQueryRepository;
 import maruhxn.rankademy.application.team.required.TeamRepository;
 import maruhxn.rankademy.domain.team.Team;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,12 @@ public class TeamQueryService implements TeamReader {
     @Override
     public TeamPageResponse getTeamList(int page) {
         return teamQueryRepository.findAll(page);
+    }
+
+    @Override
+    public PagedModel<MyTeamPageResponse> getMyTeamList(Long userId, int page) {
+        Page<MyTeamPageResponse> result = teamQueryRepository.findMyTeamList(userId, page);
+        return new PagedModel<>(result);
     }
 
     @Override

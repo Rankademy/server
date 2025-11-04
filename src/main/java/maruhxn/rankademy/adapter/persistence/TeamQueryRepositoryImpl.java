@@ -5,6 +5,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import maruhxn.rankademy.application.team.provided.dto.MyTeamPageResponse;
 import maruhxn.rankademy.application.team.provided.dto.TeamDetailResponse;
 import maruhxn.rankademy.application.team.provided.dto.TeamPageResponse;
 import maruhxn.rankademy.application.team.required.TeamQueryRepository;
@@ -14,6 +15,10 @@ import maruhxn.rankademy.domain.team.QTeamMember;
 import maruhxn.rankademy.domain.user.QSummonerInfo;
 import maruhxn.rankademy.domain.user.QUser;
 import maruhxn.rankademy.domain.user.TierInfo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -144,5 +149,40 @@ public class TeamQueryRepositoryImpl implements TeamQueryRepository {
                 isTeamLeader,
                 isMyTeam
         ));
+    }
+
+    @Override
+    public Page<MyTeamPageResponse> findMyTeamList(Long userId, int page) {
+        Pageable pageable = PageRequest.of(page, 3);
+
+        Long total = queryFactory
+                .select(team.count())
+                .from(team)
+                .join(group).on(team.groupId.eq(group.id))
+                .where(team.isActive.eq(true))
+                .fetchOne();
+
+        if(total == null || total <= 0L) return new PageImpl<>(List.of(),  pageable, 0L);
+
+        List<MyTeamPageResponse> result = queryFactory
+                .select(
+                        Projections.constructor(
+                                MyTeamPageResponse.class,
+                                team.id,
+                                team.name,
+                                group.id,
+                                group.name
+                        )
+                )
+                .from(team)
+                .join(group).on(team.groupId.eq(group.id))
+                .where(team.isActive.eq(true))
+                .groupBy(team.id)
+                .orderBy(team.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(result, pageable, total);
     }
 }

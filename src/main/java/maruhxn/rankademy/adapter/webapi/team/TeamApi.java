@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.application.team.provided.TeamReader;
 import maruhxn.rankademy.application.team.provided.TeamWriter;
+import maruhxn.rankademy.application.team.provided.dto.MyTeamPageResponse;
 import maruhxn.rankademy.application.team.provided.dto.TeamDetailResponse;
 import maruhxn.rankademy.application.team.provided.dto.TeamPageResponse;
 import maruhxn.rankademy.domain.team.dto.TeamCreateRequest;
@@ -42,6 +43,20 @@ public class TeamApi {
         long totalCount = response.totalCount() == null ? 0L : response.totalCount();
         Pageable pageable = PageRequest.of(page, 10);
         return new PagedModel<>(new PageImpl<>(response.teams(), pageable, totalCount));
+    }
+
+    @GetMapping("/my")
+    @Operation(
+            summary = "나의 팀 목록 조회",
+            description = "페이지 번호에 따라 나의 팀 목록을 페이지 단위로 조회합니다."
+    )
+    @ApiResponse(responseCode = "200", description = "나의 팀 목록 조회 성공")
+    public PagedModel<MyTeamPageResponse> getMyTeamList(
+            @AuthenticationPrincipal RankademyUser user,
+            @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
+            @RequestParam(value = "page", defaultValue = "0") int page
+    ) {
+        return teamReader.getMyTeamList(user.getId(), page);
     }
 
     @PostMapping
