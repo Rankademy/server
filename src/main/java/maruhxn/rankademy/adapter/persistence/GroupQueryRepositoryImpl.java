@@ -100,6 +100,22 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
     }
 
     @Override
+    public List<MyGroupSummaryResponse> getMyGroupSummaries(Long userId) {
+        return queryFactory
+                .select(
+                        Projections.constructor(
+                                MyGroupSummaryResponse.class,
+                                group.id,
+                                group.name
+                        )
+                )
+                .from(groupMember)
+                .join(groupMember.group, group)
+                .where(groupMember.user.id.eq(userId))
+                .fetch();
+    }
+
+    @Override
     public Optional<GroupDetailResponse> getGroupDetails(Long userId, Long groupId) {
         QGroupMember leaderMember = new QGroupMember("leaderMember");
         QUser leaderUser = new QUser("leaderUser");

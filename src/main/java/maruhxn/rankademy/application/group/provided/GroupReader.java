@@ -12,6 +12,8 @@ public interface GroupReader {
 
     List<MyGroupResponse> getMyGroupList(Long userId);
 
+    List<MyGroupSummaryResponse> getMyGroupSummaryList(Long userId);
+
     GroupDetailResponse getDetail(Long userId, Long groupId);
 
     PagedModel<RecruitmentPostResponse> getRecruitmentPostList(int page);

@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "내 그룹 요약 정보")
+@Schema(description = "내 그룹 정보")
 public record MyGroupResponse(
         @Schema(description = "그룹 ID", example = "1") Long groupId,
         @Schema(description = "그룹 이름", example = "Rankademy 그룹") String groupName,

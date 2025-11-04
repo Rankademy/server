@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.application.group.provided.GroupReader;
 import maruhxn.rankademy.application.group.provided.GroupWriter;
-import maruhxn.rankademy.application.group.provided.dto.GroupDetailResponse;
-import maruhxn.rankademy.application.group.provided.dto.GroupMemberResponse;
-import maruhxn.rankademy.application.group.provided.dto.MyGroupResponse;
-import maruhxn.rankademy.application.group.provided.dto.RecentCompetitionResponse;
+import maruhxn.rankademy.application.group.provided.dto.*;
 import maruhxn.rankademy.domain.group.Group;
 import maruhxn.rankademy.domain.group.dto.GroupCreateRequest;
 import maruhxn.rankademy.domain.group.dto.GroupUpdateRequest;
@@ -44,6 +41,19 @@ public class GroupApi {
             @AuthenticationPrincipal RankademyUser rankademyUser
     ) {
         return groupReader.getMyGroupList(rankademyUser.getId());
+    }
+
+    @GetMapping("/my/summary")
+    @PreAuthorize("principal.userInfo().authorized")
+    @Operation(
+            summary = "내 그룹 목록 조회 (요약)",
+            description = "로그인한 사용자가 속한 그룹 목록을 조회합니다. (팀 생성 시 사용)"
+    )
+    @ApiResponse(responseCode = "200", description = "그룹 목록 조회 성공")
+    public List<MyGroupSummaryResponse> getMyGroupSummaries(
+            @AuthenticationPrincipal RankademyUser rankademyUser
+    ) {
+        return groupReader.getMyGroupSummaryList(rankademyUser.getId());
     }
 
     @PostMapping

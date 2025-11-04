@@ -21,4 +21,6 @@ public interface GroupQueryRepository {
     List<MyGroupResponse> getMyGroupList(Long userId);
 
     List<RecentCompetitionResponse> getRecentCompetitions(Long groupId);
+
+    List<MyGroupSummaryResponse> getMyGroupSummaries(Long userId);
 }
