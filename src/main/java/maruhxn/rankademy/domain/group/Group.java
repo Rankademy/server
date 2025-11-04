@@ -12,10 +12,7 @@ import maruhxn.rankademy.domain.user.User;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Objects.requireNonNull;
 
@@ -103,6 +100,7 @@ public class Group extends AbstractEntity {
     }
 
     public void removeMember(User user) {
+        Assert.isTrue(!Objects.equals(user.getId(), this.leader.getId()), "리더는 추방할 수 없습니다.");
         this.members.removeIf(member -> member.getUser().equals(user));
     }
 

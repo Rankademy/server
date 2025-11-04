@@ -7,13 +7,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.security.model.RankademyUser;
+import maruhxn.rankademy.application.group.provided.GroupMemberManager;
 import maruhxn.rankademy.application.group.provided.GroupReader;
 import maruhxn.rankademy.application.group.provided.GroupWriter;
-import maruhxn.rankademy.application.group.provided.dto.*;
+import maruhxn.rankademy.application.group.provided.dto.GroupDetailResponse;
+import maruhxn.rankademy.application.group.provided.dto.MyGroupResponse;
+import maruhxn.rankademy.application.group.provided.dto.MyGroupSummaryResponse;
+import maruhxn.rankademy.application.group.provided.dto.RecentCompetitionResponse;
 import maruhxn.rankademy.domain.group.Group;
 import maruhxn.rankademy.domain.group.dto.GroupCreateRequest;
 import maruhxn.rankademy.domain.group.dto.GroupUpdateRequest;
-import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,6 +32,7 @@ public class GroupApi {
 
     private final GroupReader groupReader;
     private final GroupWriter groupWriter;
+    private final GroupMemberManager groupMemberManager;
 
     @GetMapping("/my")
     @PreAuthorize("principal.userInfo().authorized")
@@ -99,21 +103,6 @@ public class GroupApi {
         return groupReader.getRecentCompetitions(groupId);
     }
 
-    @GetMapping("/{groupId}/members")
-    @Operation(
-            summary = "그룹 멤버 목록 조회",
-            description = "그룹 멤버 목록을 페이지 단위로 조회합니다."
-    )
-    @ApiResponse(responseCode = "200", description = "그룹 멤버 조회 성공")
-    public PagedModel<GroupMemberResponse> getGroupMembers(
-            @Parameter(description = "대상 그룹 ID", example = "1")
-            @PathVariable Long groupId,
-            @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
-            @RequestParam(value = "page", defaultValue = "0") int page
-    ) {
-        return groupReader.getGroupMembers(groupId, page);
-    }
-
     @PutMapping("/{groupId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@groupLeaderChecker.isGroupLeader(principal.userInfo(), #groupId)")
@@ -128,6 +117,18 @@ public class GroupApi {
             @RequestBody @Valid GroupUpdateRequest request
     ) {
         groupWriter.update(groupId, request);
+    }
+
+    @DeleteMapping("/{groupId}/withdraw")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@groupMemberChecker.isGroupMember(principal.userInfo(), #groupId)")
+    public void withdrawGroup(
+            @Parameter(description = "탈퇴할 그룹 ID", example = "1")
+            @PathVariable("groupId") Long groupId,
+
+            @AuthenticationPrincipal RankademyUser rankademyUser
+    ) {
+        groupMemberManager.removeMember(groupId, rankademyUser.getId());
     }
 
     @DeleteMapping("/{groupId}")

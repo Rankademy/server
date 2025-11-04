@@ -3,7 +3,6 @@ package maruhxn.rankademy.adapter.security.checker;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.security.model.UserInfo;
 import maruhxn.rankademy.application.group_invitation.provided.GroupInvitationReader;
-import maruhxn.rankademy.application.user.provided.UserReader;
 import maruhxn.rankademy.domain.group_invitation.GroupInvitation;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class GroupInviteeChecker {
 
-    private final UserReader userReader;
     private final GroupInvitationReader groupInvitationReader;
 
     public boolean isInvitee(UserInfo userInfo, Long invitationId) {

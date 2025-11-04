@@ -6,6 +6,7 @@ import maruhxn.rankademy.domain.user.UserFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static maruhxn.rankademy.domain.group.GroupFixture.createMember;
 import static maruhxn.rankademy.domain.group.GroupFixture.createRecruitmentRequest;
@@ -94,10 +95,11 @@ class GroupTest {
     }
 
     @Test
-    @DisplayName("그룹에서 멤버를 탈퇴시킬 수 있다")
+    @DisplayName("그룹에서 멤버를 추방시킬 수 있다")
     void removeMember() {
         // given
-        User member = createMember();
+        ReflectionTestUtils.setField(leader, "id", 1L);
+        User member = createMember(2L);
         group.addMember(member, GroupRole.MEMBER);
 
         // when

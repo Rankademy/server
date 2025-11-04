@@ -276,6 +276,53 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                 .join(groupMember.group, group)
                 .join(groupMember.user, user)
                 .join(user.summonerInfo, summonerInfo)
+                .where(groupMember.group.id.eq(groupId))
+                .fetchOne();
+
+        if(total == null || total <= 0L) return new PageImpl(List.of(), pageRequest, total);
+
+        List<GroupMemberResponse> result = queryFactory
+                .select(
+                        Projections.constructor(
+                                GroupMemberResponse.class,
+                                user.id,
+                                summonerInfo.summonerName,
+                                summonerInfo.summonerTag,
+                                summonerInfo.summonerIcon,
+                                user.univInfo.major,
+                                user.univInfo.admissionYear,
+                                user.mainPosition,
+                                user.subPosition,
+                                summonerInfo.tierInfo,
+                                Projections.constructor(
+                                        RecordInfoDto.class,
+                                        summonerInfo.winCount,
+                                        summonerInfo.lossCount
+                                )
+                        )
+                )
+                .from(groupMember)
+                .join(groupMember.group, group)
+                .join(groupMember.user, user)
+                .join(user.summonerInfo, summonerInfo)
+                .where(groupMember.group.id.eq(groupId))
+                .offset(pageRequest.getOffset())
+                .limit(pageRequest.getPageSize())
+                .fetch();
+
+        return new PageImpl(result, pageRequest, total);
+    }
+
+    @Override
+    public Page<GroupMemberResponse> getGroupMembersWithoutLeader(Long groupId, int page) {
+        PageRequest pageRequest = PageRequest.of(page, 20);
+
+        Long total = queryFactory
+                .select(groupMember.count())
+                .from(groupMember)
+                .join(groupMember.group, group)
+                .join(groupMember.user, user)
+                .join(user.summonerInfo, summonerInfo)
                 .where(groupMember.group.id.eq(groupId), groupMember.user.id.ne(group.leader.id))
                 .fetchOne();
 

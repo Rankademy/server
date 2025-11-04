@@ -26,4 +26,5 @@ public interface GroupReader {
 
     List<RecentCompetitionResponse> getRecentCompetitions(Long groupId);
 
+    PagedModel<GroupMemberResponse> getGroupMembersWithoutLeader(Long groupId, int page);
 }

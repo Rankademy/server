@@ -16,6 +16,8 @@ public interface GroupQueryRepository {
 
     Page<GroupMemberResponse> getGroupMembers(Long groupId, int page);
 
+    Page<GroupMemberResponse> getGroupMembersWithoutLeader(Long groupId, int page);
+
     Page<JoinRequestResponse> getJoinRequestList(Long groupId, int page);
 
     List<MyGroupResponse> getMyGroupList(Long userId);
