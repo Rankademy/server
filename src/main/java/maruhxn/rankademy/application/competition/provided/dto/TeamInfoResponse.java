@@ -9,6 +9,7 @@ import java.util.List;
 public record TeamInfoResponse(
         @Schema(description = "팀 ID", example = "1") Long teamId,
         @Schema(description = "팀 이름") String teamName,
+        @Schema(description = "그룹 로고") String groupLogo,
         @Schema(description = "그룹 이름") String groupName,
         @Schema(description = "팀 멤버 목록") List<TeamMemberResponse> teamMembers
 ) {
@@ -18,7 +19,8 @@ public record TeamInfoResponse(
             @Schema(description = "멤버 ID", example = "10") Long memberId,
             @Schema(description = "포지션", implementation = LolPosition.class) LolPosition position,
             @Schema(description = "소환사 이름") String summonerName,
-            @Schema(description = "소환사 태그") String summonerTag
+            @Schema(description = "소환사 태그") String summonerTag,
+            @Schema(description = "소환사 아이콘") Integer summonerIcon
     ) {
     }
 }

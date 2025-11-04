@@ -1,5 +1,6 @@
 package maruhxn.rankademy.adapter.persistence.competition;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.application.competition.provided.dto.SetResultResponse;
@@ -31,7 +32,7 @@ public class TeamAndSetLoader {
         QUser u = QUser.user;
         QSummonerInfo si = QSummonerInfo.summonerInfo;
 
-        var rows = queryFactory.select(t.id, t.name, g.name, u.id, tm.position, si.summonerName, si.summonerTag)
+        var rows = queryFactory.select(t.id, t.name, g.logoImage, g.name, u.id, tm.position, si.summonerName, si.summonerTag)
                 .from(t).join(g).on(t.groupId.eq(g.id))
                 .join(tm).on(tm.team.id.eq(t.id))
                 .join(u).on(tm.user.id.eq(u.id))
@@ -43,15 +44,21 @@ public class TeamAndSetLoader {
                 r -> r.get(t.id),
                 LinkedHashMap::new,
                 Collectors.collectingAndThen(Collectors.toList(), list -> {
-                    Long id = list.get(0).get(t.id);
-                    String tName = list.get(0).get(t.name);
-                    String gName = list.get(0).get(g.name);
+                    Tuple row = list.get(0);
+                    Long id = row.get(t.id);
+                    String tName = row.get(t.name);
+                    String gLogo = row.get(g.logoImage);
+                    String gName = row.get(g.name);
                     var members = list.stream()
                             .map(r -> new TeamInfoResponse.TeamMemberResponse(
-                                    r.get(u.id), r.get(tm.position),
-                                    r.get(si.summonerName), r.get(si.summonerTag)))
+                                    r.get(u.id),
+                                    r.get(tm.position),
+                                    r.get(si.summonerName),
+                                    r.get(si.summonerTag),
+                                    r.get(si.summonerIcon)
+                                    ))
                             .toList();
-                    return new TeamInfoResponse(id, tName, gName, members);
+                    return new TeamInfoResponse(id, tName, gLogo, gName, members);
                 })
         ));
     }
