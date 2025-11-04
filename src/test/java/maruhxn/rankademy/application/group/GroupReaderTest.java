@@ -297,6 +297,59 @@ class GroupReaderTest extends IntegrationTestSupport {
         assertThat(secondPage.getContent()).hasSize(1);
     }
 
+    @Test
+    @DisplayName("그룹 멤버 검색 - 소환사명과 태그로 부분 일치 검색")
+    void searchGroupMembersWithKeyword() {
+        // given
+        User alpha = userRepository.save(createMember("alpha@rankademy.app", "alpha"));
+        User beta = userRepository.save(createMember("beta@rankademy.app", "beta"));
+        group.addMember(alpha, GroupRole.MEMBER);
+        group.addMember(beta, GroupRole.MEMBER);
+
+        // when
+        List<SearchGroupMemberResponse> searchResults = groupReader.searchGroupMembers(group.getId(), "alpha#KR1");
+
+        // then
+        assertThat(searchResults).hasSize(1);
+        SearchGroupMemberResponse result = searchResults.get(0);
+        assertThat(result.summonerName()).isEqualTo("alpha");
+        assertThat(result.summonerTag()).isEqualTo("KR1");
+    }
+
+    @Test
+    @DisplayName("그룹 멤버 검색 - 소환사명과 태그로 부분 일치 검색 2")
+    void searchGroupMembersWithKeyword2() {
+        // given
+        User alpha = userRepository.save(createMember("alpha@rankademy.app", "alpha"));
+        User beta = userRepository.save(createMember("beta@rankademy.app", "beta"));
+        group.addMember(alpha, GroupRole.MEMBER);
+        group.addMember(beta, GroupRole.MEMBER);
+
+        // when
+        List<SearchGroupMemberResponse> searchResults = groupReader.searchGroupMembers(group.getId(), "KR1");
+
+        // then
+        assertThat(searchResults).hasSize(3); // leader, alpha, beta
+    }
+
+    @Test
+    @DisplayName("그룹 멤버 검색 - 최대 4개의 결과만 반환")
+    void searchGroupMembersWithResultLimit() {
+        // given
+        for (int i = 0; i < 6; i++) {
+            User member = userRepository.save(createMember("searcher" + i + "@rankademy.app", "searcher" + i));
+            group.addMember(member, GroupRole.MEMBER);
+        }
+
+        // when
+        List<SearchGroupMemberResponse> searchResults = groupReader.searchGroupMembers(group.getId(), "searcher");
+
+        // then
+        assertThat(searchResults).hasSize(4);
+        assertThat(searchResults)
+                .allMatch(response -> response.summonerName().startsWith("searcher"));
+    }
+
 //    @Test
 //    @DisplayName("최근 경기 목록 조회 - 현재는 비어있음")
 //    void getRecentCompetitions() {

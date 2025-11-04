@@ -116,6 +116,35 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
     }
 
     @Override
+    public List<SearchGroupMemberResponse> searchGroupMembers(Long groupId, String memberNameKey) {
+        return queryFactory
+                .select(
+                        Projections.constructor(
+                                SearchGroupMemberResponse.class,
+                                user.id,
+                                summonerInfo.summonerName,
+                                summonerInfo.summonerTag,
+                                summonerInfo.summonerIcon
+                        )
+                )
+                .from(groupMember)
+                .join(groupMember.user, user)
+                .join(user.summonerInfo, summonerInfo)
+                .where(
+                        groupMember.group.id.eq(groupId),
+                        searchBySummonerNameKey(memberNameKey)
+                )
+                .limit(4)
+                .fetch();
+    }
+
+    private BooleanExpression searchBySummonerNameKey(String memberNameKey) {
+        return memberNameKey != null
+                ? summonerInfo.summonerName.concat("#").concat(summonerInfo.summonerTag).contains(memberNameKey)
+                : null;
+    }
+
+    @Override
     public Optional<GroupDetailResponse> getGroupDetails(Long userId, Long groupId) {
         QGroupMember leaderMember = new QGroupMember("leaderMember");
         QUser leaderUser = new QUser("leaderUser");

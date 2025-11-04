@@ -67,6 +67,11 @@ public class GroupQueryService implements GroupReader {
     }
 
     @Override
+    public List<SearchGroupMemberResponse> searchGroupMembers(Long groupId, String memberNameKey) {
+        return groupQueryRepository.searchGroupMembers(groupId, memberNameKey);
+    }
+
+    @Override
     public PagedModel<JoinRequestResponse> getJoinRequests(Long groupId, int page) {
         Page<JoinRequestResponse> result = groupQueryRepository.getJoinRequestList(groupId, page);
         return new PagedModel(result);

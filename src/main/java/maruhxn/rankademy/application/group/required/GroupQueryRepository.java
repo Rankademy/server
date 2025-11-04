@@ -25,4 +25,6 @@ public interface GroupQueryRepository {
     List<RecentCompetitionResponse> getRecentCompetitions(Long groupId);
 
     List<MyGroupSummaryResponse> getMyGroupSummaries(Long userId);
+
+    List<SearchGroupMemberResponse> searchGroupMembers(Long groupId, String memberNameKey);
 }
