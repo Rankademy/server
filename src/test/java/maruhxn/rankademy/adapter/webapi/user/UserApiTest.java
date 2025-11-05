@@ -44,7 +44,7 @@ class UserApiTest extends IntegrationTestSupport {
     void getProfile_success() throws Exception {
         User viewer = userRepository.save(UserFixture.createAuthorizedMember("viewer@test.com", "viewer"));
         User target = UserFixture.createAuthorizedMember("target@test.com", "target");
-        target.updateProfile(new ProfileUpdateRequest("target", "test description", LolPosition.TOP, LolPosition.JUNGLE));
+        target.updateProfile(new ProfileUpdateRequest("target", "test description", LolPosition.TOP, LolPosition.JUNGLE, 2020, "서울과학기술대학교"));
         userRepository.save(target);
 
         Long viewerId = viewer.getId();
@@ -67,7 +67,6 @@ class UserApiTest extends IntegrationTestSupport {
         assertThat(response.id()).isEqualTo(persistedTarget.getId());
         assertThat(response.description()).isEqualTo(persistedTarget.getDescription());
         assertThat(response.univInfo().univName()).isEqualTo(persistedTarget.getUnivInfo().getUnivName());
-        assertThat(response.univInfo().univVerified()).isTrue();
         assertThat(response.summonerInfo().summonerName()).isEqualTo(persistedTarget.getSummonerInfo().getSummonerName());
         assertThat(response.summonerInfo().summonerTag()).isEqualTo(persistedTarget.getSummonerInfo().getSummonerTag());
         assertThat(response.mainPosition()).isEqualTo(persistedTarget.getMainPosition());

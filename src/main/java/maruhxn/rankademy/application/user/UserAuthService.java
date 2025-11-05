@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.application.univ_certification_code.provided.UnivCertificationCodeManager;
 import maruhxn.rankademy.application.user.provided.UserAuthorizer;
 import maruhxn.rankademy.application.user.provided.UserReader;
+import maruhxn.rankademy.application.user.required.UnivExtractor;
 import maruhxn.rankademy.application.user.required.UnivMailCertifier;
 import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.shared.DomainEventPublisher;
 import maruhxn.rankademy.domain.shared.event.RiotAuthEvent;
 import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
 import org.springframework.stereotype.Service;
@@ -25,48 +27,37 @@ public class UserAuthService implements UserAuthorizer {
 
     private final UserReader userReader;
     private final UserRepository userRepository;
+    private final UnivExtractor univExtractor;
     private final UnivMailCertifier univMailCertifier;
     private final SummonerInfoConnector summonerInfoConnector;
     private final DomainEventPublisher publisher;
     private final UnivCertificationCodeManager univCertificationCodeManager;
 
     @Override
-    public void sendUnivCertifyMail(Long userId) {
-        User user = userReader.get(userId);
+    public void sendUnivCertifyMail(Long userId, String email) {
+        String univName = univExtractor.extractUnivNameFromMail(email);
 
-        if (user.getUnivInfo() == null) {
-            throw new IllegalStateException("학교 정보를 등록해주세요.");
-        }
-
-        String univMail = user.getUnivInfo().getUnivMail().address();
-        String univName = user.getUnivInfo().getUnivName();
         int code = ThreadLocalRandom.current().nextInt(100000, 1000000);
 
-        univMailCertifier.sendCertifyMail(
-                univMail,
-                univName,
-                code
-        );
+        univMailCertifier.sendCertifyMail(email, code);
 
         univCertificationCodeManager.generateCode(
                 userId,
-                univMail,
+                email,
                 univName,
                 code
         );
     }
 
     @Override
-    public User completeUnivAuthentication(Long userId, int code) {
+    public User completeUnivAuthentication(Long userId, String email, int code) {
         User user = userReader.get(userId);
 
-        univMailCertifier.certifyCode(
-                user.getUnivInfo().getUnivMail().address(),
-                user.getUnivInfo().getUnivName(),
-                code
-        );
+        String univName = univExtractor.extractUnivNameFromMail(email);
 
-        user.completeUnivAuthentication();
+        univMailCertifier.certifyCode(email, univName, code);
+
+        user.completeUnivAuthentication(new EnrollUnivRequest(univName, email));
 
         return userRepository.save(user);
     }

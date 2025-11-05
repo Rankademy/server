@@ -13,61 +13,46 @@ import static java.util.Objects.requireNonNull;
 @Getter
 @NoArgsConstructor
 public class UnivInfo {
-    @Column(length = 100)
+    @Column(name = "univ_name", length = 100)
     private String univName;
 
     private Email univMail;
 
-    private boolean univVerified;
-
-    private boolean inCollege;
-
-    private int admissionYear;
+    private Integer admissionYear;
 
     @Column(length = 100)
     private String major;
 
-
     @Builder
-    public UnivInfo(String univName, Email univMail, boolean univVerified, boolean inCollege, int admissionYear, String major) {
+    public UnivInfo(String univName, Email univMail, Integer admissionYear, String major) {
         this.univName = univName;
         this.univMail = univMail;
-        this.univVerified = univVerified;
-        this.inCollege = inCollege;
         this.admissionYear = admissionYear;
         this.major = major;
+    }
+
+    static UnivInfo empty() {
+        return new UnivInfo(null, null, null, "미설정");
     }
 
     static UnivInfo from(EnrollUnivRequest enrollUnivRequest) {
         return new UnivInfo(
                 requireNonNull(enrollUnivRequest.univName()),
                 new Email(enrollUnivRequest.univMail()),
-                false,
-                requireNonNull(enrollUnivRequest.inCollege()),
-                enrollUnivRequest.admissionYear(),
-                requireNonNull(enrollUnivRequest.major())
+                null,
+                null
         );
     }
 
-    UnivInfo update(EnrollUnivRequest enrollUnivRequest) {
-        return new UnivInfo(
-                requireNonNull(enrollUnivRequest.univName()),
-                new Email(enrollUnivRequest.univMail()),
-                this.univVerified, // 이전 값
-                requireNonNull(enrollUnivRequest.inCollege()),
-                enrollUnivRequest.admissionYear(),
-                requireNonNull(enrollUnivRequest.major())
-        );
+    public boolean isAuthorized() {
+        return univMail != null && univName != null;
     }
 
-    public UnivInfo authenticate() {
-        return UnivInfo.builder()
-                .univName(requireNonNull(this.getUnivName()))
-                .univMail(this.getUnivMail())
-                .univVerified(true)
-                .inCollege(this.isInCollege())
-                .admissionYear(this.getAdmissionYear())
-                .major(requireNonNull(this.getMajor()))
-                .build();
+    public void updateAdmissionYear(Integer admissionYear) {
+        this.admissionYear = admissionYear;
+    }
+
+    public void updateMajor(String major) {
+        this.major = major;
     }
 }

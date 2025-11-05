@@ -2,7 +2,6 @@ package maruhxn.rankademy.domain.group;
 
 import maruhxn.rankademy.domain.group.dto.GroupUpdateRequest;
 import maruhxn.rankademy.domain.user.User;
-import maruhxn.rankademy.domain.user.UserFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -84,9 +83,7 @@ class GroupTest {
     @DisplayName("다른 학교 소속의 유저는 그룹에 가입할 수 없다")
     void addMemberWithDifferentUniv() {
         // given
-        User otherUnivUser = createMember();
-        otherUnivUser.enrollUnivInfo(UserFixture.createEnrollUnivRequest("다른대학교", "test@other.ac.kr"));
-        otherUnivUser.completeUnivAuthentication();
+        User otherUnivUser = createMember("other@test.com", "other","다른대학교", "otherUnivUser@other.ac.kr");
 
         // when & then
         assertThatThrownBy(() -> group.addMember(otherUnivUser, GroupRole.MEMBER))

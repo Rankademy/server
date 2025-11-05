@@ -22,9 +22,8 @@ public record MyProfileResponse(
     public record UnivInfoResponse(
             @Schema(description = "대학교 이름") String univName,
             @Schema(description = "대학교 이메일") String univMail,
-            @Schema(description = "인증 완료 여부") boolean univVerified,
             @Schema(description = "전공") String major,
-            @Schema(description = "입학년도") int admissionYear
+            @Schema(description = "입학년도") Integer admissionYear
     ) {
     }
 

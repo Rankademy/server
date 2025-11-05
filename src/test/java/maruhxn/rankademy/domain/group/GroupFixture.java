@@ -50,16 +50,21 @@ public class GroupFixture {
     public static User createMember(Long id) {
         User member = createUser("member@rankademy.app", "member");
         ReflectionTestUtils.setField(member, "id", id);
-        member.enrollUnivInfo(createEnrollUnivRequest());
-        member.completeUnivAuthentication();
+        member.completeUnivAuthentication(createEnrollUnivRequest());
         member.connectSummonerInfo(createSummonerInfoConnector("member-puuid"), createRiotAuthRequest("member", "KR1"));
         return member;
     }
 
     public static User createMember(String email, String username) {
         User member = createUser(email, username);
-        member.enrollUnivInfo(createEnrollUnivRequest("서울과학기술대학교", username + "@seoultech.ac.kr"));
-        member.completeUnivAuthentication();
+        member.completeUnivAuthentication(createEnrollUnivRequest("서울과학기술대학교", username + "@seoultech.ac.kr"));
+        member.connectSummonerInfo(createSummonerInfoConnector(username + "-puuid"), createRiotAuthRequest(username, "KR1"));
+        return member;
+    }
+
+    public static User createMember(String email, String username, String univName, String univMail) {
+        User member = createUser(email, username);
+        member.completeUnivAuthentication(createEnrollUnivRequest(univName, univMail));
         member.connectSummonerInfo(createSummonerInfoConnector(username + "-puuid"), createRiotAuthRequest(username, "KR1"));
         return member;
     }
@@ -70,8 +75,7 @@ public class GroupFixture {
 
     public static User createLeader(String leaderName) {
         User leader = createUser(leaderName + "@rankademy.app", leaderName);
-        leader.enrollUnivInfo(createEnrollUnivRequest());
-        leader.completeUnivAuthentication();
+        leader.completeUnivAuthentication(createEnrollUnivRequest());
         leader.connectSummonerInfo(createSummonerInfoConnector(leaderName + "-puuid"), createRiotAuthRequest(leaderName, "KR1"));
         return leader;
     }

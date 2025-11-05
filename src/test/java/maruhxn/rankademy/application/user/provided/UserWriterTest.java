@@ -6,7 +6,6 @@ import maruhxn.rankademy.application.user.required.UserRepository;
 import maruhxn.rankademy.domain.user.LolPosition;
 import maruhxn.rankademy.domain.user.OAuth2Provider;
 import maruhxn.rankademy.domain.user.User;
-import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
 import maruhxn.rankademy.domain.user.dto.UserOAuth2CreateRequest;
 import maruhxn.rankademy.support.IntegrationTestSupport;
@@ -15,9 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import static maruhxn.rankademy.domain.user.UserFixture.createEnrollUnivRequest;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -61,34 +58,34 @@ class UserWriterTest extends IntegrationTestSupport {
         );
     }
 
-    @Test
-    void enrollUnivInfo() {
-        User user = oauth2RegisterUser();
+//    @Test
+//    void enrollUnivInfo() {
+//        User user = oauth2RegisterUser();
+//
+//        EnrollUnivRequest enrollUnivRequest = createEnrollUnivRequest();
+//
+//        user = userWriter.enrollUnivInfo(user.getId(), enrollUnivRequest);
+//        em.flush();
+//
+//        assertThat(user.getUnivInfo().getUnivName()).isEqualTo(enrollUnivRequest.univName());
+//        assertThat(user.getUnivInfo().isUnivVerified()).isEqualTo(false);
+//    }
 
-        EnrollUnivRequest enrollUnivRequest = createEnrollUnivRequest();
-
-        user = userWriter.enrollUnivInfo(user.getId(), enrollUnivRequest);
-        em.flush();
-
-        assertThat(user.getUnivInfo().getUnivName()).isEqualTo(enrollUnivRequest.univName());
-        assertThat(user.getUnivInfo().isUnivVerified()).isEqualTo(false);
-    }
-
-    @Test
-    void enrollUnivInfo_Validation_Fail() {
-        User user = oauth2RegisterUser();
-
-        EnrollUnivRequest enrollUnivRequest = createEnrollUnivRequest("서울과학기술대학교", "test@test.ac.kr");
-
-        assertThatThrownBy(() -> userWriter.enrollUnivInfo(user.getId(), enrollUnivRequest))
-                .isInstanceOf(IllegalArgumentException.class);
-
-
-        EnrollUnivRequest enrollUnivRequest2 = createEnrollUnivRequest("없는대학교", "test@test.ac.kr");
-
-        assertThatThrownBy(() -> userWriter.enrollUnivInfo(user.getId(), enrollUnivRequest2))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
+//    @Test
+//    void enrollUnivInfo_Validation_Fail() {
+//        User user = oauth2RegisterUser();
+//
+//        EnrollUnivRequest enrollUnivRequest = createEnrollUnivRequest("서울과학기술대학교", "test@test.ac.kr");
+//
+//        assertThatThrownBy(() -> userWriter.enrollUnivInfo(user.getId(), enrollUnivRequest))
+//                .isInstanceOf(IllegalArgumentException.class);
+//
+//
+//        EnrollUnivRequest enrollUnivRequest2 = createEnrollUnivRequest("없는대학교", "test@test.ac.kr");
+//
+//        assertThatThrownBy(() -> userWriter.enrollUnivInfo(user.getId(), enrollUnivRequest2))
+//                .isInstanceOf(IllegalArgumentException.class);
+//    }
 
     private User oauth2RegisterUser() {
         var request = new UserOAuth2CreateRequest(
@@ -110,7 +107,6 @@ class UserWriterTest extends IntegrationTestSupport {
         user = userWriter.removeUnivInfo(user.getId());
         em.flush();
 
-        assertThat(user.getUnivInfo()).isNull();
         assertThat(user.isAuthorized()).isFalse();
     }
 
@@ -122,7 +118,9 @@ class UserWriterTest extends IntegrationTestSupport {
                 "newname",
                 "자기소개입니다.",
                 LolPosition.TOP,
-                LolPosition.JUNGLE
+                LolPosition.JUNGLE,
+                2020,
+                "컴퓨터공학과"
         );
 
         user = userWriter.updateProfile(user.getId(), request);

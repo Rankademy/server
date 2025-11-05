@@ -1,7 +1,6 @@
 package maruhxn.rankademy.application.match.provided;
 
 import jakarta.persistence.EntityManager;
-import maruhxn.rankademy.RankademyTestConfiguration;
 import maruhxn.rankademy.application.match.required.MatchDataRepository;
 import maruhxn.rankademy.application.match.required.MatchHistoryCollector;
 import maruhxn.rankademy.application.user.required.UserRepository;
@@ -11,11 +10,8 @@ import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.IOException;
@@ -58,8 +54,7 @@ class MatchHistoryAnalyzerTest extends IntegrationTestSupport {
     @Test
     void fetchAndAnalyzeMatches() throws IOException {
         User user = createUser();
-        user.enrollUnivInfo(createEnrollUnivRequest());
-        user.completeUnivAuthentication();
+        user.completeUnivAuthentication(createEnrollUnivRequest());
         user.connectSummonerInfo(createSummonerInfoConnector("MfiVjqqTLQ_XhERTcyHydIdiFmlQhK9zNTfKSel_DECSZHGgTIITI7QmHGGaPDbpjlPVOqAahCtHzA"), createRiotAuthRequest());
         userRepository.save(user);
         em.flush();
@@ -99,8 +94,7 @@ class MatchHistoryAnalyzerTest extends IntegrationTestSupport {
     @Test
     void fetchAndAnalyzeMatchesWhenLastMatchIdExists() throws IOException {
         User user = createUser();
-        user.enrollUnivInfo(createEnrollUnivRequest());
-        user.completeUnivAuthentication();
+        user.completeUnivAuthentication(createEnrollUnivRequest());
         user.connectSummonerInfo(createSummonerInfoConnector("MfiVjqqTLQ_XhERTcyHydIdiFmlQhK9zNTfKSel_DECSZHGgTIITI7QmHGGaPDbpjlPVOqAahCtHzA"), createRiotAuthRequest());
 
         String lastMatchId = "KR_7694397953";

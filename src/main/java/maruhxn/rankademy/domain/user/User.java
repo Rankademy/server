@@ -94,6 +94,7 @@ public class User extends AbstractEntity {
         this.authStatus = UserAuthStatus.UNAUTHORIZED;
         this.role = Role.ROLE_USER;
         this.effectiveStrength = new EffectiveStrength();
+        this.univInfo = UnivInfo.empty();
     }
 
     public static User oauth2Register(UserOAuth2CreateRequest userOAuth2CreateRequest) {
@@ -113,39 +114,26 @@ public class User extends AbstractEntity {
     }
 
     private void checkAuthorized() {
-        if ((univInfo == null || !univInfo.isUnivVerified()) ||
-                summonerInfo == null) {
+        if (!univInfo.isAuthorized() || summonerInfo == null) {
             authStatus = UserAuthStatus.UNAUTHORIZED;
             return;
         }
         authStatus = UserAuthStatus.AUTHORIZED;
     }
 
-    public void enrollUnivInfo(EnrollUnivRequest enrollUnivRequest) {
-        if (this.univInfo == null) {
-            this.univInfo = UnivInfo.from(enrollUnivRequest);
-            return;
-        }
-
-        boolean isEmailChanged = !this.univInfo.getUnivMail().address().equals(enrollUnivRequest.univMail());
-
-        if (isEmailChanged) { // 이메일이 바뀌었으면 학생 재인증 필요
-            this.authStatus = UserAuthStatus.UNAUTHORIZED;
-            this.univInfo = UnivInfo.from(enrollUnivRequest);
-        } else {
-            this.univInfo = this.univInfo.update(enrollUnivRequest);
-        }
-    }
-
-    public void completeUnivAuthentication() {
-        Assert.state(this.univInfo != null, "학교 정보를 등록해주세요.");
-        Assert.state(!this.univInfo.isUnivVerified(), "이미 학교 인증이 완료되었습니다.");
-        this.univInfo = this.univInfo.authenticate();
+    public void completeUnivAuthentication(EnrollUnivRequest enrollUnivRequest) {
+        Assert.state(!this.univInfo.isAuthorized(), "이미 학교 인증이 완료되었습니다.");
+        this.univInfo = UnivInfo.from(enrollUnivRequest);
         checkAuthorized();
     }
 
     public void removeUnivInfo() {
-        this.univInfo = null;
+        this.univInfo = new UnivInfo(
+                null,
+                null,
+                this.univInfo.getAdmissionYear(),
+                this.univInfo.getMajor()
+        );
     }
 
     public void connectSummonerInfo(SummonerInfoConnector summonerInfoConnector, RiotAuthRequest riotAuthRequest) {
@@ -167,6 +155,8 @@ public class User extends AbstractEntity {
         if(StringUtils.hasText(profileUpdateRequest.description())) this.description = profileUpdateRequest.description();
         if(profileUpdateRequest.mainPosition() != null) this.mainPosition = profileUpdateRequest.mainPosition();
         if(profileUpdateRequest.subPosition() != null) this.subPosition = profileUpdateRequest.subPosition();
+        if(StringUtils.hasText(profileUpdateRequest.major())) this.univInfo.updateMajor(profileUpdateRequest.major());
+        if(profileUpdateRequest.admissionYear() != null)  this.univInfo.updateAdmissionYear(profileUpdateRequest.admissionYear());
     }
 
     public void updateTitles(UserTitleProvider titleProvider) {

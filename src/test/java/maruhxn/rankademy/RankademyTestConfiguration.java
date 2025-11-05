@@ -2,6 +2,7 @@ package maruhxn.rankademy;
 
 import maruhxn.rankademy.application.match.RiotAuthEventHandler;
 import maruhxn.rankademy.application.user.required.EmailSender;
+import maruhxn.rankademy.application.user.required.UnivExtractor;
 import maruhxn.rankademy.application.user.required.UnivMailCertifier;
 import maruhxn.rankademy.domain.user.UserFixture;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
@@ -20,7 +21,7 @@ public class RankademyTestConfiguration {
     public UnivMailCertifier univMailCertifier() {
         return new UnivMailCertifier() {
             @Override
-            public void sendCertifyMail(String email, String univName, int code) {
+            public void sendCertifyMail(String email, int code) {
                 System.out.println("Sending email: " + email + " code: " + code);
             }
 
@@ -39,6 +40,11 @@ public class RankademyTestConfiguration {
     @Bean
     public RiotAuthEventHandler riotAuthEventHandler() {
         return new RiotAuthEventHandler(userId -> System.out.println("Refreshing matches for user: " + userId));
+    }
+
+    @Bean
+    public UnivExtractor univExtractor() {
+        return univMail -> "서울과학기술대학교";
     }
 
 }

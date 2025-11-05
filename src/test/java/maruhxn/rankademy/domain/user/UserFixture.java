@@ -128,13 +128,7 @@ public class UserFixture {
     }
 
     public static EnrollUnivRequest createEnrollUnivRequest(String univname, String univMail) {
-        return new EnrollUnivRequest(
-                univname,
-                univMail,
-                true,
-                2020,
-                "컴퓨터공학과"
-        );
+        return new EnrollUnivRequest(univname, univMail);
     }
 
     public static RiotAuthRequest createRiotAuthRequest() {
@@ -151,8 +145,7 @@ public class UserFixture {
 
     public static User createAuthorizedMember(String email, String username) {
         User member = createUser(email, username);
-        member.enrollUnivInfo(createEnrollUnivRequest("서울과학기술대학교", username + "@seoultech.ac.kr"));
-        member.completeUnivAuthentication();
+        member.completeUnivAuthentication(createEnrollUnivRequest("서울과학기술대학교", username + "@seoultech.ac.kr"));
         member.connectSummonerInfo(createSummonerInfoConnector(username + "-puuid"), createRiotAuthRequest(username, "KR1"));
         return member;
     }

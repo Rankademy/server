@@ -59,14 +59,12 @@ class SummonerMatchRefreshSchedulerTest extends IntegrationTestSupport {
         ReflectionTestUtils.setField(scheduler, "running", new AtomicBoolean(false));
 
         User activeUser = createUser("active@rankademy.app", "active");
-        activeUser.enrollUnivInfo(createEnrollUnivRequest());
-        activeUser.completeUnivAuthentication();
+        activeUser.completeUnivAuthentication(createEnrollUnivRequest());
         activeUser.connectSummonerInfo(createSummonerInfoConnector("active-puuid"), createRiotAuthRequest());
         ReflectionTestUtils.setField(activeUser, "lastLoginAt", now.minusDays(1));
 
         User inactiveUser = createUser("inactive@rankademy.app", "inactive");
-        inactiveUser.enrollUnivInfo(createEnrollUnivRequest("대학교", "inactive@univ.app"));
-        inactiveUser.completeUnivAuthentication();
+        inactiveUser.completeUnivAuthentication(createEnrollUnivRequest());
         inactiveUser.connectSummonerInfo(createSummonerInfoConnector("inactive-puuid"), createRiotAuthRequest("inactive", "KR1"));
         ReflectionTestUtils.setField(inactiveUser, "lastLoginAt", now.minusDays(30));
 

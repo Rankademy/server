@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 public class DummyUnivMailCertifier implements UnivMailCertifier {
 
     @Override
-    public void sendCertifyMail(String email, String univName, int code) {
-        log.info("email: {}, univName: {}", email, univName);
+    public void sendCertifyMail(String email, int code) {
+        log.info("email: {}, code: {}", email, code);
     }
 
     @Override

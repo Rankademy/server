@@ -20,8 +20,7 @@ public class TeamFixture {
     public static TeamMember createTeamMember(Long id, TierInfo tierInfo, LolPosition position) {
         User user = UserFixture.createUser("test" + id + "@test.com", "tester" + id);
         ReflectionTestUtils.setField(user, "id", id);
-        user.enrollUnivInfo(createEnrollUnivRequest());
-        user.completeUnivAuthentication();
+        user.completeUnivAuthentication(createEnrollUnivRequest());
         user.connectSummonerInfo(
                 createSummonerInfoConnector("member" + id + "-puuid", tierInfo),
                 createRiotAuthRequest("member" + id, "KR" + id)

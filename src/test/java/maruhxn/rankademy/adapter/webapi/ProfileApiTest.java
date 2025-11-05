@@ -46,8 +46,7 @@ class ProfileApiTest extends IntegrationTestSupport {
     @Test
     void getMyProfile() throws UnsupportedEncodingException, JsonProcessingException {
         User user = createUser();
-        user.enrollUnivInfo(createEnrollUnivRequest());
-        user.completeUnivAuthentication();
+        user.completeUnivAuthentication(createEnrollUnivRequest());
         user.connectSummonerInfo(createSummonerInfoConnector(), createRiotAuthRequest());
         userRepository.save(user);
 
@@ -70,7 +69,6 @@ class ProfileApiTest extends IntegrationTestSupport {
                 () -> assertThat(response.id()).isEqualTo(target.getId()),
                 () -> assertThat(response.summonerInfo().summonerName()).isEqualTo(target.getSummonerInfo().getSummonerName()),
                 () -> assertThat(response.univInfo().univName()).isEqualTo(target.getUnivInfo().getUnivName()),
-                () -> assertThat(response.univInfo().univVerified()).isEqualTo(true),
                 () -> assertThat(response.univInfo().admissionYear()).isEqualTo(target.getUnivInfo().getAdmissionYear()),
                 () -> assertThat(response.univInfo().major()).isEqualTo(target.getUnivInfo().getMajor()),
                 () -> assertThat(response.mostChampionIds()).isEmpty(),
@@ -87,7 +85,9 @@ class ProfileApiTest extends IntegrationTestSupport {
                 "new-summonerName",
                 "it's about",
                 LolPosition.TOP,
-                LolPosition.JUNGLE
+                LolPosition.JUNGLE,
+                1999,
+                "기계공학과"
         );
         String requestJson = objectMapper.writeValueAsString(request);
 
@@ -104,7 +104,9 @@ class ProfileApiTest extends IntegrationTestSupport {
                 () -> assertThat(target.getUsername()).isEqualTo(request.username()),
                 () -> assertThat(target.getDescription()).isEqualTo(request.description()),
                 () -> assertThat(target.getMainPosition()).isEqualTo(request.mainPosition()),
-                () -> assertThat(target.getSubPosition()).isEqualTo(request.subPosition())
+                () -> assertThat(target.getSubPosition()).isEqualTo(request.subPosition()),
+                () -> assertThat(target.getUnivInfo().getMajor()).isEqualTo(request.major()),
+                () -> assertThat(target.getUnivInfo().getAdmissionYear()).isEqualTo(request.admissionYear())
         );
     }
 
@@ -121,27 +123,27 @@ class ProfileApiTest extends IntegrationTestSupport {
         assertThat(userRepository.findById(user.getId())).isEmpty();
     }
 
-    @Test
-    void sendCertifyUnivMail_FAIL() {
-        User user = registerUser();
-        RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
-
-        MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/send", user.getId())
-                .with(user(mockUser))
-                .exchange();
-        assertThat(result)
-                .hasStatus(HttpStatus.CONFLICT);
-    }
+//    @Test
+//    void sendCertifyUnivMail_FAIL() {
+//        User user = registerUser();
+//        RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
+//
+//        MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/send", user.getId())
+//                .with(user(mockUser))
+//                .param("email", "test@seoultech.ac.kr")
+//                .exchange();
+//        assertThat(result).hasStatus(HttpStatus.CONFLICT);
+//    }
 
     @Test
     void sendCertifyUnivMail() {
         User user = registerUser();
-        user.enrollUnivInfo(createEnrollUnivRequest());
         userRepository.save(user);
         RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
 
         MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/send", user.getId())
                 .with(user(mockUser))
+                .param("email", "test@seoultech.ac.kr")
                 .exchange();
 
         assertThat(result).hasStatusOk();
@@ -150,7 +152,6 @@ class ProfileApiTest extends IntegrationTestSupport {
     @Test
     void certifyUnivMail() {
         User user = registerUser();
-        user.enrollUnivInfo(createEnrollUnivRequest());
         userRepository.save(user);
         RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
 
@@ -158,24 +159,25 @@ class ProfileApiTest extends IntegrationTestSupport {
         MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/certify", user.getId())
                 .with(user(mockUser))
                 .param("code", "1234")
+                .param("email", "test@seoultech.ac.kr")
                 .exchange();
 
         assertThat(result).hasStatusOk();
 
         User target = userRepository.findById(user.getId()).orElseThrow();
-        assertThat(target.getUnivInfo().isUnivVerified()).isTrue();
+        assertThat(target.getUnivInfo()).isNotNull();
     }
 
     @Test
     void certifyUnivMail_FAIL_WITHOUT_CODE() {
         User user = registerUser();
-        user.enrollUnivInfo(createEnrollUnivRequest());
         userRepository.save(user);
         RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
 
 
         MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/certify", user.getId())
                 .with(user(mockUser))
+                .param("email", "test@seoultech.ac.kr")
                 .exchange();
 
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);

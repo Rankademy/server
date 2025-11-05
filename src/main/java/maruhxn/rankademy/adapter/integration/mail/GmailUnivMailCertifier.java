@@ -5,7 +5,6 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.application.univ_certification_code.provided.UnivCertificationCodeManager;
 import maruhxn.rankademy.application.user.required.UnivMailCertifier;
-import maruhxn.rankademy.application.user.required.UnivMailValidator;
 import maruhxn.rankademy.domain.univ_certification_code.UnivCertificationCode;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -19,16 +18,11 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class GmailUnivMailCertifier implements UnivMailCertifier {
 
-    private final UnivMailValidator univMailValidator;
     private final JavaMailSender javaMailSender;
     private final UnivCertificationCodeManager univCertificationCodeManager;
 
     @Override
-    public void sendCertifyMail(String email, String univName, int code) {
-        if (!univMailValidator.isValid(univName, email)) {
-            throw new IllegalArgumentException("이메일 정보가 올바르지 않습니다.");
-        }
-
+    public void sendCertifyMail(String email,  int code) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");

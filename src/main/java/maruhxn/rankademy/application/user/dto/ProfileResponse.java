@@ -16,7 +16,7 @@ public record ProfileResponse(
         LolPosition mainPosition,
         LolPosition subPosition
 ) {
-    public record UnivInfoResponse(String univName, boolean univVerified, String major, int admissionYear) {
+    public record UnivInfoResponse(String univName, String major, Integer admissionYear) {
     }
 
     public record SummonerInfoResponse(

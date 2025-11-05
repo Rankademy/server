@@ -26,8 +26,7 @@ class MatchHistoryCollectorTest extends IntegrationTestSupport {
     void collectMatchesWithLastMatchId() {
         // given
         User user = createUser();
-        user.enrollUnivInfo(createEnrollUnivRequest());
-        user.completeUnivAuthentication();
+        user.completeUnivAuthentication(createEnrollUnivRequest());
         user.connectSummonerInfo(createSummonerInfoConnector("MfiVjqqTLQ_XhERTcyHydIdiFmlQhK9zNTfKSel_DECSZHGgTIITI7QmHGGaPDbpjlPVOqAahCtHzA"), createRiotAuthRequest());
 
         String lastMatchId = "KR_7690698299";

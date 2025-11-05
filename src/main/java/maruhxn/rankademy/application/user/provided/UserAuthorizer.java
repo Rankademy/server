@@ -6,9 +6,9 @@ import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
 
 public interface UserAuthorizer {
 
-    void sendUnivCertifyMail(Long userId);
+    void sendUnivCertifyMail(Long userId, String email);
 
-    User completeUnivAuthentication(Long userId, int code);
+    User completeUnivAuthentication(Long userId, String email, int code);
 
     User completeRiotAuthentication(Long userId, @Valid RiotAuthRequest riotAuthRequest);
 

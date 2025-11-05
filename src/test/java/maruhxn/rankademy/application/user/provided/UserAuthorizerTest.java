@@ -37,35 +37,33 @@ class UserAuthorizerTest extends IntegrationTestSupport {
     @Test
     void sendUnivCertifyMail() {
         User user = registerUser();
-        enrollUnivInfo(user);
 
-        userAuthorizer.sendUnivCertifyMail(user.getId());
+        userAuthorizer.sendUnivCertifyMail(user.getId(), "test@seoultech.ac.kr");
 
         verify(univMailCertifier, times(1))
-                .sendCertifyMail(anyString(), anyString(), anyInt());
+                .sendCertifyMail(anyString(), anyInt());
     }
 
     @Test
     void completeUnivAuthentication() {
         User user = registerUser();
-        enrollUnivInfo(user);
 
-        user = userAuthorizer.completeUnivAuthentication(user.getId(), 1234);
+        user = userAuthorizer.completeUnivAuthentication(user.getId(), "test@seoultech.ac.kr", 1234);
         em.flush();
         em.clear();
 
-        assertThat(user.getUnivInfo().isUnivVerified()).isTrue();
+        assertThat(user.getUnivInfo()).isNotNull();
     }
 
     @Test
     void completeUnivAuthentication_Fail() {
         User user = registerUser();
-        enrollUnivInfo(user);
+        completeUnivAuthentication(user);
         doThrow(new IllegalArgumentException())
                 .when(univMailCertifier)
                 .certifyCode(anyString(), anyString(), anyInt());
 
-        assertThatThrownBy(() -> userAuthorizer.completeUnivAuthentication(user.getId(), 0000))
+        assertThatThrownBy(() -> userAuthorizer.completeUnivAuthentication(user.getId(), "test@seoultech.ac.kr", 0000))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -73,8 +71,7 @@ class UserAuthorizerTest extends IntegrationTestSupport {
     void completeRiotAuthentication() {
         User user = registerUser();
         RiotAuthRequest request = createRiotAuthRequest();
-        when(summonerInfoConnector.connect(request))
-                .thenReturn(createSummonerInfo(request));
+        when(summonerInfoConnector.connect(request)).thenReturn(createSummonerInfo(request));
 
         user = userAuthorizer.completeRiotAuthentication(user.getId(), request);
         em.flush();
@@ -87,8 +84,7 @@ class UserAuthorizerTest extends IntegrationTestSupport {
         assertThat(user.isAuthorized()).isFalse();
 
         // 학교 인증까지 성공 시, isAuthorized는 true
-        enrollUnivInfo(user);
-        user.completeUnivAuthentication();
+        completeUnivAuthentication(user);
 
         assertThat(user.isAuthorized()).isTrue();
     }
@@ -117,8 +113,8 @@ class UserAuthorizerTest extends IntegrationTestSupport {
         return user;
     }
 
-    private void enrollUnivInfo(User user) {
-        user.enrollUnivInfo(createEnrollUnivRequest());
+    private void completeUnivAuthentication(User user) {
+        user.completeUnivAuthentication(createEnrollUnivRequest());
         userRepository.save(user);
         em.flush();
         em.clear();

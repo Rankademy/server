@@ -11,7 +11,6 @@ import maruhxn.rankademy.application.user.dto.MyProfileResponse;
 import maruhxn.rankademy.application.user.provided.UserAuthorizer;
 import maruhxn.rankademy.application.user.provided.UserReader;
 import maruhxn.rankademy.application.user.provided.UserWriter;
-import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
 import org.springframework.http.HttpStatus;
@@ -54,18 +53,18 @@ public class ProfileApi {
         userWriter.updateProfile(rankademyUser.getId(), profileUpdateRequest);
     }
 
-    @PostMapping("/univ")
-    @Operation(
-            summary = "대학교 정보 등록",
-            description = "대학교 인증 정보를 등록합니다."
-    )
-    @ApiResponse(responseCode = "200", description = "대학교 정보 등록 성공")
-    public void enrollUnivInfo(
-            @AuthenticationPrincipal RankademyUser rankademyUser,
-            @RequestBody @Valid EnrollUnivRequest enrollUnivRequest
-    ) {
-        userWriter.enrollUnivInfo(rankademyUser.getId(), enrollUnivRequest);
-    }
+//    @PostMapping("/univ")
+//    @Operation(
+//            summary = "대학교 정보 등록",
+//            description = "대학교 인증 정보를 등록합니다."
+//    )
+//    @ApiResponse(responseCode = "200", description = "대학교 정보 등록 성공")
+//    public void enrollUnivInfo(
+//            @AuthenticationPrincipal RankademyUser rankademyUser,
+//            @RequestBody @Valid EnrollUnivRequest enrollUnivRequest
+//    ) {
+//        userWriter.enrollUnivInfo(rankademyUser.getId(), enrollUnivRequest);
+//    }
 
     @DeleteMapping("/univ")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -87,9 +86,10 @@ public class ProfileApi {
     )
     @ApiResponse(responseCode = "200", description = "인증 메일 발송 성공")
     public void sendCertifyUnivMail(
-            @AuthenticationPrincipal RankademyUser rankademyUser
+            @AuthenticationPrincipal RankademyUser rankademyUser,
+            @RequestParam(name = "email") String email
     ) {
-        userAuthorizer.sendUnivCertifyMail(rankademyUser.getId());
+        userAuthorizer.sendUnivCertifyMail(rankademyUser.getId(), email);
     }
 
     @PostMapping("/univ-email/certify")
@@ -100,10 +100,12 @@ public class ProfileApi {
     @ApiResponse(responseCode = "200", description = "대학교 인증 성공")
     public void certifyUnivMail(
             @AuthenticationPrincipal RankademyUser rankademyUser,
+            @Parameter(description = "코드가 발급된 이메일", example = "test@seoultech.ac.kr")
+            @RequestParam(name = "email") String email,
             @Parameter(description = "메일로 발급된 인증 코드", example = "123456")
             @RequestParam(name = "code", required = true) int code
     ) {
-        userAuthorizer.completeUnivAuthentication(rankademyUser.getId(), code);
+        userAuthorizer.completeUnivAuthentication(rankademyUser.getId(), email, code);
     }
 
     @PostMapping("/rso")

@@ -1,7 +1,6 @@
 package maruhxn.rankademy.application.user.provided;
 
 import maruhxn.rankademy.domain.user.User;
-import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
 import maruhxn.rankademy.domain.user.dto.UserOAuth2CreateRequest;
 
@@ -10,7 +9,7 @@ import maruhxn.rankademy.domain.user.dto.UserOAuth2CreateRequest;
  */
 public interface UserWriter {
 
-    User enrollUnivInfo(Long userId, EnrollUnivRequest enrollUnivRequest);
+//    User enrollUnivInfo(Long userId, EnrollUnivRequest enrollUnivRequest);
 
     User removeUnivInfo(Long userId);
 

@@ -45,7 +45,6 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
                         Projections.constructor(
                                 ProfileResponse.UnivInfoResponse.class,
                                 user.univInfo.univName,
-                                user.univInfo.univVerified,
                                 user.univInfo.major,
                                 user.univInfo.admissionYear
                         ),
@@ -106,7 +105,6 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
                                 MyProfileResponse.UnivInfoResponse.class,
                                 user.univInfo.univName,
                                 user.univInfo.univMail.address,
-                                user.univInfo.univVerified,
                                 user.univInfo.major,
                                 user.univInfo.admissionYear
                         ),
