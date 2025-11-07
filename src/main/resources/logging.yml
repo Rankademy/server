@@ -1,6 +1,6 @@
 logging:
   file:
-    path: /var/log/app # 로그 파일이 저장될 로그 디렉토리 경로
+    path: logs # 로그 파일이 저장될 로그 디렉토리 경로
   config: classpath:logback-spring.xml
 
 springdoc:

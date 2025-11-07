@@ -7,7 +7,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - /home/ec2-user/logs:/var/log/app
+      - ./logs:/var/log/app
     depends_on:
       mysql:
         condition: service_healthy

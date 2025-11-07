@@ -80,7 +80,8 @@ dependencies {
     implementation("software.amazon.awssdk:s3")
 
     // logging
-    implementation("net.logstash.logback:logstash-logback-encoder:8.1")
+    implementation("net.logstash.logback:logstash-logback-encoder:9.0")
+    implementation("com.fasterxml.uuid:java-uuid-generator:4.3.0")
 
     // api-docs
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
