@@ -10,6 +10,7 @@ import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
 import maruhxn.rankademy.domain.user.dto.UserOAuth2CreateRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 @Service
@@ -31,7 +32,8 @@ public class UserModifyService implements UserWriter {
     }
 
     private void checkDuplicateUsername(String username) {
-        if (userRepository.findByUsername(username).isPresent()) {
+        System.out.println(StringUtils.hasText(username));
+        if (StringUtils.hasText(username) && userRepository.findByUsername(username).isPresent()) {
             throw new IllegalStateException("이미 사용 중인 유저명입니다: " + username);
         }
     }
