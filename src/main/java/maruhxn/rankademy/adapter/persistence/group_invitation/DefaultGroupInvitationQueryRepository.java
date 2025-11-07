@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.application.group_invitation.dto.GroupInvitationPageResponse;
 import maruhxn.rankademy.application.group_invitation.required.GroupInvitationQueryRepository;
+import maruhxn.rankademy.domain.group_invitation.GroupInvitationStatus;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class DefaultGroupInvitationQueryRepository implements GroupInvitationQue
     public GroupInvitationPageResponse getInvitations(Long userId, int page) {
         Long totalCount = queryFactory.select(groupInvitation.count())
                 .from(groupInvitation)
-                .where(groupInvitation.userId.eq(userId))
+                .where(groupInvitation.userId.eq(userId).and(groupInvitation.status.eq(GroupInvitationStatus.PENDING)))
                 .fetchOne();
 
         List<GroupInvitationPageResponse.GroupInvitationResponse> result = queryFactory
@@ -38,7 +39,7 @@ public class DefaultGroupInvitationQueryRepository implements GroupInvitationQue
                 )
                 .from(groupInvitation)
                 .join(group).on(groupInvitation.groupId.eq(group.id))
-                .where(groupInvitation.userId.eq(userId))
+                .where(groupInvitation.userId.eq(userId).and(groupInvitation.status.eq(GroupInvitationStatus.PENDING)))
                 .offset(page * 20)
                 .limit(20)
                 .fetch();

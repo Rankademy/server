@@ -15,6 +15,5 @@ public record EnrollUnivRequest(
         @Email
         @Schema(description = "대학교 이메일", example = "user@seoultech.ac.kr")
         String univMail
-
 ) {
 }

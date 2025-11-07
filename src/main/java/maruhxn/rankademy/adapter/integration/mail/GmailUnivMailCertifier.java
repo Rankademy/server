@@ -36,8 +36,8 @@ public class GmailUnivMailCertifier implements UnivMailCertifier {
     }
 
     @Override
-    public void certifyCode(String email, String univName, int code) {
-        List<UnivCertificationCode> codes = univCertificationCodeManager.getUnivCertificationCodes(email, univName);
+    public UnivCertificationCode certifyCode(String email, int code) {
+        List<UnivCertificationCode> codes = univCertificationCodeManager.getUnivCertificationCodes(email);
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -48,5 +48,7 @@ public class GmailUnivMailCertifier implements UnivMailCertifier {
                 .orElseThrow(() -> new NoSuchElementException("인증 코드가 일치하지 않습니다."));
 
         univCertificationCodeManager.delete(univCertificationCode);
+
+        return univCertificationCode;
     }
 }

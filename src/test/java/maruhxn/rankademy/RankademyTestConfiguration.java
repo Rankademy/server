@@ -2,8 +2,7 @@ package maruhxn.rankademy;
 
 import maruhxn.rankademy.application.match.RiotAuthEventHandler;
 import maruhxn.rankademy.application.user.required.EmailSender;
-import maruhxn.rankademy.application.user.required.UnivExtractor;
-import maruhxn.rankademy.application.user.required.UnivMailCertifier;
+import maruhxn.rankademy.application.user.required.UnivValidator;
 import maruhxn.rankademy.domain.user.UserFixture;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -18,21 +17,6 @@ public class RankademyTestConfiguration {
     }
 
     @Bean
-    public UnivMailCertifier univMailCertifier() {
-        return new UnivMailCertifier() {
-            @Override
-            public void sendCertifyMail(String email, int code) {
-                System.out.println("Sending email: " + email + " code: " + code);
-            }
-
-            @Override
-            public void certifyCode(String email, String univName, int code) {
-                System.out.println("Certifying code: " + code);
-            }
-        };
-    }
-
-    @Bean
     public SummonerInfoConnector summonerInfoConnector() {
         return UserFixture::createSummonerInfo;
     }
@@ -43,8 +27,10 @@ public class RankademyTestConfiguration {
     }
 
     @Bean
-    public UnivExtractor univExtractor() {
-        return univMail -> "서울과학기술대학교";
+    public UnivValidator univValidator() {
+        return (univName, univMail) -> {
+            System.out.println("Validating univ name: " + univName + " mail: " + univMail);
+        };
     }
 
 }

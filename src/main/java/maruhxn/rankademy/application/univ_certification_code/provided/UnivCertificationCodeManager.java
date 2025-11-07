@@ -31,8 +31,8 @@ public class UnivCertificationCodeManager {
         );
     }
 
-    public List<UnivCertificationCode> getUnivCertificationCodes(String email, String univName) {
-        return certificationCodeRepository.findByEmailAndUnivName(new Email(email), univName);
+    public List<UnivCertificationCode> getUnivCertificationCodes(String email) {
+        return certificationCodeRepository.findByEmail(new Email(email));
     }
 
     public void delete(UnivCertificationCode univCertificationCode) {

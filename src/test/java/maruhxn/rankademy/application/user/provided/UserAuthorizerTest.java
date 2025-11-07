@@ -3,13 +3,18 @@ package maruhxn.rankademy.application.user.provided;
 import jakarta.persistence.EntityManager;
 import maruhxn.rankademy.application.user.required.UnivMailCertifier;
 import maruhxn.rankademy.application.user.required.UserRepository;
+import maruhxn.rankademy.domain.univ_certification_code.UnivCertificationCode;
+import maruhxn.rankademy.domain.user.Email;
 import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
 import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import java.time.LocalDateTime;
 
 import static maruhxn.rankademy.domain.user.UserFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,7 +43,7 @@ class UserAuthorizerTest extends IntegrationTestSupport {
     void sendUnivCertifyMail() {
         User user = registerUser();
 
-        userAuthorizer.sendUnivCertifyMail(user.getId(), "test@seoultech.ac.kr");
+        userAuthorizer.sendUnivCertifyMail(user.getId(), "서울과학기술대학교", "test@seoultech.ac.kr");
 
         verify(univMailCertifier, times(1))
                 .sendCertifyMail(anyString(), anyInt());
@@ -48,7 +53,18 @@ class UserAuthorizerTest extends IntegrationTestSupport {
     void completeUnivAuthentication() {
         User user = registerUser();
 
-        user = userAuthorizer.completeUnivAuthentication(user.getId(), "test@seoultech.ac.kr", 1234);
+        String email = "test@seoultech.ac.kr";
+        int code = 1234;
+        BDDMockito.given(univMailCertifier.certifyCode(email, code))
+                .willReturn(UnivCertificationCode.create(
+                        code,
+                        new Email(email),
+                        "서울과학기술대학교",
+                        user.getId(),
+                        LocalDateTime.now().plusMinutes(5)
+                ));
+
+        user = userAuthorizer.completeUnivAuthentication(user.getId(), email, code);
         em.flush();
         em.clear();
 
@@ -61,7 +77,7 @@ class UserAuthorizerTest extends IntegrationTestSupport {
         completeUnivAuthentication(user);
         doThrow(new IllegalArgumentException())
                 .when(univMailCertifier)
-                .certifyCode(anyString(), anyString(), anyInt());
+                .certifyCode(anyString(), anyInt());
 
         assertThatThrownBy(() -> userAuthorizer.completeUnivAuthentication(user.getId(), "test@seoultech.ac.kr", 0000))
                 .isInstanceOf(IllegalArgumentException.class);

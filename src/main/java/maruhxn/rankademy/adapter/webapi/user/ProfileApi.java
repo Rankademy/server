@@ -87,9 +87,10 @@ public class ProfileApi {
     @ApiResponse(responseCode = "200", description = "인증 메일 발송 성공")
     public void sendCertifyUnivMail(
             @AuthenticationPrincipal RankademyUser rankademyUser,
+            @RequestParam(name = "univName") String univName,
             @RequestParam(name = "email") String email
     ) {
-        userAuthorizer.sendUnivCertifyMail(rankademyUser.getId(), email);
+        userAuthorizer.sendUnivCertifyMail(rankademyUser.getId(), univName, email);
     }
 
     @PostMapping("/univ-email/certify")

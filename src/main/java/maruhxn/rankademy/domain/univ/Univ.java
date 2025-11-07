@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import maruhxn.rankademy.domain.shared.AbstractEntity;
 
-@Table(name = "users")
+@Table(name = "univ")
 @Entity
 @Getter
 @ToString(callSuper = true)

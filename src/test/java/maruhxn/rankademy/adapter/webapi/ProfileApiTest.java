@@ -6,20 +6,26 @@ import jakarta.persistence.EntityManager;
 import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.adapter.security.model.UserInfo;
 import maruhxn.rankademy.application.user.dto.MyProfileResponse;
+import maruhxn.rankademy.application.user.required.UnivMailCertifier;
 import maruhxn.rankademy.application.user.required.UserRepository;
+import maruhxn.rankademy.domain.univ_certification_code.UnivCertificationCode;
+import maruhxn.rankademy.domain.user.Email;
 import maruhxn.rankademy.domain.user.LolPosition;
 import maruhxn.rankademy.domain.user.User;
 import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
 import maruhxn.rankademy.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
 
 import static maruhxn.rankademy.domain.user.UserFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,6 +45,9 @@ class ProfileApiTest extends IntegrationTestSupport {
 
     @Autowired
     UserRepository userRepository;
+
+    @MockitoBean
+    UnivMailCertifier univMailCertifier;
 
     @Autowired
     EntityManager em;
@@ -144,6 +153,7 @@ class ProfileApiTest extends IntegrationTestSupport {
         MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/send", user.getId())
                 .with(user(mockUser))
                 .param("email", "test@seoultech.ac.kr")
+                .param("univName", "서울과학기술대학교")
                 .exchange();
 
         assertThat(result).hasStatusOk();
@@ -154,12 +164,21 @@ class ProfileApiTest extends IntegrationTestSupport {
         User user = registerUser();
         userRepository.save(user);
         RankademyUser mockUser = RankademyUser.from(UserInfo.from(user));
-
+        String email = "test@seoultech.ac.kr";
+        int code = 1234;
+        BDDMockito.given(univMailCertifier.certifyCode(email, code))
+                .willReturn(UnivCertificationCode.create(
+                        code,
+                        new Email(email),
+                        "서울과학기술대학교",
+                        user.getId(),
+                        LocalDateTime.now().plusMinutes(5)
+                ));
 
         MvcTestResult result = mvcTester.post().uri(BASE_URL + "/univ-email/certify", user.getId())
                 .with(user(mockUser))
-                .param("code", "1234")
-                .param("email", "test@seoultech.ac.kr")
+                .param("code", String.valueOf(code))
+                .param("email", email)
                 .exchange();
 
         assertThat(result).hasStatusOk();

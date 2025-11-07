@@ -9,7 +9,7 @@ import java.util.List;
 public interface UnivCertificationCodeRepository extends Repository<UnivCertificationCode, Long> {
     UnivCertificationCode save(UnivCertificationCode univCertificationCode);
 
-    List<UnivCertificationCode> findByEmailAndUnivName(Email email, String univName);
+    List<UnivCertificationCode> findByEmail(Email email);
 
     void delete(UnivCertificationCode univCertificationCode);
 
