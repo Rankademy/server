@@ -1,0 +1,96 @@
+<included>
+    <!-- appender: encoder를 이용해서 로그 메시지를 출력 형식에 맞게 변환한 뒤 출력 대상(ex. 파일, 콘솔, DB)에 기록하는 역할 -->
+    <!-- Info, Warn 출력기 -->
+    <appender name="RANKADEMY_INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/rankademy-info.log</file>
+        <!-- 하루 기준으로 로그 파일을 분리 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/rankademy-info.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory> <!-- 7일이 지난 로그 파일은 자동으로 삭제 -->
+        </rollingPolicy>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>NEUTRAL</onMismatch>
+        </filter>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- Error 출력기 (에러 로그는 JSON 형식으로 출력)-->
+    <appender name="RANKADEMY_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/rankademy-error.json</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 하루 기준으로 로그 파일을 분리 (fileNamePatter) -->
+            <fileNamePattern>${LOG_PATH}/rankademy-error.%d{yyyy-MM-dd}.json</fileNamePattern>
+            <!-- 7일 지나면 삭제 -->
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <fieldName>timestamp</fieldName>
+                    <timeZone>Asia/Seoul</timeZone>
+                    <!-- 다양한 로그 저장소와의 호환성을 위해 ISO 8601 표준 -->
+                    <pattern>yyyy-MM-dd'T'HH:mm:ss.SSSXXX</pattern>
+                </timestamp>
+                <logLevel>
+                    <fieldName>level</fieldName>
+                </logLevel>
+                <loggerName>
+                    <fieldName>logger</fieldName>
+                </loggerName>
+                <threadName>
+                    <fieldName>thread</fieldName>
+                </threadName>
+                <message>
+                    <fieldName>message</fieldName>
+                </message>
+                <throwableClassName>
+                    <fieldName>exception</fieldName>
+                </throwableClassName>
+                <stackTrace>
+                    <fieldName>stacktrace</fieldName>
+                </stackTrace>
+                <uuid>
+                    <fieldName>traceId</fieldName>
+                </uuid>
+
+            </providers>
+        </encoder>
+    </appender>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <logger name="rankademy" level="INFO" additivity="false">
+        <appender-ref ref="RANKADEMY_INFO_FILE"/>
+        <appender-ref ref="RANKADEMY_ERROR_FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</included>

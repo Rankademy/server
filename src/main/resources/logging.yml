@@ -1,13 +1,7 @@
 logging:
-  level:
-    root: INFO
-    maruhxn.rankademy: INFO
-    maruhxn.rankademy.adapter.webapi.filter.LoggingFilter: INFO
-    org.springframework.web: INFO
-    org.hibernate.SQL: WARN
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} traceId=%X{traceId:-} - %msg%n"
-  register-shutdown-hook: false
+  file:
+    path: /var/log/app # 로그 파일이 저장될 로그 디렉토리 경로
+  config: classpath:logback-spring.xml
 
 springdoc:
   swagger-ui:
@@ -18,27 +12,18 @@ springdoc:
     path: /docs/api-docs
 
 ---
-spring.config.activate.on-profile: local,dev,test
+spring.config.activate.on-profile: default,local,dev,test
 
 logging:
-  file:
-    name: logs/rankademy.log
-  pattern:
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} traceId=%X{traceId:-} - %msg%n"
-  logback:
-    rollingpolicy:
-      file-name-pattern: logs/rankademy.%d{yyyy-MM-dd}.%i.log
-      max-file-size: 50MB
-      max-history: 30
-      total-size-cap: 5GB
-      clean-history-on-start: false
+  level:
+    maruhxn.rankademy: debug
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
 
 ---
 spring.config.activate.on-profile: prod
 
 logging:
   level:
-    org.springframework.web: WARN
-    org.hibernate.SQL: OFF
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} traceId=%X{traceId:-} - %msg%n"
+    root: info
+    maruhxn.rankademy: info

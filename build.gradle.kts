@@ -80,7 +80,7 @@ dependencies {
     implementation("software.amazon.awssdk:s3")
 
     // logging
-    implementation("com.kdgregory.logging:logback-aws-appenders:2.4.1")
+    implementation("net.logstash.logback:logstash-logback-encoder:8.1")
 
     // api-docs
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
