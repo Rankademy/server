@@ -11,6 +11,7 @@ import maruhxn.rankademy.domain.shared.event.TeamDeactivatedEvent;
 import maruhxn.rankademy.domain.team.Team;
 import maruhxn.rankademy.domain.team.TeamMember;
 import maruhxn.rankademy.domain.team.dto.TeamCreateRequest;
+import maruhxn.rankademy.domain.team.service.TeamLeaderLimitValidator;
 import maruhxn.rankademy.domain.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,9 +30,12 @@ public class TeamCommandService implements TeamWriter {
     private final UserRepository userRepository;
     private final DomainEventPublisher publisher;
     private final CompetitionRepository competitionRepository;
+    private final TeamLeaderLimitValidator leaderLimitValidator;
 
     @Override
     public Team create(TeamCreateRequest request) {
+        leaderLimitValidator.validateTeamLeaderLimitExceeded(request.representativeId());
+
         Team team = assembleTeam(request);
         Team saved = teamRepository.save(team);
         publisher.publish(new TeamCreatedEvent(team.getId(), LocalDateTime.now()));

@@ -10,7 +10,7 @@ public interface TeamReader {
 
     Team get(Long teamId);
 
-    TeamPageResponse getTeamList(int page);
+    TeamPageResponse getTeamList(Long userId, int page);
 
     PagedModel<MyTeamPageResponse> getMyTeamList(Long userId, int page);
 

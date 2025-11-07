@@ -13,7 +13,11 @@ import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -30,8 +34,32 @@ public class TeamQueryService implements TeamReader {
     }
 
     @Override
-    public TeamPageResponse getTeamList(int page) {
-        return teamQueryRepository.findAll(page);
+    public TeamPageResponse getTeamList(Long userId, int page) {
+        Optional<Team> optionalLeaderTeam = teamQueryRepository.findMyLeaderTeamByUserId(userId);
+        Long leaderTeamId = null;
+        if (optionalLeaderTeam.isPresent()) {
+            leaderTeamId = optionalLeaderTeam.get().getId();
+        }
+        List<TeamPageResponse.TeamResponse> recommendedTeams = List.of();
+        List<Long> recommendedTeamIds = List.of();
+
+        if (page == 0 && leaderTeamId != null) {
+            recommendedTeams = teamQueryRepository.findRecommendedTeams(leaderTeamId, 3);
+            recommendedTeamIds = recommendedTeams.stream()
+                    .map(TeamPageResponse.TeamResponse::teamId)
+                    .collect(Collectors.toList());
+        }
+
+        TeamPageResponse basePage = teamQueryRepository.findAll(page, recommendedTeamIds, recommendedTeams.size());
+
+        if (page == 0 && !recommendedTeams.isEmpty()) {
+            List<TeamPageResponse.TeamResponse> combined = new ArrayList<>(recommendedTeams.size() + basePage.teams().size());
+            combined.addAll(recommendedTeams);
+            combined.addAll(basePage.teams());
+            return new TeamPageResponse(basePage.totalCount(), combined);
+        }
+
+        return basePage;
     }
 
     @Override

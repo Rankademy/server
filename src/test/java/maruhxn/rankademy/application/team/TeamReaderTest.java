@@ -20,7 +20,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -83,8 +85,8 @@ class TeamReaderTest extends IntegrationTestSupport {
         em.clear();
 
         // when
-        TeamPageResponse firstPage = teamReader.getTeamList(0);
-        TeamPageResponse secondPage = teamReader.getTeamList(1);
+        TeamPageResponse firstPage = teamReader.getTeamList(user.getId(), 0);
+        TeamPageResponse secondPage = teamReader.getTeamList(user.getId(), 1);
 
         // then
         assertThat(firstPage.totalCount()).isEqualTo(15);
@@ -98,11 +100,52 @@ class TeamReaderTest extends IntegrationTestSupport {
     @DisplayName("팀 목록 조회 - 팀이 없을 경우")
     void getTeamListWhenNoTeams() {
         // when
-        TeamPageResponse result = teamReader.getTeamList(0);
+        TeamPageResponse result = teamReader.getTeamList(user.getId(), 0);
 
         // then
         assertThat(result.totalCount()).isEqualTo(0);
         assertThat(result.teams()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("리더 팀을 보유한 사용자는 첫 페이지 상단에 추천 팀 3개가 노출된다")
+    void getTeamListWithLeaderRecommendations() {
+        // given
+        Team leaderTeam = createTeamForRepresentative(user, "leader-main", 1000.0);
+
+        Team nearFirst = createOpponentTeam("near-first", 1001.0);
+        Team nearSecond = createOpponentTeam("near-second", 1003.0);
+        Team nearThird = createOpponentTeam("near-third", 1006.0);
+
+        List<Team> fillers = new ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            fillers.add(createOpponentTeam("filler-" + i, 1100.0 + i * 25));
+        }
+        int totalTeams = 1 + 3 + fillers.size();
+
+        em.flush();
+        em.clear();
+
+        // when
+        TeamPageResponse result = teamReader.getTeamList(user.getId(), 0);
+
+        // then
+        assertThat(result.totalCount()).isEqualTo(totalTeams);
+        assertThat(result.teams()).hasSize(10);
+
+        List<TeamPageResponse.TeamResponse> recommended = result.teams().subList(0, 3);
+        assertThat(recommended)
+                .extracting(TeamPageResponse.TeamResponse::teamId)
+                .containsExactly(nearFirst.getId(), nearSecond.getId(), nearThird.getId());
+        assertThat(recommended)
+                .allMatch(TeamPageResponse.TeamResponse::isRecommended);
+        assertThat(recommended)
+                .noneMatch(team -> team.teamId().equals(leaderTeam.getId()));
+
+        boolean baseTeamsAreNotRecommended = result.teams().stream()
+                .skip(3)
+                .allMatch(team -> !team.isRecommended());
+        assertThat(baseTeamsAreNotRecommended).isTrue();
     }
 
     @Test
@@ -145,5 +188,34 @@ class TeamReaderTest extends IntegrationTestSupport {
         // when / then
         assertThatThrownBy(() -> teamReader.getTeamDetails(user.getId(), 999L))
                 .isInstanceOf(NoSuchElementException.class);
+    }
+
+    private Team createTeamForRepresentative(User representative, String prefix, double avgMmr) {
+        Set<TeamMember> members = createMembers(representative, prefix);
+        Team team = Team.create(
+                TeamFixture.createTeamCreateRequest(representative.getId(), TeamFixture.toSlots(members), group.getId()),
+                members
+        );
+        team.updateTeamMmr(avgMmr);
+        return teamRepository.save(team);
+    }
+
+    private Team createOpponentTeam(String prefix, double avgMmr) {
+        User representative = GroupFixture.createLeader(prefix);
+        userRepository.save(representative);
+        return createTeamForRepresentative(representative, prefix, avgMmr);
+    }
+
+    private Set<TeamMember> createMembers(User representative, String prefix) {
+        Set<TeamMember> members = new HashSet<>();
+        members.add(new TeamMember(representative, LolPosition.TOP));
+
+        for (int j = 0; j < 4; j++) {
+            User memberUser = GroupFixture.createMember(prefix + "-member" + j + "@rankademy.app", prefix + "-member" + j);
+            userRepository.save(memberUser);
+            members.add(new TeamMember(memberUser, LolPosition.values()[j + 1]));
+        }
+
+        return members;
     }
 }

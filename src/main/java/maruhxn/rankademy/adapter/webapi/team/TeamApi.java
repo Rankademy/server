@@ -36,10 +36,11 @@ public class TeamApi {
     )
     @ApiResponse(responseCode = "200", description = "팀 목록 조회 성공")
     public PagedModel<TeamPageResponse.TeamResponse> getTeamList(
+            @AuthenticationPrincipal RankademyUser user,
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
             @RequestParam("page") int page
     ) {
-        TeamPageResponse response = teamReader.getTeamList(page);
+        TeamPageResponse response = teamReader.getTeamList(user.getId(), page);
         long totalCount = response.totalCount() == null ? 0L : response.totalCount();
         Pageable pageable = PageRequest.of(page, 10);
         return new PagedModel<>(new PageImpl<>(response.teams(), pageable, totalCount));

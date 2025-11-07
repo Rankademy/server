@@ -1,8 +1,11 @@
 package maruhxn.rankademy.adapter.persistence;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.application.team.provided.dto.MyTeamPageResponse;
@@ -12,6 +15,7 @@ import maruhxn.rankademy.application.team.required.TeamQueryRepository;
 import maruhxn.rankademy.domain.group.QGroup;
 import maruhxn.rankademy.domain.team.QTeam;
 import maruhxn.rankademy.domain.team.QTeamMember;
+import maruhxn.rankademy.domain.team.Team;
 import maruhxn.rankademy.domain.user.QSummonerInfo;
 import maruhxn.rankademy.domain.user.QUser;
 import maruhxn.rankademy.domain.user.TierInfo;
@@ -38,8 +42,26 @@ public class TeamQueryRepositoryImpl implements TeamQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public TeamPageResponse findAll(int page) {
-        List<TeamPageResponse.TeamResponse> result = queryFactory
+    public TeamPageResponse findAll(int page, List<Long> excludedTeamIds, int excludedCount) {
+        final int pageSize = 10;
+        long baseOffset = (long) page * pageSize;
+        long baseLimit = pageSize;
+
+        if (page == 0) {
+            baseOffset = 0L;
+            baseLimit = Math.max(pageSize - excludedCount, 0);
+        } else if (excludedCount > 0) {
+            baseOffset = Math.max(baseOffset - excludedCount, 0);
+        }
+
+        BooleanBuilder baseCondition = new BooleanBuilder(team.isActive.eq(true));
+        if (excludedTeamIds != null && !excludedTeamIds.isEmpty()) {
+            baseCondition.and(team.id.notIn(excludedTeamIds));
+        }
+
+        List<TeamPageResponse.TeamResponse> baseResults = baseLimit <= 0
+                ? List.of()
+                : queryFactory
                 .select(
                         Projections.constructor(
                                 TeamPageResponse.TeamResponse.class,
@@ -58,11 +80,11 @@ public class TeamQueryRepositoryImpl implements TeamQueryRepository {
                 .join(teamMember).on(team.id.eq(teamMember.team.id))
                 .join(user).on(user.id.eq(teamMember.user.id))
                 .join(summonerInfo).on(user.summonerInfo.id.eq(summonerInfo.id))
-                .where(team.isActive.eq(true))
+                .where(baseCondition)
                 .groupBy(team.id)
                 .orderBy(team.id.desc())
-                .offset(page * 10L)
-                .limit(10)
+                .offset(baseOffset)
+                .limit(baseLimit)
                 .fetch();
 
 
@@ -72,7 +94,56 @@ public class TeamQueryRepositoryImpl implements TeamQueryRepository {
                 .where(team.isActive.eq(true))
                 .fetchOne();
 
-        return new TeamPageResponse(count, result);
+        return new TeamPageResponse(count, baseResults);
+    }
+
+    @Override
+    public List<TeamPageResponse.TeamResponse> findRecommendedTeams(Long leaderTeamId, int limit) {
+        if (leaderTeamId == null || limit <= 0) {
+            return List.of();
+        }
+
+        Double leaderAvgMmr = queryFactory
+                .select(team.avgMmr)
+                .from(team)
+                .where(team.id.eq(leaderTeamId))
+                .fetchOne();
+
+        NumberExpression<Double> similarityScore = Expressions.numberTemplate(
+                Double.class,
+                "abs(coalesce({0}, 0) - {1})",
+                team.avgMmr,
+                leaderAvgMmr
+        );
+
+        return queryFactory
+                .select(
+                        Projections.constructor(
+                                TeamPageResponse.TeamResponse.class,
+                                team.id,
+                                team.name,
+                                group.univName,
+                                group.name,
+                                team.intro,
+                                team.createdAt,
+                                summonerInfo.tierInfo.mappedTier.avg(),
+                                Expressions.constant(true)
+                        )
+                )
+                .from(team)
+                .join(group).on(team.groupId.eq(group.id))
+                .join(teamMember).on(team.id.eq(teamMember.team.id))
+                .join(user).on(user.id.eq(teamMember.user.id))
+                .join(summonerInfo).on(user.summonerInfo.id.eq(summonerInfo.id))
+                .where(team.isActive.eq(true).and(team.id.ne(leaderTeamId)))
+                .groupBy(team.id)
+                .orderBy(
+                        new CaseBuilder().when(team.id.eq(leaderTeamId)).then(0).otherwise(1).asc(),
+                        similarityScore.asc(),
+                        team.id.desc()
+                )
+                .limit(limit)
+                .fetch();
     }
 
     @Override
@@ -184,5 +255,22 @@ public class TeamQueryRepositoryImpl implements TeamQueryRepository {
                 .fetch();
 
         return new PageImpl<>(result, pageable, total);
+    }
+
+    @Override
+    public Boolean existsTeamLeaderByUserId(Long userId) {
+        return queryFactory
+                .selectOne()
+                .from(team)
+                .where(team.representativeId.eq(userId))
+                .fetchFirst() != null;
+    }
+
+    @Override
+    public Optional<Team> findMyLeaderTeamByUserId(Long userId) {
+         return Optional.ofNullable(queryFactory
+                 .selectFrom(team)
+                 .where(team.representativeId.eq(userId))
+                 .fetchOne());
     }
 }
