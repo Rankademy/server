@@ -41,7 +41,7 @@ public class UserQueryService implements UserReader {
     @Override
     public ProfileResponse getProfile(Long userId) {
         return userQueryRepository.getProfile(userId)
-                .orElseThrow(() -> new NoSuchElementException("회원을 찾을 수 없습니다. id: " + userId));
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않거나 인증받지 않은 사용자입니다. id: " + userId));
     }
 
     @Override
