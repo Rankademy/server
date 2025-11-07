@@ -30,5 +30,5 @@ public interface UserReader {
 
     List<User> findActiveUsers(LocalDateTime dateTime);
 
-    List<SearchedUserResponse> searchUsers(String userNameKey);
+    List<SearchedUserResponse> searchUsers(String userNameKey, String univName);
 }

@@ -19,9 +19,11 @@ public record GroupDetailResponse(
         @Schema(description = "그룹 리더 정보") LeaderDto leader,
         @Schema(description = "생성일") LocalDateTime createdAt,
         @Schema(description = "요청자가 그룹에 가입되어 있는지 여부") boolean isJoined,
-        @Schema(description = "요청자가 그룹 리더인지 여부") boolean isLeader
+        @Schema(description = "요청자가 그룹 리더인지 여부") boolean isLeader,
+        @Schema(description = "그룹 모집 중 여부") boolean isRecruiting,
+        @Schema(description = "학교 이름") String univName
 ) {
-    public GroupDetailResponse(Long groupId, String name, String about, String logoImageUrl, Double mappedTier, RecordInfoDto competitionInfo, Long capacity, Long memberCnt, LeaderDto leader, LocalDateTime createdAt, boolean isJoined, boolean isLeader) {
+    public GroupDetailResponse(Long groupId, String name, String about, String logoImageUrl, Double mappedTier, RecordInfoDto competitionInfo, Long capacity, Long memberCnt, LeaderDto leader, LocalDateTime createdAt, boolean isJoined, boolean isLeader, boolean isRecruiting, String univName) {
         this(
                 groupId,
                 name,
@@ -34,7 +36,9 @@ public record GroupDetailResponse(
                 leader,
                 createdAt,
                 isJoined,
-                isLeader
+                isLeader,
+                isRecruiting,
+                univName
         );
     }
 }

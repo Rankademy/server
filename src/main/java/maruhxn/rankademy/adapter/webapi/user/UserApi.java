@@ -28,9 +28,10 @@ public class UserApi {
     @ApiResponse(responseCode = "200", description = "프로필 조회 성공")
     public List<SearchedUserResponse> searchUsers(
             @Parameter(description = "유저 소환사명 키", example = "니카")
-            @RequestParam(value = "userNameKey") String userNameKey
+            @RequestParam(value = "userNameKey") String userNameKey,
+            @RequestParam(value = "univName") String univName
     ) {
-        return userReader.searchUsers(userNameKey);
+        return userReader.searchUsers(userNameKey, univName);
     }
 
     @GetMapping("/{userId}")

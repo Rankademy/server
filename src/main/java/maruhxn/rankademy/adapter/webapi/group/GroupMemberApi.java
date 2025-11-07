@@ -62,13 +62,13 @@ public class GroupMemberApi {
             description = "그룹 멤버 목록(그룹장 제외)을 페이지 단위로 조회합니다."
     )
     @ApiResponse(responseCode = "200", description = "그룹 멤버(그룹장 제외) 조회 성공")
-    public void getGroupMembersWithoutLeader(
+    public PagedModel<GroupMemberResponse> getGroupMembersWithoutLeader(
             @Parameter(description = "대상 그룹 ID", example = "1")
             @PathVariable Long groupId,
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
             @RequestParam(value = "page", defaultValue = "0") int page
     ) {
-        groupReader.getGroupMembersWithoutLeader(groupId, page);
+        return groupReader.getGroupMembersWithoutLeader(groupId, page);
     }
 
     @DeleteMapping("/{memberId}")

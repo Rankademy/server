@@ -13,5 +13,5 @@ public interface UserQueryRepository {
 
     Optional<MyProfileResponse> getMyProfile(Long userId);
 
-    List<SearchedUserResponse> searchUsersByKey(String userNameKey);
+    List<SearchedUserResponse> searchUsersByKey(String userNameKey, String univName);
 }

@@ -51,7 +51,7 @@ class UserReaderTest extends IntegrationTestSupport {
         em.clear();
 
         // when
-        List<SearchedUserResponse> results = userReader.searchUsers("alpha#KR1");
+        List<SearchedUserResponse> results = userReader.searchUsers("alpha#KR1", null);
 
         // then
         assertThat(results).hasSize(1);
@@ -73,7 +73,7 @@ class UserReaderTest extends IntegrationTestSupport {
         em.clear();
 
         // when
-        List<SearchedUserResponse> results = userReader.searchUsers("searcher");
+        List<SearchedUserResponse> results = userReader.searchUsers("searcher", null);
 
         // then
         assertThat(results).hasSize(4);

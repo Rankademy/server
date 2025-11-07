@@ -1,6 +1,7 @@
 package maruhxn.rankademy.adapter.persistence.user;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.webapi.dto.SearchedUserResponse;
@@ -143,7 +144,7 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
     }
 
     @Override
-    public List<SearchedUserResponse> searchUsersByKey(String userNameKey) {
+    public List<SearchedUserResponse> searchUsersByKey(String userNameKey, String univName) {
         return queryFactory
                 .select(
                         Projections.constructor(
@@ -156,9 +157,16 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
                 )
                 .from(user)
                 .join(user.summonerInfo, summonerInfo)
-                .where(searchBySummonerNameKey(userNameKey))
+                .where(
+                        searchBySummonerNameKey(userNameKey),
+                        searchByUnivName(univName)
+                )
                 .limit(4)
                 .fetch();
+    }
+
+    private static BooleanExpression searchByUnivName(String univName) {
+        return univName != null ? user.univInfo.univName.eq(univName) : null;
     }
 
     /**

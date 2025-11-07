@@ -161,7 +161,9 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                         leaderUser.summonerInfo.summonerName,
                         leaderUser.summonerInfo.summonerTag,
                         leaderUser.summonerInfo.summonerIcon,
-                        group.createdAt
+                        group.createdAt,
+                        group.isRecruiting,
+                        group.univName
                 )
                 .from(group)
                 .join(group.members, groupMember)
@@ -224,7 +226,9 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                 leaderDto,
                 head.get(group.createdAt),
                 isJoined,
-                isLeader
+                isLeader,
+                head.get(group.isRecruiting),
+                head.get(group.univName)
         ));
     }
 

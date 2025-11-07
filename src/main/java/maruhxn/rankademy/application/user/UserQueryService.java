@@ -78,7 +78,7 @@ public class UserQueryService implements UserReader {
     }
 
     @Override
-    public List<SearchedUserResponse> searchUsers(String userNameKey) {
-        return userQueryRepository.searchUsersByKey(userNameKey);
+    public List<SearchedUserResponse> searchUsers(String userNameKey, String univName) {
+        return userQueryRepository.searchUsersByKey(userNameKey, univName);
     }
 }
