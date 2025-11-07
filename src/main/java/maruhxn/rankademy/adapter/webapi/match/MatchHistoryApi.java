@@ -1,8 +1,8 @@
 package maruhxn.rankademy.adapter.webapi.match;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.application.match.provided.MatchHistoryAnalyzer;
@@ -16,11 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/me/matches")
-@Tag(name = "Matches", description = "매치 전적 관리 API")
+//@Tag(name = "Matches", description = "매치 전적 관리 API")
+@Hidden
 public class MatchHistoryApi {
 
     private final MatchHistoryAnalyzer matchHistoryAnalyzer;
 
+    @Deprecated
     @PostMapping("/refresh")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(

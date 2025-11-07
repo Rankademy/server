@@ -10,6 +10,7 @@ import maruhxn.rankademy.domain.match.MatchData;
 import maruhxn.rankademy.domain.match.service.MostChampionCalculator;
 import maruhxn.rankademy.domain.user.SummonerInfo;
 import maruhxn.rankademy.domain.user.User;
+import maruhxn.rankademy.domain.user.service.UserLabelProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ public class MatchHistoryService implements MatchHistoryAnalyzer {
     private final MatchDataRepository matchDataRepository;
     private final MatchHistoryCollector matchHistoryCollector;
     private final MostChampionCalculator mostChampionCalculator;
+    private final UserLabelProvider userLabelProvider;
 
     @Override
     @Transactional
@@ -42,6 +44,8 @@ public class MatchHistoryService implements MatchHistoryAnalyzer {
         if (saved == 0) {
             summonerInfo.touchMatchSync();
         }
+
+        user.updateLabels(userLabelProvider);
     }
 
     private int persistMatches(User user, List<MatchData> newMatches) {

@@ -6,15 +6,15 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class UserTitleProviderTest {
+class UserLabelProviderTest {
 
-    UserTitleProvider userTitleProvider;
+    UserLabelProvider userLabelProvider;
 
     @Test
-    void getTitles() {
-        userTitleProvider = userId -> List.of("DUMMY");
+    void getLabels() {
+        userLabelProvider = userId -> List.of("DUMMY");
 
-        assertThat(userTitleProvider.getTitles(1L))
+        assertThat(userLabelProvider.getLabels("puuid"))
                 .hasSize(1)
                 .contains("DUMMY");
     }

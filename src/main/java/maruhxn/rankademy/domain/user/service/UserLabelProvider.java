@@ -5,8 +5,8 @@ import java.util.List;
 /**
  * AI 서비스로부터 멤버의 칭호 리스트를 가져옵니다.
  */
-public interface UserTitleProvider {
+public interface UserLabelProvider {
 
-    List<String> getTitles(Long userId);
+    List<String> getLabels(String puuid);
 
 }

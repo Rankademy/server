@@ -12,13 +12,14 @@ import maruhxn.rankademy.domain.user.dto.ProfileUpdateRequest;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
 import maruhxn.rankademy.domain.user.dto.UserOAuth2CreateRequest;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
-import maruhxn.rankademy.domain.user.service.UserTitleProvider;
+import maruhxn.rankademy.domain.user.service.UserLabelProvider;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -71,8 +72,10 @@ public class User extends AbstractEntity {
     @JoinColumn(name = "summoner_info_id")
     private SummonerInfo summonerInfo;
 
-    // TODO: AttributeConverter
-    private List<String> titles;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "labels",
+            joinColumns = @JoinColumn(name = "user_id"))
+    private List<Label> labels = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "refresh_tokens",
@@ -83,6 +86,8 @@ public class User extends AbstractEntity {
     private Set<GroupMember> groupMembers = new HashSet<>();
 
     private LocalDateTime lastLoginAt;
+
+    private LocalDateTime lastLabelUpdatedAt;
 
     @Embedded
     private EffectiveStrength effectiveStrength;
@@ -160,10 +165,11 @@ public class User extends AbstractEntity {
         );
     }
 
-    public void updateTitles(UserTitleProvider titleProvider) {
-        Assert.state(this.getId() != null, "ID가 null일 수 없습니다.");
-
-        this.titles = titleProvider.getTitles(this.getId());
+    public void updateLabels(UserLabelProvider labelProvider) {
+        this.labels.clear();
+        this.labels = labelProvider.getLabels(this.getSummonerInfo().getPuuid()).stream()
+                .map(Label::new).toList();
+        this.lastLabelUpdatedAt = LocalDateTime.now();
     }
 
     public void invalidateAllTokens() {

@@ -183,11 +183,13 @@ class UserTest {
     }
 
     @Test
-    void updateTitles() {
+    void updateLabels() {
         user = createUser(1L);
+        user.completeUnivAuthentication(createEnrollUnivRequest());
+        user.connectSummonerInfo(createSummonerInfoConnector(), createRiotAuthRequest());
 
-        user.updateTitles(createTitleProvider());
+        user.updateLabels(createLabelProvider());
 
-        assertThat(user.getTitles()).hasSize(1);
+        assertThat(user.getLabels()).hasSize(1);
     }
 }

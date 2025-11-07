@@ -14,7 +14,8 @@ public record ProfileResponse(
         String description,
         List<String> mostChampionIds,
         LolPosition mainPosition,
-        LolPosition subPosition
+        LolPosition subPosition,
+        List<String> labels
 ) {
     public record UnivInfoResponse(String univName, String major, Integer admissionYear) {
     }

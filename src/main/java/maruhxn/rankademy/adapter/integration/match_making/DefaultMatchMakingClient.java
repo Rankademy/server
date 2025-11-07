@@ -1,6 +1,5 @@
 package maruhxn.rankademy.adapter.integration.match_making;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import maruhxn.rankademy.application.team.dto.request.AdjustMmrRequest;
 import maruhxn.rankademy.application.team.dto.request.GetTeamMmrRequest;
@@ -15,7 +14,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class DefaultMatchMakingClient implements MatchMakingClient {
 
     private WebClient matchMakingClient;

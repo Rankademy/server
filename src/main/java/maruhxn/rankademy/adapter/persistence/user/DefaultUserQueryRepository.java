@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import static maruhxn.rankademy.adapter.persistence.ranking.WhereClauseHelper.searchBySummonerNameKey;
 import static maruhxn.rankademy.domain.user.QChampionPlayRecord.championPlayRecord;
+import static maruhxn.rankademy.domain.user.QLabel.label;
 import static maruhxn.rankademy.domain.user.QSummonerInfo.summonerInfo;
 import static maruhxn.rankademy.domain.user.QUser.user;
 
@@ -67,6 +68,16 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
 
         if (base == null) return Optional.empty();
 
+        List<String> labels = new ArrayList<>();
+        if (base.summonerInfoId != null) {
+            labels = queryFactory
+                    .select(label.value)
+                    .from(user)
+                    .leftJoin(user.labels, label)
+                    .where(user.id.eq(userId))
+                    .fetch();
+        }
+
         List<String> mostChampions = queryFactory
                 .select(championPlayRecord.championId)
                 .from(summonerInfo)
@@ -81,7 +92,8 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
                 base.description(),
                 mostChampions,
                 base.mainPosition(),
-                base.subPosition()
+                base.subPosition(),
+                labels
         ));
     }
 
@@ -121,6 +133,16 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
 
         if (base == null) return Optional.empty();
 
+        List<String> labels = new ArrayList<>();
+        if (base.summonerInfoId != null) {
+            labels = queryFactory
+                    .select(label.value)
+                    .from(user)
+                    .leftJoin(user.labels, label)
+                    .where(user.id.eq(userId))
+                    .fetch();
+        }
+
         List<String> mostChampions = new ArrayList<>();
         if (base.summonerInfoId != null) {
             mostChampions = queryFactory
@@ -139,7 +161,8 @@ public class DefaultUserQueryRepository implements UserQueryRepository {
                 base.description(),
                 mostChampions,
                 base.mainPosition(),
-                base.subPosition()
+                base.subPosition(),
+                labels
         ));
     }
 

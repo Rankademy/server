@@ -4,7 +4,7 @@ import maruhxn.rankademy.domain.user.dto.EnrollUnivRequest;
 import maruhxn.rankademy.domain.user.dto.RiotAuthRequest;
 import maruhxn.rankademy.domain.user.dto.UserOAuth2CreateRequest;
 import maruhxn.rankademy.domain.user.service.SummonerInfoConnector;
-import maruhxn.rankademy.domain.user.service.UserTitleProvider;
+import maruhxn.rankademy.domain.user.service.UserLabelProvider;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
@@ -139,7 +139,7 @@ public class UserFixture {
         return new RiotAuthRequest(summonerName, summonerTag);
     }
 
-    public static UserTitleProvider createTitleProvider() {
+    public static UserLabelProvider createLabelProvider() {
         return userId -> List.of("DUMMY");
     }
 

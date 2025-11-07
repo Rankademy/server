@@ -23,8 +23,8 @@ services:
       - "9000:8000"
     pull_policy: always
 
-#  label:
-#    image: "ghcr.io/rankademy/rankademy-labels:latest"
-#    ports:
-#      - "9001:8000"
-#    pull_policy: always
+  label:
+    image: "ghcr.io/rankademy/rankademy-labels:latest"
+    ports:
+      - "9001:8000"
+    pull_policy: always

@@ -15,7 +15,8 @@ public record MyProfileResponse(
         @Schema(description = "자기소개") String description,
         @Schema(description = "자주 플레이한 챔피언 ID 목록") List<String> mostChampionIds,
         @Schema(description = "주 포지션", implementation = LolPosition.class) LolPosition mainPosition,
-        @Schema(description = "부 포지션", implementation = LolPosition.class) LolPosition subPosition
+        @Schema(description = "부 포지션", implementation = LolPosition.class) LolPosition subPosition,
+        @Schema(description = "칭호") List<String> labels
 ) {
 
     @Schema(description = "대학교 상세 정보")
