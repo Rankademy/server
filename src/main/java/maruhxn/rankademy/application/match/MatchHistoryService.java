@@ -41,11 +41,10 @@ public class MatchHistoryService implements MatchHistoryAnalyzer {
 
         int saved = persistMatches(user, newMatches);
         log.info("[MatchHistoryService] - userId: {}, 추가된 매치 개수: {}", userId, saved);
-        if (saved == 0) {
-            summonerInfo.touchMatchSync();
+        if (saved != 0) {
+            user.updateLabels(userLabelProvider);
         }
-
-        user.updateLabels(userLabelProvider);
+        summonerInfo.touchMatchSync();
     }
 
     private int persistMatches(User user, List<MatchData> newMatches) {

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class Label {
-    @Column(nullable = false)
+    @Column(name = "\"value\"", nullable = false)
     String value;
 
     public Label(String value) {
