@@ -5,7 +5,7 @@ import maruhxn.rankademy.domain.scrim_team.dto.ScrimTeamCreateRequest;
 import maruhxn.rankademy.domain.scrim_team.dto.ScrimTeamUpdateRequest;
 
 public interface ScrimTeamWriter {
-    ScrimTeam create(ScrimTeamCreateRequest createRequest);
+    ScrimTeam create(Long userId, ScrimTeamCreateRequest createRequest);
 
     ScrimTeam update(Long scrimTeamId, ScrimTeamUpdateRequest updateRequest);
 

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import maruhxn.rankademy.adapter.security.model.RankademyUser;
 import maruhxn.rankademy.application.scrim_team.provided.ScrimTeamReader;
 import maruhxn.rankademy.application.scrim_team.provided.ScrimTeamWriter;
 import maruhxn.rankademy.application.scrim_team.provided.dto.ScrimTeamDetailResponse;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,10 +37,11 @@ public class ScrimTeamApi {
     )
     @ApiResponse(responseCode = "200", description = "스크림 팀 조회 성공")
     public PagedModel<ScrimTeamPageResponse.ScrimTeamResponse> getScrimTeamList(
+            @AuthenticationPrincipal RankademyUser user,
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
             @RequestParam("page") int page
     ) {
-        ScrimTeamPageResponse response = scrimTeamReader.getScrimTeamList(page);
+        ScrimTeamPageResponse response = scrimTeamReader.getScrimTeamList(user == null ? null : user.getId(), page);
         long totalCount = response.totalCount() == null ? 0L : response.totalCount();
         Pageable pageable = PageRequest.of(page, 10);
         return new PagedModel<>(new PageImpl<>(response.teams(), pageable, totalCount));
@@ -51,8 +54,11 @@ public class ScrimTeamApi {
             description = "스크림 팀 정보를 등록하여 팀을 생성합니다."
     )
     @ApiResponse(responseCode = "201", description = "스크림 팀 생성 성공")
-    public void createScrimTeam(@RequestBody ScrimTeamCreateRequest request) {
-        scrimTeamWriter.create(request);
+    public void createScrimTeam(
+            @AuthenticationPrincipal RankademyUser user,
+            @RequestBody ScrimTeamCreateRequest request
+    ) {
+        scrimTeamWriter.create(user.getId(), request);
     }
 
     @GetMapping("/{scrimTeamId}")

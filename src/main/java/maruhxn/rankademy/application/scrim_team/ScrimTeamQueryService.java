@@ -10,7 +10,11 @@ import maruhxn.rankademy.domain.scrim_team.ScrimTeam;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -27,8 +31,35 @@ public class ScrimTeamQueryService implements ScrimTeamReader {
     }
 
     @Override
-    public ScrimTeamPageResponse getScrimTeamList(int page) {
-        return scrimTeamQueryRepository.findAll(page);
+    public ScrimTeamPageResponse getScrimTeamList(Long userId, int page) {
+        Long leaderScrimTeamId = null;
+        if (userId != null) {
+            Optional<ScrimTeam> optionalLeaderScrimTeam = scrimTeamQueryRepository.findMyLeaderTeamByUserId(userId);
+            if (optionalLeaderScrimTeam.isPresent()) {
+                leaderScrimTeamId = optionalLeaderScrimTeam.get().getId();
+            }
+        }
+
+        List<ScrimTeamPageResponse.ScrimTeamResponse> recommendedTeams = List.of();
+        List<Long> recommendedTeamIds = List.of();
+
+        if (page == 0 && leaderScrimTeamId != null) {
+            recommendedTeams = scrimTeamQueryRepository.findRecommendedTeams(leaderScrimTeamId, 3);
+            recommendedTeamIds = recommendedTeams.stream()
+                    .map(ScrimTeamPageResponse.ScrimTeamResponse::scrimTeamId)
+                    .collect(Collectors.toList());
+        }
+
+        ScrimTeamPageResponse basePage = scrimTeamQueryRepository.findAll(page, recommendedTeamIds, recommendedTeams.size());
+
+        if (page == 0 && !recommendedTeams.isEmpty()) {
+            List<ScrimTeamPageResponse.ScrimTeamResponse> combined = new ArrayList<>(recommendedTeams.size() + basePage.teams().size());
+            combined.addAll(recommendedTeams);
+            combined.addAll(basePage.teams());
+            return new ScrimTeamPageResponse(basePage.totalCount(), combined);
+        }
+
+        return basePage;
     }
 
     @Override

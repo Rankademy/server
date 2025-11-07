@@ -1,8 +1,10 @@
 package maruhxn.rankademy.adapter.persistence;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,7 @@ import maruhxn.rankademy.application.scrim_team.provided.dto.ScrimTeamPageRespon
 import maruhxn.rankademy.application.scrim_team.required.ScrimTeamQueryRepository;
 import maruhxn.rankademy.domain.scrim_team.QScrimTeam;
 import maruhxn.rankademy.domain.scrim_team.QScrimTeamMember;
+import maruhxn.rankademy.domain.scrim_team.ScrimTeam;
 import maruhxn.rankademy.domain.user.QSummonerInfo;
 import maruhxn.rankademy.domain.user.QUser;
 import org.springframework.stereotype.Repository;
@@ -30,15 +33,35 @@ public class ScrimTeamQueryRepositoryImpl implements ScrimTeamQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public ScrimTeamPageResponse findAll(int page) {
+    public ScrimTeamPageResponse findAll(int page, List<Long> excludedScrimTeamIds, int excludedCount) {
+        final int pageSize = 10;
         Long count = queryFactory.select(scrimTeam.id.count())
                 .from(scrimTeam)
                 .where(scrimTeam.isActive.eq(true))
                 .fetchOne();
 
-        if (count == null || count == 0L) return new ScrimTeamPageResponse(0L, List.of());
+        if (count == null || count == 0L) {
+            return new ScrimTeamPageResponse(0L, List.of());
+        }
 
-        List<ScrimTeamPageResponse.ScrimTeamResponse> result = queryFactory
+        long offset = (long) page * pageSize;
+        long limit = pageSize;
+
+        if (page == 0) {
+            offset = 0L;
+            limit = Math.max(pageSize - excludedCount, 0);
+        } else if (excludedCount > 0) {
+            offset = Math.max(offset - excludedCount, 0);
+        }
+
+        BooleanBuilder baseCondition = new BooleanBuilder(scrimTeam.isActive.eq(true));
+        if (excludedScrimTeamIds != null && !excludedScrimTeamIds.isEmpty()) {
+            baseCondition.and(scrimTeam.id.notIn(excludedScrimTeamIds));
+        }
+
+        List<ScrimTeamPageResponse.ScrimTeamResponse> result = limit <= 0
+                ? List.of()
+                : queryFactory
                 .select(
                         Projections.constructor(
                                 ScrimTeamPageResponse.ScrimTeamResponse.class,
@@ -54,14 +77,65 @@ public class ScrimTeamQueryRepositoryImpl implements ScrimTeamQueryRepository {
                 .join(scrimTeamMember).on(scrimTeamMember.scrimTeam.id.eq(scrimTeam.id))
                 .join(user).on(user.id.eq(scrimTeamMember.user.id))
                 .join(summonerInfo).on(summonerInfo.id.eq(user.summonerInfo.id))
-                .where(scrimTeam.isActive.eq(true))
+                .where(baseCondition)
                 .groupBy(scrimTeam.id)
                 .orderBy(scrimTeam.id.desc())
-                .offset(page * 10L)
-                .limit(10L)
+                .offset(offset)
+                .limit(limit)
                 .fetch();
 
         return new ScrimTeamPageResponse(count, result);
+    }
+
+    @Override
+    public List<ScrimTeamPageResponse.ScrimTeamResponse> findRecommendedTeams(Long leaderScrimTeamId, int limit) {
+        if (leaderScrimTeamId == null || limit <= 0) {
+            return List.of();
+        }
+
+        Double leaderAvgTier = queryFactory
+                .select(summonerInfo.tierInfo.mappedTier.avg())
+                .from(scrimTeam)
+                .join(scrimTeamMember).on(scrimTeamMember.scrimTeam.id.eq(scrimTeam.id))
+                .join(user).on(user.id.eq(scrimTeamMember.user.id))
+                .join(summonerInfo).on(summonerInfo.id.eq(user.summonerInfo.id))
+                .where(scrimTeam.id.eq(leaderScrimTeamId))
+                .fetchOne();
+
+        double targetAvgTier = leaderAvgTier == null ? 0.0 : leaderAvgTier;
+
+        NumberExpression<Double> avgMappedTier = summonerInfo.tierInfo.mappedTier.avg().coalesce(0.0);
+        NumberExpression<Double> similarityScore = Expressions.numberTemplate(
+                Double.class,
+                "abs({0} - {1})",
+                avgMappedTier,
+                targetAvgTier
+        );
+
+        return queryFactory
+                .select(
+                        Projections.constructor(
+                                ScrimTeamPageResponse.ScrimTeamResponse.class,
+                                scrimTeam.id,
+                                scrimTeam.name,
+                                scrimTeam.intro,
+                                scrimTeam.createdAt,
+                                summonerInfo.tierInfo.mappedTier.avg(),
+                                Expressions.constant(true)
+                        )
+                )
+                .from(scrimTeam)
+                .join(scrimTeamMember).on(scrimTeamMember.scrimTeam.id.eq(scrimTeam.id))
+                .join(user).on(user.id.eq(scrimTeamMember.user.id))
+                .join(summonerInfo).on(summonerInfo.id.eq(user.summonerInfo.id))
+                .where(scrimTeam.isActive.eq(true).and(scrimTeam.id.ne(leaderScrimTeamId)))
+                .groupBy(scrimTeam.id)
+                .orderBy(
+                        similarityScore.asc(),
+                        scrimTeam.id.desc()
+                )
+                .limit(limit)
+                .fetch();
     }
 
     @Override
@@ -127,5 +201,26 @@ public class ScrimTeamQueryRepositoryImpl implements ScrimTeamQueryRepository {
                 head.avgTierInfo(),
                 members
         ));
+    }
+
+    @Override
+    public Boolean existsTeamLeaderByUserId(Long userId) {
+        return queryFactory
+                .selectOne()
+                .from(scrimTeam)
+                .where(scrimTeam.representativeId.eq(userId))
+                .fetchFirst() != null;
+    }
+
+    @Override
+    public Optional<ScrimTeam> findMyLeaderTeamByUserId(Long userId) {
+        if (userId == null) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(queryFactory
+                .selectFrom(scrimTeam)
+                .where(scrimTeam.representativeId.eq(userId))
+                .fetchOne());
     }
 }

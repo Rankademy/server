@@ -8,7 +8,7 @@ public interface ScrimTeamReader {
 
     ScrimTeam get(Long scrimTeamId);
 
-    ScrimTeamPageResponse getScrimTeamList(int page);
+    ScrimTeamPageResponse getScrimTeamList(Long userId, int page);
 
     ScrimTeamDetailResponse getDetails(Long scrimTeamId);
 }

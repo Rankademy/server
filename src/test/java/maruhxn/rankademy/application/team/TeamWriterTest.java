@@ -81,6 +81,32 @@ class TeamWriterTest extends IntegrationTestSupport {
     }
 
     @Test
+    @DisplayName("2개 이상의 팀에 팀 리더로 있을 수 없다")
+    void create_fail() {
+        // given
+        User representative = UserFixture.createUser();
+        userRepository.save(representative);
+
+        Set<TeamMember> members = new HashSet<>();
+        members.add(new TeamMember(representative, LolPosition.TOP));
+
+        for (int i = 0; i < 4; i++) {
+            User memberUser = GroupFixture.createMember("member" + i + "@test.com", "member" + i);
+            userRepository.save(memberUser);
+            members.add(new TeamMember(memberUser, LolPosition.values()[i + 1]));
+        }
+        TeamCreateRequest teamCreateRequest = TeamFixture.createTeamCreateRequest(representative.getId(), TeamFixture.toSlots(members));
+
+        // when
+        Team team = teamWriter.create(teamCreateRequest);
+        em.flush();
+        em.clear();
+
+        assertThatThrownBy(() -> teamWriter.create(teamCreateRequest))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
     @DisplayName("팀 탈퇴 시 멤버 제외, 팀 비활성화, 알림 생성")
     void withdraw() {
         // given: 대표자 + 4명으로 팀 생성
