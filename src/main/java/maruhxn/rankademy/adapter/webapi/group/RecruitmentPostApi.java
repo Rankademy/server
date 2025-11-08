@@ -50,7 +50,8 @@ public class RecruitmentPostApi {
             @Parameter(description = "그룹 ID", example = "1")
             @PathVariable Long groupId
     ) {
-        return groupReader.getRecruitmentPostDetail(rankademyUser.getId(), groupId);
+        Long userId = rankademyUser != null ? rankademyUser.getId() : null;
+        return groupReader.getRecruitmentPostDetail(userId, groupId);
     }
 
     @PostMapping("/{groupId}/posts")

@@ -14,6 +14,7 @@ public record RecruitmentPostDetailResponse(
         @Schema(description = "요구 사항") String requirements,
         @Schema(description = "작성일") LocalDateTime createdAt,
         @Schema(description = "요청자가 그룹에 가입되어 있는지 여부") boolean isJoined,
-        @Schema(description = "그룹 리더 여부") boolean isLeader
+        @Schema(description = "그룹 리더 여부") boolean isLeader,
+        @Schema(description = "모집 중 여부") boolean isRecruiting
 ) {
 }

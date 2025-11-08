@@ -1,11 +1,13 @@
 package maruhxn.rankademy.adapter.persistence;
 
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.StringExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -270,6 +272,17 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
 
     @Override
     public Optional<RecruitmentPostDetailResponse> getRecruitmentPostDetail(Long userId, Long groupId) {
+        Expression<Boolean> isJoined = userId == null
+                ? Expressions.constant(false)
+                : JPAExpressions.selectOne()
+                .from(groupMember)
+                .where(groupMember.group.id.eq(groupId).and(groupMember.user.id.eq(userId)))
+                .exists();
+
+        Expression<Boolean> isLeader = userId == null
+                ? Expressions.constant(false)
+                : group.leader.id.eq(userId);
+
         return Optional.ofNullable(queryFactory
                 .select(
                         Projections.constructor(
@@ -281,11 +294,9 @@ public class GroupQueryRepositoryImpl implements GroupQueryRepository {
                                 groupRecruitmentPost.content,
                                 groupRecruitmentPost.requirements,
                                 groupRecruitmentPost.createdAt,
-                                JPAExpressions.selectOne()
-                                        .from(groupMember)
-                                        .where(groupMember.group.id.eq(groupId).and(groupMember.user.id.eq(userId)))
-                                        .exists(),
-                                group.leader.id.eq(userId)
+                                isJoined,
+                                isLeader,
+                                group.isRecruiting
                         )
                 )
                 .from(group)
