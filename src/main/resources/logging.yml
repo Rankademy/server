@@ -1,6 +1,6 @@
 logging:
   file:
-    path: logs # 로그 파일이 저장될 로그 디렉토리 경로
+    path: ${LOG_PATH:logs} # 기본은 logs, LOG_PATH로 override 가능
   config: classpath:logback-spring.xml
 
 springdoc:

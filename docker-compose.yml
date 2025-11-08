@@ -4,10 +4,12 @@ services:
     restart: always
     env_file:
       - .env
+    environment:
+      LOG_PATH: /var/log/app
     ports:
       - "8080:8080"
     volumes:
-      - ./logs:/var/log/app
+      - /var/log/app:/var/log/app
     depends_on:
       mysql:
         condition: service_healthy
