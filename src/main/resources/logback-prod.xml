@@ -83,13 +83,9 @@
         </encoder>
     </appender>
 
-    <logger name="rankademy" level="INFO" additivity="false">
+    <root level="INFO">
         <appender-ref ref="RANKADEMY_INFO_FILE"/>
         <appender-ref ref="RANKADEMY_ERROR_FILE"/>
-        <appender-ref ref="CONSOLE"/>
-    </logger>
-
-    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
 
