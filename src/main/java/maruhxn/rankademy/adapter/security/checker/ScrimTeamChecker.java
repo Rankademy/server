@@ -13,6 +13,8 @@ public class ScrimTeamChecker {
     private final ScrimTeamReader scrimTeamReader;
 
     public boolean isScrimTeamLeader(UserInfo user, Long scrimTeamId) {
+        if(!user.isAuthorized()) return false;
+
         ScrimTeam scrimTeam = scrimTeamReader.get(scrimTeamId);
 
         return scrimTeam.isRepresentative(user.id());

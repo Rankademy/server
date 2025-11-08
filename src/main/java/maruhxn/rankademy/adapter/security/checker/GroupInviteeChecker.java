@@ -12,10 +12,12 @@ public class GroupInviteeChecker {
 
     private final GroupInvitationReader groupInvitationReader;
 
-    public boolean isInvitee(UserInfo userInfo, Long invitationId) {
+    public boolean isInvitee(UserInfo user, Long invitationId) {
+        if(!user.isAuthorized()) return false;
+
         GroupInvitation invitation = groupInvitationReader.get(invitationId);
 
-        return invitation.getUserId().equals(userInfo.id());
+        return invitation.getUserId().equals(user.id());
     }
 
 }

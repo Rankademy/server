@@ -13,6 +13,8 @@ public class TeamChecker {
     private final TeamReader teamReader;
 
     public boolean isTeamLeader(UserInfo user, Long teamId) {
+        if(!user.isAuthorized()) return false;
+
         Team team = teamReader.get(teamId);
 
         return team.isRepresentative(user.id());

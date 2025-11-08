@@ -11,7 +11,9 @@ public class CompetitionChecker {
 
     private final CompetitionReader competitionReader;
 
-    public boolean isMyCompetition(UserInfo userInfo, Long competitionId) {
-        return competitionReader.checkIsMyCompetition(userInfo.id(), competitionId);
+    public boolean isMyCompetition(UserInfo user, Long competitionId) {
+        if(!user.isAuthorized()) return false;
+
+        return competitionReader.checkIsMyCompetition(user.id(), competitionId);
     }
 }

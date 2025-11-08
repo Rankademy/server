@@ -16,9 +16,9 @@ public class GroupLeaderChecker {
     private final GroupReader groupReader;
 
     public boolean isGroupLeader(UserInfo user, Long groupId) {
-        Group group = groupReader.get(groupId);
+        if(!user.isAuthorized()) return false;
 
-        if (!user.isAuthorized()) return false;
+        Group group = groupReader.get(groupId);
 
         boolean isGroupLeader = Objects.equals(group.getLeader().getId(), user.id());
         boolean isAdmin = user.role().equals(Role.ROLE_ADMIN.name());

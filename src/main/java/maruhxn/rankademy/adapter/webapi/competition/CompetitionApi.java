@@ -34,7 +34,7 @@ public class CompetitionApi {
             description = "사용자가 참여한 대항전 목록을 페이지 단위로 조회합니다."
     )
     @ApiResponse(responseCode = "200", description = "대항전 목록 조회 성공")
-    public PagedModel<CompetitionPageResponse> getGroupCompetitions(
+    public PagedModel<CompetitionPageResponse> getMyCompetitions(
             @AuthenticationPrincipal RankademyUser user,
             @Parameter(description = "0부터 시작하는 페이지 번호", example = "0")
             @RequestParam("page") int page

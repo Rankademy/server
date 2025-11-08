@@ -13,7 +13,7 @@ public record CompetitionResultResponse(
         @Schema(description = "세트별 결과") List<SetResultResponse> setResults,
         @Schema(description = "최종 승자 팀 ID", example = "1") Long finalWinnerTeamId
 ) {
-    @Schema(description = "결과용 팀 정보")
+    @Schema(name = "CompetitionResultTeamInfoResponse", description = "결과용 팀 정보")
     public record TeamInfoResponse(
             @Schema(description = "팀 ID", example = "1") Long teamId,
             @Schema(description = "팀 이름") String teamName,
@@ -21,7 +21,7 @@ public record CompetitionResultResponse(
             @Schema(description = "팀 멤버 목록") List<TeamMemberResponse> teamMembers
     ) {
 
-        @Schema(description = "결과용 팀 멤버 정보")
+        @Schema(name = "CompetitionResultTeamMemberResponse", description = "결과용 팀 멤버 정보")
         public record TeamMemberResponse(
                 @Schema(description = "멤버 ID", example = "10") Long memberId,
                 @Schema(description = "포지션", implementation = LolPosition.class) LolPosition position,
