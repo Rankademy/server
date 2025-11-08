@@ -27,6 +27,8 @@ public class LoggingFilter extends OncePerRequestFilter {
     private static final Logger log = LoggerFactory.getLogger(LoggingFilter.class);
 
     private static final String TRACE_ID_MDC_KEY = "traceId";
+    private static final String REQUEST_URI_MDC_KEY = "requestUri";
+    private static final String REQUEST_METHOD_MDC_KEY = "requestMethod";
     private static final String REQUEST_ID_HEADER = "X-Request-Id";
 
     private static final List<String> URL_WHITELIST = List.of(
@@ -52,10 +54,12 @@ public class LoggingFilter extends OncePerRequestFilter {
         ContentCachingRequestWrapper req = wrapRequest(request);
         ContentCachingResponseWrapper res = wrapResponse(response);
 
-        String traceId = StringUtils.hasText(request.getHeader(REQUEST_ID_HEADER))
-                ? request.getHeader(REQUEST_ID_HEADER)
+        String traceId = StringUtils.hasText(req.getHeader(REQUEST_ID_HEADER))
+                ? req.getHeader(REQUEST_ID_HEADER)
                 : UUID.randomUUID().toString();
         MDC.put(TRACE_ID_MDC_KEY, traceId);
+        MDC.put(REQUEST_URI_MDC_KEY, resolveFullUri(req));
+        MDC.put(REQUEST_METHOD_MDC_KEY, req.getMethod());
         res.setHeader(REQUEST_ID_HEADER, traceId);
 
         long startTime = System.currentTimeMillis();
@@ -89,9 +93,7 @@ public class LoggingFilter extends OncePerRequestFilter {
     }
 
     private void logRequestLineAndHeaders(ContentCachingRequestWrapper request) {
-        String uri = request.getRequestURI();
-        String query = request.getQueryString();
-        String fullUri = query == null ? uri : uri + '?' + query;
+        String fullUri = resolveFullUri(request);
 
         String remoteIp = request.getRemoteAddr();
         String forwardedFor = request.getHeader("X-Forwarded-For");
@@ -195,5 +197,11 @@ public class LoggingFilter extends OncePerRequestFilter {
                 || lowerCase.contains("form")
                 || lowerCase.contains("javascript")
                 || lowerCase.contains("html");
+    }
+
+    private String resolveFullUri(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        String query = request.getQueryString();
+        return query == null ? uri : uri + '?' + query;
     }
 }

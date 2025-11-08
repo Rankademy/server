@@ -22,7 +22,7 @@
         </filter>
 
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} [traceId=%X{traceId:-}] [method=%X{requestMethod:-}] [uri=%X{requestUri:-}] - %msg%n</pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>
@@ -43,6 +43,7 @@
         </filter>
 
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <charset>UTF-8</charset>
             <providers>
                 <timestamp>
                     <fieldName>timestamp</fieldName>
@@ -59,6 +60,11 @@
                 <threadName>
                     <fieldName>thread</fieldName>
                 </threadName>
+                <mdc>
+                    <includeMdcKeyName>traceId</includeMdcKeyName>
+                    <includeMdcKeyName>requestUri</includeMdcKeyName>
+                    <includeMdcKeyName>requestMethod</includeMdcKeyName>
+                </mdc>
                 <message>
                     <fieldName>message</fieldName>
                 </message>
