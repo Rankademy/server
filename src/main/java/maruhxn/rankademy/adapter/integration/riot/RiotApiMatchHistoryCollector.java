@@ -8,6 +8,7 @@ import maruhxn.rankademy.domain.match.MatchData;
 import maruhxn.rankademy.domain.user.User;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDate;
@@ -25,7 +26,7 @@ public class RiotApiMatchHistoryCollector implements MatchHistoryCollector {
             .atStartOfDay(ZoneOffset.UTC).toEpochSecond();
 
     private static final int CHUNK_SIZE = 10;
-    private static final int MATCH_FETCH_CONCURRENCY = 5;
+    private static final int MATCH_FETCH_CONCURRENCY = 3; // 5에서 3으로 감소
 
     private final RiotApiProvider riotApiProvider;
 
@@ -42,10 +43,9 @@ public class RiotApiMatchHistoryCollector implements MatchHistoryCollector {
             if (matchIds.isEmpty()) {
                 return List.of();
             }
-
         }
 
-        log.info("Match Ids: {}", matchIds);
+        log.info("Collected {} match IDs for user {}", matchIds.size(), user.getId());
 
         return fetchMatches(user.getId(), puuid, matchIds);
     }
@@ -55,6 +55,9 @@ public class RiotApiMatchHistoryCollector implements MatchHistoryCollector {
         int remain = totalMatchCnt % CHUNK_SIZE;
 
         List<String> allMatchIds = new ArrayList<>();
+
+        log.debug("Fetching {} chunks of match IDs (total: {})", r + 1, totalMatchCnt);
+
         for (int i = 0; i < r + 1; i++) {
             int start = i * CHUNK_SIZE;
             if (i != r) {
@@ -94,6 +97,7 @@ public class RiotApiMatchHistoryCollector implements MatchHistoryCollector {
             start += CHUNK_SIZE;
         }
 
+        log.debug("Found {} new matches since last match ID", incrementalMatchIds.size());
         return incrementalMatchIds;
     }
 
@@ -102,12 +106,33 @@ public class RiotApiMatchHistoryCollector implements MatchHistoryCollector {
             return List.of();
         }
 
-        // cㅚ대 5개까지 병렬로 매치 상세 수집
+        log.info("Fetching {} matches with concurrency={}", matchIds.size(), MATCH_FETCH_CONCURRENCY);
+
+        long startTime = System.currentTimeMillis();
+
+        // 최대 5개까지 병렬로 매치 상세 수집
+        // Rate Limit은 RiotApiProvider 내부에서 자동으로 처리됨
         List<MatchData> matches = Flux.fromIterable(matchIds)
-                .flatMapSequential(matchId -> riotApiProvider.getMatchInfo(matchId, puuid, userId)
-                                .subscribeOn(Schedulers.boundedElastic()), MATCH_FETCH_CONCURRENCY)
+                .flatMapSequential(matchId ->
+                                riotApiProvider.getMatchInfo(matchId, puuid, userId)
+                                        .doOnSuccess(data -> log.trace("Fetched match: {}", matchId))
+                                        .doOnError(error -> log.error("Failed to fetch match {}: {}", matchId, error.getMessage()))
+                                        .onErrorResume(error -> {
+                                            log.warn("Skipping match {} due to error", matchId);
+                                            return Mono.empty();
+                                        })
+                                        .subscribeOn(Schedulers.boundedElastic()),
+                        MATCH_FETCH_CONCURRENCY
+                )
                 .collectList()
                 .block();
+
+        long duration = System.currentTimeMillis() - startTime;
+        log.info("Fetched {}/{} matches in {}ms (avg: {}ms per match)",
+                matches != null ? matches.size() : 0,
+                matchIds.size(),
+                duration,
+                matches != null && !matches.isEmpty() ? duration / matches.size() : 0);
 
         return matches != null ? matches : List.of();
     }
