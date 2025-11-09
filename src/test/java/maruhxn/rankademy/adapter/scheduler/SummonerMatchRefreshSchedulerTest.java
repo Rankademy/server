@@ -12,9 +12,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,6 +43,9 @@ class SummonerMatchRefreshSchedulerTest extends IntegrationTestSupport {
     @Autowired
     EntityManager em;
 
+    @Autowired
+    PlatformTransactionManager transactionManager;
+
     @MockitoBean
     MatchHistoryCollector matchHistoryCollector;
 
@@ -47,33 +53,43 @@ class SummonerMatchRefreshSchedulerTest extends IntegrationTestSupport {
     TimeProvider timeProvider;
 
     LocalDateTime now;
+    TransactionTemplate requiresNewTransaction;
+    Long activeUserId;
+    Long inactiveUserId;
 
     @BeforeEach
     void setUp() {
         now = LocalDateTime.of(2025, 10, 1, 12, 0);
         matchDataRepository.deleteAll();
+        requiresNewTransaction = new TransactionTemplate(transactionManager);
+        requiresNewTransaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        activeUserId = null;
+        inactiveUserId = null;
+    }
+
+    @AfterEach
+    void tearDown() {
+        matchDataRepository.deleteAll();
+        if (requiresNewTransaction == null) {
+            return;
+        }
+        requiresNewTransaction.executeWithoutResult(status -> {
+            if (activeUserId != null) {
+                userRepository.findById(activeUserId).ifPresent(userRepository::delete);
+            }
+            if (inactiveUserId != null) {
+                userRepository.findById(inactiveUserId).ifPresent(userRepository::delete);
+            }
+            em.flush();
+            em.clear();
+        });
     }
 
     @Test
     void refreshMatchHistory() {
         ReflectionTestUtils.setField(scheduler, "running", new AtomicBoolean(false));
 
-        User activeUser = createUser("active@rankademy.app", "active");
-        activeUser.completeUnivAuthentication(createEnrollUnivRequest());
-        activeUser.connectSummonerInfo(createSummonerInfoConnector("active-puuid"), createRiotAuthRequest());
-        ReflectionTestUtils.setField(activeUser, "lastLoginAt", now.minusDays(1));
-
-        User inactiveUser = createUser("inactive@rankademy.app", "inactive");
-        inactiveUser.completeUnivAuthentication(createEnrollUnivRequest());
-        inactiveUser.connectSummonerInfo(createSummonerInfoConnector("inactive-puuid"), createRiotAuthRequest("inactive", "KR1"));
-        ReflectionTestUtils.setField(inactiveUser, "lastLoginAt", now.minusDays(30));
-
-        userRepository.save(activeUser);
-        userRepository.save(inactiveUser);
-        em.flush();
-        Long activeUserId = activeUser.getId();
-        Long inactiveUserId = inactiveUser.getId();
-        em.clear();
+        prepareUsers();
 
         when(timeProvider.getCurrentTime()).thenReturn(now);
         when(matchHistoryCollector.collectMatchesWithLastMatchId(any(User.class), isNull()))
@@ -107,6 +123,27 @@ class SummonerMatchRefreshSchedulerTest extends IntegrationTestSupport {
         scheduler.refreshMatchHistory();
 
         verify(matchHistoryCollector, never()).collectMatchesWithLastMatchId(any(User.class), any());
+    }
+
+    private void prepareUsers() {
+        requiresNewTransaction.executeWithoutResult(status -> {
+            User activeUser = createUser("active@rankademy.app", "active");
+            activeUser.completeUnivAuthentication(createEnrollUnivRequest());
+            activeUser.connectSummonerInfo(createSummonerInfoConnector("active-puuid"), createRiotAuthRequest());
+            ReflectionTestUtils.setField(activeUser, "lastLoginAt", now.minusDays(1));
+
+            User inactiveUser = createUser("inactive@rankademy.app", "inactive");
+            inactiveUser.completeUnivAuthentication(createEnrollUnivRequest());
+            inactiveUser.connectSummonerInfo(createSummonerInfoConnector("inactive-puuid"), createRiotAuthRequest("inactive", "KR1"));
+            ReflectionTestUtils.setField(inactiveUser, "lastLoginAt", now.minusDays(30));
+
+            userRepository.save(activeUser);
+            userRepository.save(inactiveUser);
+            em.flush();
+            em.clear();
+            activeUserId = activeUser.getId();
+            inactiveUserId = inactiveUser.getId();
+        });
     }
 
     private String sampleMatchJson(String puuid) {
