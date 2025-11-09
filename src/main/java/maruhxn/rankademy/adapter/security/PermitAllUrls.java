@@ -33,6 +33,7 @@ public enum PermitAllUrls {
     SCRIM_TEAM_LIST("/api/v1/scrim-teams**", GET),
     SCRIM_TEAM_DETAILS("/api/v1/scrim-teams/{scrimTeamId}", GET),
     GROUP_COMPETITIONS_LIST("/api/v1/competitions/groups/{groupId}**", GET),
+    GET_USER_PROFILE("/api/v1/users/{userId}", GET),
     ;
 
     private final String url;

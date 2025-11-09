@@ -6,6 +6,7 @@ services:
       - .env
     environment:
       LOG_PATH: /var/log/app
+      TZ: Asia/Seoul
     ports:
       - "8080:8080"
     volumes:

@@ -45,7 +45,6 @@ class GroupRecruitmentPostTest {
     void up() {
         // given
         LocalDateTime beforeUp = LocalDateTime.now();
-        post.up(beforeUp);
         LocalDateTime uppedAt = post.getLastUppedAt().plusDays(2);
 
         // when
@@ -60,7 +59,6 @@ class GroupRecruitmentPostTest {
     void up_Fail() {
         // given
         LocalDateTime now = LocalDateTime.now();
-        post.up(now);
         LocalDateTime uppedAt = now.plusHours(23).plusMinutes(59);
 
         // when

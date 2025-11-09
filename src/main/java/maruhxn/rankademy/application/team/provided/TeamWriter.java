@@ -8,4 +8,6 @@ public interface TeamWriter {
     Team create(TeamCreateRequest request);
 
     void withdraw(Long userId, Long teamId);
+
+    void delete(Long userId, Long teamId);
 }

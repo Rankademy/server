@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,15 @@ public class TeamCommandService implements TeamWriter {
 
         team.withdraw(userId);
 
+        publisher.publish(new TeamDeactivatedEvent(team.getId(), LocalDateTime.now()));
+    }
+
+    @Override
+    public void delete(Long userId, Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new NoSuchElementException("팀을 찾을 수 없습니다. id: " + teamId));
+
+        team.deactivate();
         publisher.publish(new TeamDeactivatedEvent(team.getId(), LocalDateTime.now()));
     }
 

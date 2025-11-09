@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -83,6 +84,22 @@ public class TeamApi {
             @PathVariable("teamId") Long teamId
     ) {
         return teamReader.getTeamDetails(user.getId(), teamId);
+    }
+
+    @DeleteMapping("/{teamId}")
+    @Operation(
+            summary = "팀 삭제",
+            description = "팀 식별자를 통해 팀을 삭제합니다"
+    )
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiResponse(responseCode = "204", description = "팀 삭제 성공")
+    @PreAuthorize("@teamChecker.isTeamLeader(principal.userInfo(), #teamId)")
+    public void deleteTeam(
+            @AuthenticationPrincipal RankademyUser user,
+            @Parameter(description = "조회할 팀 ID", example = "1")
+            @PathVariable("teamId") Long teamId
+    ) {
+        teamWriter.delete(user.getId(), teamId);
     }
 
     @DeleteMapping("/{teamId}/withdraw")

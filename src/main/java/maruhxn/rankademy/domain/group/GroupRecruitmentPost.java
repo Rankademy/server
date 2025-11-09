@@ -55,7 +55,7 @@ public class GroupRecruitmentPost extends AbstractEntity {
 
     public void up(LocalDateTime uppedAt) {
         if (lastUppedAt != null) {
-            boolean isAfterOneDay = Duration.between(lastUppedAt, uppedAt).toHours() > 24;
+            boolean isAfterOneDay = Math.abs(Duration.between(lastUppedAt, uppedAt).toHours()) > 24;
             Assert.state(isAfterOneDay, "24시간 이내에는 다시 up할 수 없습니다.");
         }
         this.lastUppedAt = uppedAt;

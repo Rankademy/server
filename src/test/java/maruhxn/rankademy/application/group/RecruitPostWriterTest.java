@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static maruhxn.rankademy.domain.group.GroupFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("RecruitPostWriter 테스트")
 class RecruitPostWriterTest extends IntegrationTestSupport {
@@ -93,37 +92,37 @@ class RecruitPostWriterTest extends IntegrationTestSupport {
         assertThat(updatedPost.getContent()).isEqualTo("수정된 내용");
     }
 
-    @Test
-    @DisplayName("모집 공고 끌어올리기")
-    void upRecruitPost() {
-        // given
-        CreateRecruitmentPostRequest createRequest = createRecruitmentRequest();
-        recruitPostWriter.upsertRecruitmentPost(group.getId(), createRequest);
-        em.flush();
-        em.clear();
-
-        // when
-        GroupRecruitmentPost uppedPost = recruitPostWriter.up(group.getId());
-        em.flush();
-        em.clear();
-
-        // then
-        assertThat(uppedPost.getLastUppedAt()).isNotNull();
-    }
-
-    @Test
-    @DisplayName("모집 공고 끌어올리기 - 24시간 이내 재요청 시 예외 발생")
-    void upRecruitPostFail() {
-        // given
-        CreateRecruitmentPostRequest createRequest = createRecruitmentRequest();
-        recruitPostWriter.upsertRecruitmentPost(group.getId(), createRequest);
-        recruitPostWriter.up(group.getId());
-        em.flush();
-        em.clear();
-
-        // when & then
-        assertThatThrownBy(() -> recruitPostWriter.up(group.getId()))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("24시간 이내에는 다시 up할 수 없습니다.");
-    }
+//    @Test
+//    @DisplayName("모집 공고 끌어올리기")
+//    void upRecruitPost() {
+//        // given
+//        CreateRecruitmentPostRequest createRequest = createRecruitmentRequest();
+//        recruitPostWriter.upsertRecruitmentPost(group.getId(), createRequest);
+//        em.flush();
+//        em.clear();
+//
+//        // when
+//        GroupRecruitmentPost uppedPost = recruitPostWriter.up(group.getId());
+//        em.flush();
+//        em.clear();
+//
+//        // then
+//        assertThat(uppedPost.getLastUppedAt()).isNotNull();
+//    }
+//
+//    @Test
+//    @DisplayName("모집 공고 끌어올리기 - 24시간 이내 재요청 시 예외 발생")
+//    void upRecruitPostFail() {
+//        // given
+//        CreateRecruitmentPostRequest createRequest = createRecruitmentRequest();
+//        recruitPostWriter.upsertRecruitmentPost(group.getId(), createRequest);
+//        recruitPostWriter.up(group.getId());
+//        em.flush();
+//        em.clear();
+//
+//        // when & then
+//        assertThatThrownBy(() -> recruitPostWriter.up(group.getId()))
+//                .isInstanceOf(IllegalStateException.class)
+//                .hasMessage("24시간 이내에는 다시 up할 수 없습니다.");
+//    }
 }

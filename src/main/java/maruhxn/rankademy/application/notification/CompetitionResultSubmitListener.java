@@ -41,7 +41,6 @@ public class CompetitionResultSubmitListener {
         team1.deactivate();
         team2.deactivate();
 
-
         String actingUserName = Stream.of(team1.getTeamMembers(), team2.getTeamMembers())
                 .flatMap(Collection::stream)
                 .filter(tm -> tm.getUser().getId().equals(event.getActingUserId()))

@@ -135,6 +135,7 @@ public class Group extends AbstractEntity {
     public GroupRecruitmentPost upsertRecruitmentPost(CreateRecruitmentPostRequest request) {
         if (this.recruitmentPost == null) {
             this.recruitmentPost = GroupRecruitmentPost.create(request);
+            this.recruitmentPost.up(LocalDateTime.now());
         } else {
             this.recruitmentPost.update(request);
         }

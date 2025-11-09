@@ -49,14 +49,15 @@ public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHa
 
         this.clearAuthenticationAttributes(request);
 
-        response.sendRedirect(buildRedirectUrl(tokenDto));
+        response.sendRedirect(buildRedirectUrl(user.getId(), tokenDto));
     }
 
-    private String buildRedirectUrl(TokenDto tokenDto) {
+    private String buildRedirectUrl(Long userId, TokenDto tokenDto) {
         LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.put("accessToken", List.of(tokenDto.accessToken()));
         params.put("refreshToken", List.of(tokenDto.refreshToken()));
         params.put("summonerIcon", List.of(String.valueOf(tokenDto.summonerIcon())));
+        params.put("userId", List.of(String.valueOf(userId)));
 
         return UriComponentsBuilder
                 .fromHttpUrl(clientUrl + "/auth/callback")
