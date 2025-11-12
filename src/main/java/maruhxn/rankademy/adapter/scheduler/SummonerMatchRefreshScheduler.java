@@ -6,7 +6,6 @@ import maruhxn.rankademy.application.match.provided.MatchHistoryAnalyzer;
 import maruhxn.rankademy.application.user.provided.UserReader;
 import maruhxn.rankademy.domain.shared.TimeProvider;
 import maruhxn.rankademy.domain.user.User;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -15,7 +14,6 @@ import reactor.core.scheduler.Schedulers;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -36,7 +34,7 @@ public class SummonerMatchRefreshScheduler {
     // 각 유저가 여러 API 호출을 하므로 동시 처리 유저 수를 최소화
     private static final int BATCH_CONCURRENCY = 1;
 
-    @Scheduled(fixedRate = 10, timeUnit = TimeUnit.MINUTES)
+//    @Scheduled(fixedRate = 10, timeUnit = TimeUnit.MINUTES)
     public void refreshMatchHistory() {
         if (!running.compareAndSet(false, true)) {
             log.warn("[전적 자동 갱신 배치] - 이전 실행이 종료되지 않아 이번 라운드를 건너뜁니다.");
