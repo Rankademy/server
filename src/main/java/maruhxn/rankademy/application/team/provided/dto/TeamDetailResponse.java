@@ -13,6 +13,7 @@ public record TeamDetailResponse(
         @Schema(description = "팀 ID", example = "1") Long teamId,
         @Schema(description = "팀 이름", example = "Rankademy") String teamName,
         @Schema(description = "팀이 속한 대학교", example = "서울과학기술대학교") String univName,
+        @Schema(description = "소속 그룹 아이디", example = "1") Long groupId,
         @Schema(description = "소속 그룹 이름", example = "Rankademy 그룹") String groupName,
         @Schema(description = "그룹 로고 이미지 URL") String groupLogo,
         @Schema(description = "팀 소개", example = "랭크 전문 팀") String intro,
@@ -24,11 +25,12 @@ public record TeamDetailResponse(
         @Schema(description = "요청자가 팀 구성원인지 여부") boolean isMyTeam
 ) {
 
-    public TeamDetailResponse(Long teamId, String teamName, String univName, String groupName, String groupLogo, String intro, LocalDateTime createdAt, boolean isActive, Double avgMappedTier, List<TeamMemberResponse> teamMembers, boolean isTeamLeader, boolean isMyTeam) {
+    public TeamDetailResponse(Long teamId, String teamName, String univName, Long groupId, String groupName, String groupLogo, String intro, LocalDateTime createdAt, boolean isActive, Double avgMappedTier, List<TeamMemberResponse> teamMembers, boolean isTeamLeader, boolean isMyTeam) {
         this(
                 teamId,
                 teamName,
                 univName,
+                groupId,
                 groupName,
                 groupLogo,
                 intro,

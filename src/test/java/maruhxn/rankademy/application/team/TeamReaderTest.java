@@ -20,11 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -176,6 +172,7 @@ class TeamReaderTest extends IntegrationTestSupport {
         // then
         assertThat(teamDetails).isNotNull();
         assertThat(teamDetails.teamId()).isEqualTo(team.getId());
+        assertThat(teamDetails.groupId()).isEqualTo(group.getId());
         assertThat(teamDetails.groupName()).isEqualTo(group.getName());
         assertThat(teamDetails.isActive()).isTrue();
         assertThat(teamDetails.teamMembers()).hasSize(5);
